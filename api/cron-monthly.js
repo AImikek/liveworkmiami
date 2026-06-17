@@ -6,6 +6,7 @@
 // Vercel triggers this via GET. It is protected by Vercel's cron secret header.
 
 import { db } from '../lib/firebase.js';
+import * as pricing from '../lib/pricing.js';
 import { randomToken, sendEmail, sendSMS } from '../lib/util.js';
 import { PRICING } from '../lib/stripe.js';
 
@@ -26,7 +27,7 @@ export default async function handler(req, res) {
   for (const doc of snap.docs) {
     const app = doc.data();
     if (!app.stripeCustomerId || !app.paymentMethodId || app.membershipActive === false) continue;
-    const amount = (app.plan && app.plan.monthlyTotal) ? Number(app.plan.monthlyTotal) : PRICING.MEMBERSHIP_FEE;
+    const amount = (app.plan && app.plan.term) ? pricing.monthly(app.plan) : PRICING.MEMBERSHIP_FEE;
 
     const token = randomToken();
     await db.collection('pendingCharges').add({

@@ -18,6 +18,14 @@ vercel.json             schedules the monthly cron
 
 ## How the money works
 
+- **Pricing** is built on the page (term + add-ons + optional discount code). Base by
+  term: 12mo $2,500, 6mo $2,750, month-to-month $3,000. Each add-on +$500; all three
+  flat $4,000. Deposit equals one month. Last month is collected in advance on 6- and
+  12-month terms only.
+- **Discount codes** live in `lib/pricing.js` (`DISCOUNT_CODES`, e.g. `JAMES16: 16`) and
+  in the `CONFIG.DISCOUNT_CODES` block in `index.html`. Keep the two in sync. The browser
+  shows the discounted price, but every charge is **recomputed server-side** from the
+  plan inputs, so a tampered client cannot change the amount.
 - **Bank connect** (`bank-session.js`): the member links their bank through Stripe's
   secure UI. A SetupIntent saves the account with an **ACH mandate** = your written
   authorization to debit them later.

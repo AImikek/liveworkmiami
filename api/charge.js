@@ -16,6 +16,7 @@
 // 'processing' and a webhook (not included here) would confirm final success.
 
 import { stripe, toCents, PRICING } from '../lib/stripe.js';
+import * as pricing from '../lib/pricing.js';
 import { db, admin } from '../lib/firebase.js';
 import { cors } from '../lib/util.js';
 
@@ -82,14 +83,15 @@ export default async function handler(req, res) {
     const app = snap.data();
     const { stripeCustomerId: customerId, paymentMethodId, fullName, plan } = app;
     if (!customerId || !paymentMethodId) return res.status(400).json({ error: 'No connected bank on file' });
-    const monthly = (plan && plan.monthlyTotal) ? Number(plan.monthlyTotal) : PRICING.MEMBERSHIP_FEE;
+    if (!plan || !plan.term) return res.status(400).json({ error: 'No plan on file' });
+    const monthlyAmt = pricing.monthly(plan);
 
-    // ---- 1) MOVE-IN: deposit + first month ----
+    // ---- 1) MOVE-IN: first + (last month if 6/12) + deposit, recomputed server-side ----
     if (type === 'movein') {
-      const amount = monthly + PRICING.SECURITY_DEPOSIT;
+      const amount = pricing.dueAtMoveIn(plan);
       const pi = await chargeBank({
         customerId, paymentMethodId, amountDollars: amount,
-        description: 'LiveWork Miami move-in (deposit + first month)',
+        description: `LiveWork Miami move-in (${plan.term === 'mtm' ? 'first + deposit' : 'first + last + deposit'})`,
         metadata: { applicationId, kind: 'movein' },
       });
       await snap.ref.set({ moveInCharge: { paymentIntentId: pi.id, amount, at: new Date().toISOString() } }, { merge: true });
@@ -99,7 +101,7 @@ export default async function handler(req, res) {
     // ---- 3) MONTHLY direct charge (optional auto path) ----
     if (type === 'monthly') {
       const pi = await chargeBank({
-        customerId, paymentMethodId, amountDollars: monthly,
+        customerId, paymentMethodId, amountDollars: monthlyAmt,
         description: 'LiveWork Miami monthly membership',
         metadata: { applicationId, kind: 'monthly' },
       });
