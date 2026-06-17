@@ -109,22 +109,22 @@ h1,h2,h3{ font-family:var(--f-disp); font-weight:400; line-height:1.05; letter-s
   animation:kenburns 22s ease-out forwards; will-change:transform; }
 .hero-video{ position:absolute; inset:0; height:100%; }
 @keyframes kenburns{ from{ transform:scale(1.12) translateY(0); } to{ transform:scale(1) translateY(-2%); } }
-/* brighter, warmer scrim — readable but airy, not nightclub */
+/* readable warm scrim — darker behind the text so white type always reads */
 .hero-media::after{ content:""; position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(33,28,21,.30) 0%, rgba(33,28,21,.04) 30%, rgba(33,28,21,.06) 58%, rgba(33,28,21,.52) 100%); }
+  background:linear-gradient(180deg, rgba(20,16,11,.52) 0%, rgba(20,16,11,.20) 30%, rgba(20,16,11,.34) 60%, rgba(20,16,11,.78) 100%); }
 .hero-inner{ position:relative; z-index:2; color:#fff; padding-bottom:8vh; width:100%; }
 .hero .eyebrow{ opacity:0; transform:translateY(14px); animation:rise .9s var(--ease-out) .3s forwards; }
 .hero h1{ font-size:clamp(2.8rem, 6.8vw, 6rem); font-weight:300; letter-spacing:-.025em;
   max-width:15ch; margin:18px 0 0; text-wrap:balance;
-  text-shadow:0 1px 40px rgba(20,16,10,.34); }
+  text-shadow:0 2px 30px rgba(15,11,6,.6), 0 1px 3px rgba(15,11,6,.4); }
 .hero h1 em{ font-style:italic; font-weight:400; }
 .hero h1 .l{ display:block; opacity:0; transform:translateY(22px); animation:rise 1s var(--ease-out) forwards; }
 .hero h1 .l:nth-child(1){ animation-delay:.42s; }
 .hero h1 .l:nth-child(2){ animation-delay:.54s; }
 .hero .audience{ font-family:var(--f-disp); font-style:italic; font-weight:400; font-size:clamp(1.05rem,1.9vw,1.4rem);
-  color:rgba(255,255,255,.94); margin:22px 0 0; opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .66s forwards; }
-.hero p.sub{ font-size:clamp(1rem,1.5vw,1.16rem); max-width:48ch; margin:18px 0 32px; color:rgba(255,255,255,.9);
-  font-weight:400; opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .8s forwards; }
+  color:rgba(255,255,255,.96); margin:22px 0 0; text-shadow:0 1px 14px rgba(15,11,6,.6); opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .66s forwards; }
+.hero p.sub{ font-size:clamp(1rem,1.5vw,1.16rem); max-width:48ch; margin:18px 0 32px; color:rgba(255,255,255,.94);
+  font-weight:400; text-shadow:0 1px 12px rgba(15,11,6,.55); opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .8s forwards; }
 .hero-cta{ display:flex; gap:14px; flex-wrap:wrap;
   opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .92s forwards; }
 @keyframes rise{ to{ opacity:1; transform:none; } }
@@ -220,8 +220,8 @@ section{ position:relative; }
 .amen .a p{ font-size:.9rem; color:var(--ink-soft); }
 
 /* ---- neighborhood ---- */
-.hood{ display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:30px; align-items:stretch; }
-.hood-l{ background:var(--sand); border-radius:8px; padding:34px; }
+.hood{ margin-top:30px; }
+.hood-l{ background:var(--sand); border-radius:8px; padding:34px 40px; }
 .hood-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:24px; }
 .hood-head h3{ font-family:var(--f-disp); font-weight:300; font-size:1.7rem; margin-top:8px; }
 .weather{ display:flex; align-items:center; gap:11px; padding:11px 16px; border-radius:100px; }
@@ -237,9 +237,7 @@ section{ position:relative; }
 .walks .wk-i{ font-size:1.15rem; }
 .walks .wk-n{ font-weight:500; font-size:1rem; }
 .walks .wk-t{ font-family:var(--f-disp); font-style:italic; color:var(--accent); font-size:.95rem; white-space:nowrap; }
-.hood-map{ border-radius:8px; overflow:hidden; border:1px solid var(--hair); min-height:380px; }
-.hood-map iframe{ width:100%; height:100%; min-height:380px; border:0; filter:saturate(.92) contrast(1.02); }
-@media (max-width:820px){ .hood{ grid-template-columns:1fr; } .hood-map{ min-height:300px; } }
+@media (max-width:820px){ .hood-l{ padding:26px; } }
 
 /* ============================================================
    MEMBERSHIP / STEPS / PRICE
@@ -692,7 +690,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
       <div class="a"><span class="ai">🚶</span><h4>Walkable</h4><p>The most walkable corner of Miami</p></div>
     </div>
 
-    <!-- neighborhood: walking times + map + live weather -->
+    <!-- neighborhood: walking times + live weather -->
     <div class="hood" data-reveal>
       <div class="hood-l">
         <div class="hood-head">
@@ -712,10 +710,6 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
           <li><span class="wk-i">🚆</span><span class="wk-n">Metromover (free transit)</span><span class="wk-t">4 min walk</span></li>
           <li><span class="wk-i">💪</span><span class="wk-n">Stretch Zone</span><span class="wk-t">2 min walk</span></li>
         </ul>
-      </div>
-      <div class="hood-map">
-        <iframe title="Brickell map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=-80.2010%2C25.7585%2C-80.1875%2C25.7700&layer=mapnik&marker=25.7642%2C-80.1942"></iframe>
       </div>
     </div>
   </div>
@@ -1170,12 +1164,9 @@ const TPL = {
       <div class="field"><label>Target move-in</label><input id="f_moveIn" type="date" value="${esc(application.moveIn)}" /></div>
     </div>
     <div class="field"><label>Current address <span class="rq">*</span></label><input id="f_currentAddress" value="${esc(application.currentAddress)}" placeholder="Street, city, state" /></div>
-    <div class="two">
-      <div class="field"><label>Occupation <span class="rq">*</span></label><input id="f_occupation" value="${esc(application.occupation)}" placeholder="Founder, investor, etc." /></div>
-      <div class="field"><label>Company</label><input id="f_company" value="${esc(application.company)}" placeholder="Where you build" /></div>
-    </div>
+    <div class="field"><label>Occupation <span class="rq">*</span></label><input id="f_occupation" value="${esc(application.occupation)}" placeholder="Founder, investor, etc." /></div>
     <div class="field"><label>Who referred you, or how did you find us?</label><input id="f_referral" value="${esc(application.referral)}" placeholder="A member's name, event, or source" /></div>
-    <div class="field"><label>Tell us a little about you and what you're building <span class="rq">*</span></label><textarea id="f_about" placeholder="A few sentences. We hand-select every member.">${esc(application.about)}</textarea></div>`,
+    <div class="field"><label>Tell us a little about yourself and why you find this type of living arrangement interesting <span class="rq">*</span></label><textarea id="f_about" placeholder="A few sentences. We hand-select every member.">${esc(application.about)}</textarea></div>`,
 
   1: ()=>`
     <h3>Choose your plan</h3>
@@ -1297,7 +1288,7 @@ function bindDrop(key,onFile){ const d=document.getElementById('drop_'+key), inp
   d.addEventListener('drop', e=>{ if(e.dataTransfer.files[0]) show(e.dataTransfer.files[0]); }); }
 
 function collectStep(){
-  if(step===0) ['fullName','email','phone','dob','moveIn','currentAddress','occupation','company','referral','about'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+  if(step===0) ['fullName','email','phone','dob','moveIn','currentAddress','occupation','referral','about'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===1){ application.plan = planSnapshot(); }
   if(step===2){ const c=document.getElementById('f_bgAuthorize'); if(c) application.bgAuthorize=c.checked; }
   if(step===3){ const s=document.getElementById('f_idType'); if(s) application.idType=s.value; }
