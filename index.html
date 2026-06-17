@@ -274,6 +274,21 @@ section{ position:relative; }
 .join-note{ margin-top:14px; color:var(--ink-soft); font-size:.95rem; }
 .tsave{ margin-top:6px; font-size:.74rem; font-weight:600; letter-spacing:.02em; color:var(--accent); }
 .tsave.flex{ color:var(--ink-soft); font-weight:500; }
+/* who this is for / not for */
+.fit-grid{ display:grid; grid-template-columns:1fr 1fr; gap:26px; }
+.fit-card{ border:1px solid var(--hair); border-radius:10px; padding:30px 32px; background:var(--paper); }
+.fit-card.yes{ border-color:rgba(166,128,62,.4); background:linear-gradient(180deg, rgba(166,128,62,.05), transparent); }
+.fit-h{ display:flex; align-items:center; gap:12px; font-family:var(--f-disp); font-size:1.3rem; font-weight:400; margin-bottom:18px; }
+.fit-i{ display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; font-size:.95rem; font-weight:700; flex-shrink:0; }
+.fit-card.yes .fit-i{ background:var(--accent); color:#fff; }
+.fit-card.no .fit-i{ background:var(--sand); color:var(--ink-soft); }
+.fit-card ul{ list-style:none; margin:0; padding:0; }
+.fit-card li{ position:relative; padding:9px 0 9px 22px; font-size:.98rem; color:var(--ink); border-bottom:1px solid var(--hair); line-height:1.45; }
+.fit-card li:last-child{ border-bottom:none; }
+.fit-card li::before{ content:""; position:absolute; left:0; top:16px; width:7px; height:7px; border-radius:50%; }
+.fit-card.yes li::before{ background:var(--accent); }
+.fit-card.no li::before{ background:var(--hair); }
+@media (max-width:760px){ .fit-grid{ grid-template-columns:1fr; gap:18px; } }
 /* in-flow lifestyle questions + savings summary */
 .calc-grid.flow{ grid-template-columns:1fr; gap:24px; margin-top:8px; }
 .flow-savings{ background:var(--sand); border-radius:8px; padding:22px 24px; margin-bottom:22px; display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 26px; }
@@ -732,6 +747,39 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   </div>
 </section>
 
+<!-- ===================== FIT ===================== -->
+<section class="pad" id="fit">
+  <div class="wrap">
+    <div class="lede" data-reveal style="margin-bottom:40px;">
+      <span class="eyebrow">Is this you?</span>
+      <h2>Who this is <em>for.</em></h2>
+      <p>We keep the home calm, clean, and genuinely good to live in. A quick gut-check before you apply.</p>
+    </div>
+    <div class="fit-grid" data-reveal>
+      <div class="fit-card yes">
+        <div class="fit-h"><span class="fit-i">✓</span>A great fit if you are</div>
+        <ul>
+          <li>Clean, organized, and respectful of shared spaces</li>
+          <li>Financially responsible and easy to communicate with</li>
+          <li>Social, but not looking for a party house</li>
+          <li>Comfortable with clear house expectations</li>
+          <li>Looking for a beautiful Miami home base</li>
+        </ul>
+      </div>
+      <div class="fit-card no">
+        <div class="fit-h"><span class="fit-i">—</span>Probably not a fit if you</div>
+        <ul>
+          <li>Want frequent overnight guests</li>
+          <li>Smoke or party heavily at home</li>
+          <li>Are messy in shared spaces</li>
+          <li>Need unclear or flexible payment timing</li>
+          <li>Prefer a very casual roommate setup</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ===================== MEMBERSHIP ===================== -->
 <section class="sand pad" id="membership">
   <div class="wrap">
@@ -791,6 +839,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
           <div class="b"><i></i></div><div class="b"><i></i></div><div class="b"><i></i></div>
           <div class="b"><i></i></div><div class="b"><i></i></div><div class="b"><i></i></div>
           <div class="b"><i></i></div><div class="b"><i></i></div><div class="b"><i></i></div>
+          <div class="b"><i></i></div><div class="b"><i></i></div>
         </div>
         <div class="slabel" id="slabel">Step 1 of 7 · Your details</div>
       </div>
@@ -1084,10 +1133,13 @@ if(!reduce){
 /* ============================================================
    ONBOARDING (same flow, restyled)
    ============================================================ */
-let step = 0; const TOTAL = 9;
-const stepLabels = ['Your details','Your lifestyle','Your plan','A few details','Background check','Photo ID','Agreement','Payment','Welcome'];
-const application = { fullName:'',email:'',phone:'',dob:'',currentAddress:'',occupation:'',company:'',moveIn:'',
-  referral:'',about:'', plan:null,
+let step = 0; const TOTAL = 11;
+const stepLabels = ['Contact','Timing','Lifestyle','Social','Your time','Your plan','Background check','Photo ID','Agreement','Payment','Welcome'];
+const application = { fullName:'',email:'',phone:'',
+  moveIn:'',lengthOfStay:'',inMiami:'',
+  occupation:'',schedule:'',wfh:'',guests:'',cleanliness:'',
+  instagram:'',linkedin:'',website:'',anythingElse:'',
+  currentAddress:'', plan:null,
   bgAuthorize:false, bgCheckFile:null, idType:'passport', idFile:null,
   signature:'', printedName:'', signedAt:'', mailingAddress:'',
   ec1Name:'', ec1Phone:'', ec2Name:'', ec2Phone:'',
@@ -1108,8 +1160,8 @@ function updateBar(){
   document.getElementById('backBtn').style.visibility = step===0?'hidden':'visible';
   const n=document.getElementById('nextBtn');
   if(step===TOTAL-1){ n.textContent='Done'; document.getElementById('backBtn').style.visibility='hidden'; }
-  else if(step===6) n.textContent='Sign & continue →';
-  else if(step===7) n.textContent = CONFIG.PAYMENT_MODE==='stripe' ? 'Authorize & submit →' : 'Submit & finish →';
+  else if(step===8) n.textContent='Sign & continue →';
+  else if(step===9) n.textContent = CONFIG.PAYMENT_MODE==='stripe' ? 'Authorize & submit →' : 'Submit & finish →';
   else n.textContent='Continue →';
 }
 function renderStep(){ setErr(''); const b=document.getElementById('sbody'); b.innerHTML=TPL[step](); bindStep(); updateBar();
@@ -1122,18 +1174,48 @@ function renderStep(){ setErr(''); const b=document.getElementById('sbody'); b.i
 
 const TPL = {
   0: ()=>`
-    <h3>Tell us who you are</h3>
-    <p class="desc">Just the basics to begin. Everything is encrypted and seen only by the LiveWork Miami team.</p>
-    <div class="field"><label>Full legal name <span class="rq">*</span></label><input id="f_fullName" value="${esc(application.fullName)}" placeholder="As it appears on your ID" /></div>
+    <h3>Let's start with the basics</h3>
+    <p class="desc">Share a few details so I can see if the timing and lifestyle fit make sense. If it feels aligned, we'll do a quick call before moving forward.</p>
+    <div class="field"><label>Full name <span class="rq">*</span></label><input id="f_fullName" value="${esc(application.fullName)}" placeholder="As it appears on your ID" /></div>
     <div class="field"><label>Email <span class="rq">*</span></label><input id="f_email" type="email" value="${esc(application.email)}" placeholder="you@email.com" /></div>
     <div class="field"><label>Phone <span class="rq">*</span></label><input id="f_phone" type="tel" value="${esc(application.phone)}" placeholder="(305) 000-0000" /></div>`,
 
   1: ()=>`
-    <h3>A few quiet questions</h3>
+    <h3>Timing</h3>
+    <p class="desc">When you are hoping to move in, and for how long.</p>
+    <div class="field"><label>Desired move-in date <span class="rq">*</span></label><input id="f_moveIn" type="date" value="${esc(application.moveIn)}" /></div>
+    <div class="field"><label>Desired length of stay <span class="rq">*</span></label>
+      ${sel('lengthOfStay',application.lengthOfStay,['Not sure yet','A few months','6 months','12 months','A year or more'])}</div>
+    <div class="field"><label>Are you currently in Miami? <span class="rq">*</span></label>
+      ${sel('inMiami',application.inMiami,['Yes, I am in Miami now','No, I am relocating'])}</div>`,
+
+  2: ()=>`
+    <h3>Lifestyle fit</h3>
+    <p class="desc">A few honest questions. There are no wrong answers, we just want the home to be right for you.</p>
+    <div class="field"><label>Occupation <span class="rq">*</span></label><input id="f_occupation" value="${esc(application.occupation)}" placeholder="Founder, investor, etc." /></div>
+    <div class="field"><label>Typical schedule <span class="rq">*</span></label>
+      ${sel('schedule',application.schedule,['Mostly 9 to 5','Flexible hours','Frequent travel','Nights or late shifts'])}</div>
+    <div class="field"><label>Do you work from home? <span class="rq">*</span></label>
+      ${sel('wfh',application.wfh,['Yes, most days','A few days a week','No'])}</div>
+    <div class="field"><label>Overnight guest expectations <span class="rq">*</span></label>
+      ${sel('guests',application.guests,['Rarely','Occasionally','Frequently'])}</div>
+    <div class="field"><label>Cleanliness style <span class="rq">*</span></label>
+      ${sel('cleanliness',application.cleanliness,['Very tidy','Tidy enough','Relaxed'])}</div>`,
+
+  3: ()=>`
+    <h3>A little about you</h3>
+    <p class="desc">This helps us get to know you before our call. Enter NA if you do not have one.</p>
+    <div class="field"><label>Instagram — enter NA if none <span class="rq">*</span></label><input id="f_instagram" value="${esc(application.instagram)}" placeholder="@handle or NA" /></div>
+    <div class="field"><label>LinkedIn — enter NA if none <span class="rq">*</span></label><input id="f_linkedin" value="${esc(application.linkedin)}" placeholder="Profile URL or NA" /></div>
+    <div class="field"><label>Website — enter NA if none <span class="rq">*</span></label><input id="f_website" value="${esc(application.website)}" placeholder="yoursite.com or NA" /></div>
+    <div class="field"><label>Anything else I should know?</label><textarea id="f_anythingElse" placeholder="Optional. Anything you'd like to share.">${esc(application.anythingElse)}</textarea></div>`,
+
+  4: ()=>`
+    <h3>The value of your time</h3>
     <p class="desc">Tell us what life costs you today. Next, we will show what this lifts off your week, in time and money.</p>
     <div class="calc-grid flow" id="flowCalcGrid">${calcGridHTML()}</div>`,
 
-  2: ()=>{ const sum=calcSummary(); return `
+  5: ()=>{ const sum=calcSummary(); return `
     <h3>Your plan, and what it saves you</h3>
     <p class="desc">Here is the time and overhead this lifts off your week. Configure your residence below, and deselect anything you do not want.</p>
     <div class="flow-savings">
@@ -1142,16 +1224,7 @@ const TPL = {
     </div>
     <div id="flowPlan"></div>`; },
 
-  3: ()=>`
-    <h3>A few more details</h3>
-    <p class="desc">This helps us prepare your residence and complete your file.</p>
-    <div class="field"><label>Target move-in</label><input id="f_moveIn" type="date" value="${esc(application.moveIn)}" /></div>
-    <div class="field"><label>Current address <span class="rq">*</span></label><input id="f_currentAddress" value="${esc(application.currentAddress)}" placeholder="Street, city, state" /></div>
-    <div class="field"><label>Occupation <span class="rq">*</span></label><input id="f_occupation" value="${esc(application.occupation)}" placeholder="Founder, investor, etc." /></div>
-    <div class="field"><label>Who referred you, or how did you find us?</label><input id="f_referral" value="${esc(application.referral)}" placeholder="A member's name, event, or source" /></div>
-    <div class="field"><label>Tell us a little about yourself and why you find this type of living arrangement interesting <span class="rq">*</span></label><textarea id="f_about" placeholder="A few sentences. We hand-select every member.">${esc(application.about)}</textarea></div>`,
-
-  4: ()=>`
+  6: ()=>`
     <h3>Background check</h3>
     <p class="desc">Every member is vetted. We keep this effortless on your end.</p>
     <div class="note-box">
@@ -1163,7 +1236,7 @@ const TPL = {
       ${drop('bg','PDF of a recent screening report',application.bgCheckFile)}
     </div>`,
 
-  5: ()=>`
+  7: ()=>`
     <h3>Photo identification</h3>
     <p class="desc">Upload a clear photo of your passport or driver's license to confirm your identity.</p>
     <div class="field"><label>ID type <span class="rq">*</span></label>
@@ -1171,7 +1244,7 @@ const TPL = {
     <div class="field"><label>Upload your ID <span class="rq">*</span></label>${drop('id','Clear photo or scan, all corners visible',application.idFile)}</div>
     <div class="note-box">Make sure the photo, name, and dates are fully legible. Blurry uploads slow approval.</div>`,
 
-  6: ()=>`
+  8: ()=>`
     <h3>Membership agreement</h3>
     <p class="desc">Please read in full, complete the details, then type your full legal name to sign.</p>
     <div class="agree">${AGREEMENT()}</div>
@@ -1200,7 +1273,7 @@ const TPL = {
     <label class="chk"><input type="checkbox" id="f_agreePay" ${application.agreePay?'checked':''} /><span>I understand the deposit, first month, and any last month due prior to move-in, and that membership is a revocable license, not a lease.</span></label>
     <label class="chk"><input type="checkbox" id="f_agreeSign" ${application.agreeSign?'checked':''} /><span>Typing my name above is my legal electronic signature on this Agreement.</span></label>`,
 
-  7: ()=>{ const p = application.plan || planSnapshot(); const m = p.monthlyTotal; const due = p.dueAtMoveIn; return `
+  9: ()=>{ const p = application.plan || planSnapshot(); const m = p.monthlyTotal; const due = p.dueAtMoveIn; return `
     <h3>Payment</h3>
     <p class="desc">Securely pay with ACH or wire to secure your membership.</p>
     <div class="charge">
@@ -1222,7 +1295,7 @@ const TPL = {
 
     <label class="chk"><input type="checkbox" id="f_paymentAck" ${application.paymentAck?'checked':''} /><span>I understand I will receive a secure Mercury link to complete payment, and my residence is confirmed once payment is received.</span></label>`; },
 
-  8: ()=>`
+  10: ()=>`
     <div class="donewrap">
       <div class="donering"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
       <h3>You're all set</h3>
@@ -1230,6 +1303,7 @@ const TPL = {
       <div class="sig" style="margin-top:24px;color:var(--ink);">Warm regards, Mike<small style="color:var(--ink-soft);">Founder, LiveWork Miami</small></div>
     </div>`
 };
+function sel(id,val,opts){ return `<select id="f_${id}"><option value="" ${val?'':'selected'} disabled>Select...</option>${opts.map(o=>`<option ${val===o?'selected':''}>${o}</option>`).join('')}</select>`; }
 
 function drop(key,sub,existing){ const has=existing?'has':''; const name=existing?existing.name:'';
   return `<div class="drop ${has}" id="drop_${key}" onclick="document.getElementById('file_${key}').click()">
@@ -1239,7 +1313,7 @@ function drop(key,sub,existing){ const has=existing?'has':''; const name=existin
     <input type="file" id="file_${key}" accept="image/*,.pdf" style="display:none" />`; }
 
 function bindStep(){
-  if(step===1){
+  if(step===4){
     document.querySelectorAll('#flowCalcGrid .cq').forEach(cq=>{
       const q=cq.dataset.q;
       cq.querySelectorAll('.opt').forEach(btn=> btn.addEventListener('click', ()=>{
@@ -1248,11 +1322,11 @@ function bindStep(){
       }));
     });
   }
-  if(step===2){ renderPlanBuilder('flowPlan', true); }
-  if(step===4){ const c=document.getElementById('f_bgAuthorize'); if(c) c.addEventListener('change', e=> application.bgAuthorize=e.target.checked); bindDrop('bg', f=> application.bgCheckFile=f); }
-  if(step===5){ bindDrop('id', f=> application.idFile=f);
+  if(step===5){ renderPlanBuilder('flowPlan', true); }
+  if(step===6){ const c=document.getElementById('f_bgAuthorize'); if(c) c.addEventListener('change', e=> application.bgAuthorize=e.target.checked); bindDrop('bg', f=> application.bgCheckFile=f); }
+  if(step===7){ bindDrop('id', f=> application.idFile=f);
     document.getElementById('f_idType').addEventListener('change', e=> application.idType=e.target.value); }
-  if(step===7){
+  if(step===9){
     const cs=document.getElementById('f_paymentAck'); if(cs) cs.addEventListener('change', e=> application.paymentAck=e.target.checked);
   }
 }
@@ -1265,37 +1339,47 @@ function bindDrop(key,onFile){ const d=document.getElementById('drop_'+key), inp
 
 function collectStep(){
   if(step===0) ['fullName','email','phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
-  if(step===1){ if(!recsApplied && calcAllAnswered()){ selectedPlan.addons = calcRecommendations(); recsApplied=true; } }
-  if(step===2){ application.plan = planSnapshot(); }
-  if(step===3) ['moveIn','currentAddress','occupation','referral','about'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
-  if(step===4){ const c=document.getElementById('f_bgAuthorize'); if(c) application.bgAuthorize=c.checked; }
-  if(step===5){ const s=document.getElementById('f_idType'); if(s) application.idType=s.value; }
-  if(step===6){
+  if(step===1) ['moveIn','lengthOfStay','inMiami'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+  if(step===2) ['occupation','schedule','wfh','guests','cleanliness'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+  if(step===3) ['instagram','linkedin','website','anythingElse'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+  if(step===4){ if(!recsApplied && calcAllAnswered()){ selectedPlan.addons = calcRecommendations(); recsApplied=true; } }
+  if(step===5){ application.plan = planSnapshot(); }
+  if(step===6){ const c=document.getElementById('f_bgAuthorize'); if(c) application.bgAuthorize=c.checked; }
+  if(step===7){ const s=document.getElementById('f_idType'); if(s) application.idType=s.value; }
+  if(step===8){
     ['signature','printedName','mailingAddress','ec1Name','ec1Phone','ec2Name','ec2Phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
     application.signedAt=(document.getElementById('f_signedAt')||{}).value||today();
     ['agreeAll','agreeAccess','agreePay','agreeSign'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.checked; });
   }
-  if(step===7){ const cs=document.getElementById('f_paymentAck'); if(cs) application.paymentAck=cs.checked; }
+  if(step===9){ const cs=document.getElementById('f_paymentAck'); if(cs) application.paymentAck=cs.checked; }
 }
 function validateStep(){ collectStep();
-  if(step===0){ if(!application.fullName) return 'Please enter your full legal name.';
+  if(step===0){ if(!application.fullName) return 'Please enter your full name.';
     if(!/^\S+@\S+\.\S+$/.test(application.email)) return 'Please enter a valid email address.';
     if(!application.phone) return 'Please enter your phone number.'; }
-  if(step===1){ if(!calcAllAnswered()) return 'Please answer all four questions to continue.'; }
-  if(step===3){ if(!application.currentAddress) return 'Please enter your current address.';
-    if(!application.occupation) return 'Please tell us your occupation.';
-    if(!application.about) return 'Please tell us a little about yourself.'; }
-  if(step===4 && !application.bgAuthorize) return 'Please authorize the background check to continue.';
-  if(step===5 && !application.idFile) return 'Please upload a photo of your ID.';
-  if(step===6){
+  if(step===1){ if(!application.moveIn) return 'Please choose a desired move-in date.';
+    if(!application.lengthOfStay) return 'Please choose a desired length of stay.';
+    if(!application.inMiami) return 'Please let us know if you are currently in Miami.'; }
+  if(step===2){ if(!application.occupation) return 'Please tell us your occupation.';
+    if(!application.schedule) return 'Please choose your typical schedule.';
+    if(!application.wfh) return 'Please let us know if you work from home.';
+    if(!application.guests) return 'Please choose your overnight guest expectations.';
+    if(!application.cleanliness) return 'Please choose your cleanliness style.'; }
+  if(step===3){ if(!application.instagram) return 'Please add Instagram, or enter NA.';
+    if(!application.linkedin) return 'Please add LinkedIn, or enter NA.';
+    if(!application.website) return 'Please add a website, or enter NA.'; }
+  if(step===4){ if(!calcAllAnswered()) return 'Please answer all four questions to continue.'; }
+  if(step===6 && !application.bgAuthorize) return 'Please authorize the background check to continue.';
+  if(step===7 && !application.idFile) return 'Please upload a photo of your ID.';
+  if(step===8){
     if(!application.signature) return 'Please type your full name to sign.';
-    if(application.signature.toLowerCase()!==application.fullName.toLowerCase()) return 'Your signature should match the legal name from the first step.';
+    if(application.signature.toLowerCase()!==application.fullName.toLowerCase()) return 'Your signature should match the name from the first step.';
     if(!application.printedName) return 'Please enter your printed name.';
     if(!application.mailingAddress) return 'Please enter your mailing address.';
     if(!application.ec1Name || !application.ec1Phone) return 'Please add at least one emergency contact (name and phone).';
     if(!(application.agreeAll && application.agreeAccess && application.agreePay && application.agreeSign)) return 'Please check all four boxes to agree and sign.';
   }
-  if(step===7){
+  if(step===9){
     if(CONFIG.PAYMENT_MODE==='stripe'){ if(!application.bankConnected) return 'Please connect your bank to continue.'; }
     else { if(!application.paymentAck) return 'Please confirm you understand the secure link will be sent.'; }
   }
@@ -1303,7 +1387,7 @@ function validateStep(){ collectStep();
 }
 async function nextStep(){ if(step===TOTAL-1){ closeOnboarding(); return; }
   const e=validateStep(); if(e){ setErr(e); return; } setErr('');
-  await saveProgress(); if(step===7){ await submitApplication(); } step++; renderStep(); }
+  await saveProgress(); if(step===9){ await submitApplication(); } step++; renderStep(); }
 function prevStep(){ if(step>0){ collectStep(); step--; renderStep(); } }
 
 /* ============================================================
@@ -1401,9 +1485,18 @@ async function sendApplicantEmail(){
     email:         application.email || '',
     phone:         application.phone || '',
     move_in_date:  application.moveIn || '',
+    length_of_stay: application.lengthOfStay || '',
+    in_miami:      application.inMiami || '',
     occupation:    application.occupation || '',
+    schedule:      application.schedule || '',
+    work_from_home: application.wfh || '',
+    guests:        application.guests || '',
+    cleanliness:   application.cleanliness || '',
+    instagram:     application.instagram || '',
+    linkedin:      application.linkedin || '',
+    website:       application.website || '',
+    anything_else: application.anythingElse || '',
     mailing_address: application.mailingAddress || application.currentAddress || '',
-    about:         application.about || '',
     plan_label:    p.termLabel || '',
     monthly:       fmt(p.monthlyTotal),
     addons:        addonNames.length ? addonNames.join(', ') : 'None',

@@ -186,6 +186,9 @@ function render(){
       </div>
       <div class="grid">
         <div class="f"><label>Plan</label>${planSummary(a.plan)}</div>
+        <div class="f"><label>Timing</label><div>${esc(a.moveIn||'—')}${a.lengthOfStay?'<br>'+esc(a.lengthOfStay):''}${a.inMiami?'<br>'+esc(a.inMiami):''}</div></div>
+        <div class="f"><label>Lifestyle</label><div style="font-size:.85rem;">${[a.schedule,a.wfh?'WFH: '+a.wfh:'',a.guests?'Guests: '+a.guests:'',a.cleanliness?'Clean: '+a.cleanliness:''].filter(Boolean).map(esc).join('<br>')||'—'}</div></div>
+        <div class="f"><label>Social</label><div style="font-size:.85rem;">${[a.instagram?'IG: '+a.instagram:'',a.linkedin?'LI: '+a.linkedin:'',a.website?'Web: '+a.website:''].filter(Boolean).map(esc).join('<br>')||'—'}</div></div>
         <div class="f"><label>Signed</label><div>${a.signature?esc(a.signature)+'<br>'+esc(a.signedAt):'<span class="chk n">Not signed</span>'}</div></div>
         <div class="f"><label>Checks</label><div>
           <span class="chk ${a.bgAuthorize?'y':'n'}">${a.bgAuthorize?'✓':'·'} Background</span><br>
@@ -195,7 +198,7 @@ function render(){
         <div class="f"><label>Emergency</label><div>${a.ec1Name?esc(a.ec1Name)+'<br>'+esc(a.ec1Phone):'—'}</div></div>
         <div class="f"><label>Updated</label><div>${when}</div></div>
       </div>
-      ${a.about?`<div class="f" style="margin-bottom:14px;"><label>About</label><div style="font-size:.9rem;color:var(--soft);">${esc(a.about)}</div></div>`:''}
+      ${a.anythingElse?`<div class="f" style="margin-bottom:14px;"><label>Anything else</label><div style="font-size:.9rem;color:var(--soft);">${esc(a.anythingElse)}</div></div>`:''}
       <div class="actions">
         <button class="btn sm ok" onclick="setStatus('${a.id}','approved')">Approve</button>
         <button class="btn sm no" onclick="setStatus('${a.id}','declined')">Decline</button>
