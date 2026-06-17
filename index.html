@@ -515,6 +515,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   [data-reveal], .ph img{ opacity:1 !important; transform:none !important; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -883,6 +884,8 @@ const CONFIG = {
   //              'stripe'  = automated bank-connect via Stripe (needs keys + EIN).
   PAYMENT_MODE: 'mercury',
   PAYMENT: { email: 'michaelkrilivsky@gmail.com' },
+  // EmailJS — sends the confirmation email from the page (to applicant, BCC you).
+  EMAILJS: { serviceId:'service_pj51ko3', templateId:'template_iy2zyl8', publicKey:'X2dC3mFeqOruG4n4S' },
   // Your Stripe publishable key (only used when PAYMENT_MODE is 'stripe')
   STRIPE_PUBLISHABLE_KEY: 'pk_test_REPLACE_ME',
   API: {
@@ -1409,6 +1412,37 @@ async function submitApplication(){
       chargeMoveIn: CONFIG.PAYMENT_MODE === 'stripe'
     });
   }catch(e){ console.warn('[submit] demo mode:', e.message); }
+  try{ await sendApplicantEmail(); }catch(e){ console.warn('[email] skipped:', e && e.message); }
+}
+
+// Sends the confirmation email from the page via EmailJS (to applicant, BCC you).
+async function sendApplicantEmail(){
+  const E = CONFIG.EMAILJS;
+  if(!window.emailjs || !E || !E.serviceId) return;
+  try{ emailjs.init({ publicKey:E.publicKey }); }catch(_){}
+  const p = application.plan || planSnapshot();
+  const addonNames = (p.addons||[]).map(k=>{ const d=CONFIG.ADDON_DEFS.find(x=>x.key===k); return d?d.name:k; });
+  const params = {
+    to_email:      application.email || '',
+    to_name:       (application.fullName||'').split(' ')[0] || 'there',
+    full_name:     application.fullName || '',
+    email:         application.email || '',
+    phone:         application.phone || '',
+    move_in_date:  application.moveIn || '',
+    occupation:    application.occupation || '',
+    mailing_address: application.mailingAddress || application.currentAddress || '',
+    about:         application.about || '',
+    plan_label:    p.termLabel || '',
+    monthly:       fmt(p.monthlyTotal),
+    addons:        addonNames.length ? addonNames.join(', ') : 'None',
+    discount:      p.discountPct ? (p.discountPct + '% (' + (p.discountCode||'') + ')') : 'None',
+    deposit:       fmt(p.deposit),
+    last_month:    p.hasLastMonth ? fmt(p.monthlyTotal) : 'Not applicable',
+    due_at_movein: fmt(p.dueAtMoveIn),
+    pay_method:    application.paymentMethod === 'wire' ? 'Wire transfer' : 'ACH transfer',
+    reply_to:      application.email || ''
+  };
+  await emailjs.send(E.serviceId, E.templateId, params);
 }
 function serializable(a){ const c={...a};
   c.bgCheckFileName=a.bgCheckFile?a.bgCheckFile.name:null; c.idFileName=a.idFile?a.idFile.name:null;
