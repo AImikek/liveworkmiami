@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>LiveWork Miami · A members residence in Brickell</title>
-<meta name="description" content="A members-only co-living residence on a high floor of Brickell's DUA tower. Meals, cleaning, and laundry handled daily. Your network, multiplied." />
+<meta name="description" content="A members-only co-living residence on the 35th floor of Brickell's DUA luxury tower. Meals, cleaning, and laundry handled daily. Your network, multiplied." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -269,6 +269,20 @@ section{ position:relative; }
 @media (max-width:760px){ .gallery{ grid-template-columns:1fr 1fr; } }
 
 /* ---- savings calculator ---- */
+.join-cta{ margin-top:48px; text-align:center; }
+.join-cta .btn{ font-size:1rem; padding:16px 32px; }
+.join-note{ margin-top:14px; color:var(--ink-soft); font-size:.95rem; }
+.tsave{ margin-top:6px; font-size:.74rem; font-weight:600; letter-spacing:.02em; color:var(--accent); }
+.tsave.flex{ color:var(--ink-soft); font-weight:500; }
+/* in-flow lifestyle questions + savings summary */
+.calc-grid.flow{ grid-template-columns:1fr; gap:24px; margin-top:8px; }
+.flow-savings{ background:var(--sand); border-radius:8px; padding:22px 24px; margin-bottom:22px; display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 26px; }
+.flow-savings .fs-num{ font-family:var(--f-disp); font-weight:300; font-size:2.6rem; line-height:1; letter-spacing:-.02em; color:var(--accent); display:flex; align-items:baseline; gap:10px; }
+.flow-savings .fs-num small{ font-family:var(--f-base); font-size:.84rem; font-style:normal; color:var(--ink-soft); font-weight:500; }
+.flow-savings .fs-side{ flex:1; min-width:220px; color:var(--ink-soft); font-size:.95rem; max-width:40ch; }
+.code-link{ display:inline-block; margin-top:18px; background:none; border:none; padding:0; cursor:pointer;
+  color:var(--accent); font:inherit; font-size:.9rem; text-decoration:underline; text-underline-offset:3px; }
+.code-link:hover{ opacity:.8; }
 .calc{ margin-top:54px; background:transparent; padding:0; }
 .calc-top h3{ font-size:clamp(1.7rem,3vw,2.4rem); font-weight:300; margin:14px 0 10px; }
 .calc-top p{ color:var(--ink-soft); font-size:1.05rem; }
@@ -543,7 +557,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
     <span class="eyebrow light">LiveWork Miami · Brickell</span>
     <h1><span class="l">More than</span><span class="l">a place <em>to live.</em></span></h1>
     <p class="audience" id="audience">For founders, executives, creatives, and the quietly exceptional.</p>
-    <p class="sub">A private residence membership on a high floor of Brickell's DUA tower. The building, the network, the wellness, the calm. One membership is open.</p>
+    <p class="sub">A private residence membership on the 35th floor of Brickell's DUA luxury tower. The building, the network, the wellness, the calm. One membership is open.</p>
     <div class="hero-cta">
       <button class="btn btn-light" onclick="openOnboarding()">Request membership</button>
       <a href="#scene" class="btn btn-ghost-light">Take the tour</a>
@@ -629,7 +643,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
         <p>We toured more than fifty of Miami's finest residences and chose DUA. A landmark tower, two blocks from the heart of Brickell, with wellness and views most of the city only visits.</p>
         <ul class="ticks">
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Three pools, including a rooftop above the skyline</li>
-          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Cold plunge, jacuzzi, sauna, and steam</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>13-person outdoor cold plunge and jacuzzi, sauna, and steam</li>
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Private theater, billiards, and resident events</li>
         </ul>
       </div>
@@ -681,7 +695,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
 
     <div class="amen" data-reveal>
       <div class="a"><span class="ai">🏊</span><h4>Three pools</h4><p>Including a rooftop pool above the skyline</p></div>
-      <div class="a"><span class="ai">🧊</span><h4>Cold plunge</h4><p>Cold plunge, jacuzzi, and hot tub</p></div>
+      <div class="a"><span class="ai">🧊</span><h4>Cold plunge &amp; jacuzzi</h4><p>13-person outdoor cold plunge and jacuzzi</p></div>
       <div class="a"><span class="ai">🧖</span><h4>Sauna &amp; steam</h4><p>On-site sauna and steam room</p></div>
       <div class="a"><span class="ai">🍸</span><h4>Pool bar</h4><p>Resort-style pools with bar and dining</p></div>
       <div class="a"><span class="ai">🎬</span><h4>Theater</h4><p>Private screening room and billiards</p></div>
@@ -731,65 +745,12 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
       <div class="step"><div class="n">01</div><h4>Request</h4><p>Share your details and a little about who you are and what you're building.</p></div>
       <div class="step"><div class="n">02</div><h4>Verify</h4><p>Complete a background check and upload your ID. Vetting is what protects the community.</p></div>
       <div class="step"><div class="n">03</div><h4>Sign</h4><p>Review and sign the membership agreement and the house standards.</p></div>
-      <div class="step"><div class="n">04</div><h4>Move in</h4><p>Securely connect your bank to authorize membership. Your residence is confirmed.</p></div>
+      <div class="step"><div class="n">04</div><h4>Move in</h4><p>Securely pay with ACH or wire to secure your membership. Your residence is confirmed.</p></div>
     </div>
 
-    <!-- VALUE / TIME CALCULATOR -->
-    <div class="calc" data-reveal>
-      <div class="calc-top">
-        <span class="eyebrow">The value of your time</span>
-        <h3>What you stop doing.</h3>
-        <p>Four quiet questions. We will show the hours and overhead this lifts off your week.</p>
-      </div>
-      <div class="calc-grid" id="calcGrid">
-        <div class="cq" data-q="food">
-          <label>Monthly food spend <span class="sub">groceries and dining out</span></label>
-          <div class="opts">
-            <button class="opt" data-v="400">$400</button>
-            <button class="opt" data-v="700">$700</button>
-            <button class="opt" data-v="1100">$1,100</button>
-            <button class="opt" data-v="1600">$1,600+</button>
-          </div>
-        </div>
-        <div class="cq" data-q="time">
-          <label>Hours a week on food <span class="sub">shopping, ordering, prep, cleanup</span></label>
-          <div class="opts">
-            <button class="opt" data-v="3">3 hrs</button>
-            <button class="opt" data-v="6">6 hrs</button>
-            <button class="opt" data-v="10">10 hrs</button>
-            <button class="opt" data-v="15">15+ hrs</button>
-          </div>
-        </div>
-        <div class="cq" data-q="laundry">
-          <label>Monthly laundry <span class="sub">service, products, time</span></label>
-          <div class="opts">
-            <button class="opt" data-v="40">$40</button>
-            <button class="opt" data-v="100">$100</button>
-            <button class="opt" data-v="200">$200</button>
-            <button class="opt" data-v="320">$320+</button>
-          </div>
-        </div>
-        <div class="cq" data-q="cleaning">
-          <label>Monthly cleaning <span class="sub">products and service</span></label>
-          <div class="opts">
-            <button class="opt" data-v="80">$80</button>
-            <button class="opt" data-v="200">$200</button>
-            <button class="opt" data-v="350">$350</button>
-            <button class="opt" data-v="500">$500+</button>
-          </div>
-        </div>
-      </div>
-      <div class="calc-out" id="calcOut" hidden></div>
-    </div>
-
-    <!-- CONFIGURATOR -->
-    <div class="builder" data-reveal>
-      <div class="builder-head">
-        <span class="eyebrow">Configure your residence</span>
-        <h3>Your terms. Your service. Your number.</h3>
-        <p>Choose a commitment and the services you want handled. All three together is a flat $4,000.</p>
-      </div>
-      <div id="planBuilder"></div>
+    <div class="join-cta" data-reveal>
+      <button class="btn btn-solid" onclick="openOnboarding()">Request membership →</button>
+      <p class="join-note">Takes a few minutes. You will configure your residence and see your number inside.</p>
     </div>
   </div>
 </section>
@@ -828,7 +789,8 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
         </div>
         <div class="bar" id="bar">
           <div class="b"><i></i></div><div class="b"><i></i></div><div class="b"><i></i></div>
-          <div class="b"><i></i></div><div class="b"><i></i></div><div class="b"><i></i></div><div class="b"><i></i></div>
+          <div class="b"><i></i></div><div class="b"><i></i></div><div class="b"><i></i></div>
+          <div class="b"><i></i></div><div class="b"><i></i></div><div class="b"><i></i></div>
         </div>
         <div class="slabel" id="slabel">Step 1 of 7 · Your details</div>
       </div>
@@ -955,47 +917,33 @@ document.getElementById('yr').textContent = new Date().getFullYear();
 })();
 
 /* ============================================================
-   SAVINGS CALCULATOR + PLAN BUILDER
+   SAVINGS CALCULATOR (now lives inside the application flow)
    ============================================================ */
 const calcState = { food:null, time:null, laundry:null, cleaning:null };
+let recsApplied = false;
 
-document.querySelectorAll('#calcGrid .cq').forEach(cq=>{
-  const q = cq.dataset.q;
-  cq.querySelectorAll('.opt').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      cq.querySelectorAll('.opt').forEach(b=>b.classList.remove('sel'));
-      btn.classList.add('sel');
-      calcState[q] = Number(btn.dataset.v);
-      renderCalcOut();
-    });
-  });
-});
-
-function renderCalcOut(){
-  const { food, time, laundry, cleaning } = calcState;
-  if(food==null || time==null || laundry==null || cleaning==null) return; // wait for all four
-  const cash = food + laundry + cleaning;
-  const hrsMonth = Math.round(time * 4.33);
-  const timeVal = hrsMonth * CONFIG.TIME_VALUE_PER_HR;
-
-  // recommendations -> pre-select add-ons
-  const rec = [];
-  if(food >= 700 || time >= 6) rec.push('chef');
-  if(laundry >= 100 || cleaning >= 200) rec.push('cleaning');
-  if(cleaning >= 200 || food >= 1100 || time >= 10) rec.push('management');
-  selectedPlan.addons = [...new Set(rec)];
-  renderPlanBuilder('planBuilder');
-
-  const recNames = selectedPlan.addons.map(k => CONFIG.ADDON_DEFS.find(a=>a.key===k).name);
-  const out = document.getElementById('calcOut');
-  out.hidden = false;
-  out.innerHTML = `
-    <div class="calc-hero">
-      <div class="ch-main"><span class="ch-num">${hrsMonth}</span><span class="ch-unit">hours a month, reclaimed</span></div>
-      <div class="ch-side">About ${fmt(cash)} a month in spend and ${fmt(timeVal)} of your time, handled for you.</div>
-    </div>
-    ${recNames.length ? `<p class="rec">We have set up <b>${recNames.join(', ')}</b> below to match. Refine anything you like.</p>`
-                      : `<p class="rec">Configure your residence below.</p>`}`;
+function calcAllAnswered(){ const {food,time,laundry,cleaning}=calcState; return food!=null&&time!=null&&laundry!=null&&cleaning!=null; }
+function calcSummary(){ const {food,time,laundry,cleaning}=calcState;
+  const cash=(food||0)+(laundry||0)+(cleaning||0);
+  const hrsMonth=Math.round((time||0)*4.33);
+  const timeVal=hrsMonth*CONFIG.TIME_VALUE_PER_HR;
+  return { cash, hrsMonth, timeVal }; }
+function calcRecommendations(){ const {food,time,laundry,cleaning}=calcState; const rec=[];
+  if(food>=700||time>=6) rec.push('chef');
+  if(laundry>=100||cleaning>=200) rec.push('cleaning');
+  if(cleaning>=200||food>=1100||time>=10) rec.push('management');
+  return [...new Set(rec)]; }
+function calcGridHTML(){
+  const Q=[
+    {q:'food', label:'Monthly food spend', sub:'groceries and dining out', opts:[['$400',400],['$700',700],['$1,100',1100],['$1,600+',1600]]},
+    {q:'time', label:'Hours a week on food', sub:'shopping, ordering, prep, cleanup', opts:[['3 hrs',3],['6 hrs',6],['10 hrs',10],['15+ hrs',15]]},
+    {q:'laundry', label:'Monthly laundry', sub:'service, products, time', opts:[['$40',40],['$100',100],['$200',200],['$320+',320]]},
+    {q:'cleaning', label:'Monthly cleaning', sub:'products and service', opts:[['$80',80],['$200',200],['$350',350],['$500+',500]]},
+  ];
+  return Q.map(it=>`<div class="cq" data-q="${it.q}">
+    <label>${it.label} <span class="sub">${it.sub}</span></label>
+    <div class="opts">${it.opts.map(([lbl,v])=>`<button type="button" class="opt ${calcState[it.q]===v?'sel':''}" data-v="${v}">${lbl}</button>`).join('')}</div>
+  </div>`).join('');
 }
 
 /* ---- plan builder (used on the page and inside the flow) ---- */
@@ -1012,11 +960,16 @@ function renderPlanBuilder(elId, inFlow){
   const last = planHasLastMonth();
   const due = planDueAtMoveIn();
 
-  const terms = TERM_ORDER.map(k=>`
+  const mtmBase = CONFIG.BASE_BY_TERM['mtm'];
+  const terms = TERM_ORDER.map(k=>{
+    const saveVsMtm = mtmBase - CONFIG.BASE_BY_TERM[k];
+    return `
     <div class="term ${selectedPlan.term===k?'sel':''}" data-term="${k}">
       ${k==='12'?'<span class="best">Best value</span>':''}
       <div class="t">${termLabel(k)}</div><div class="pr">${fmt(CONFIG.BASE_BY_TERM[k])}<small>/mo</small></div>
-    </div>`).join('');
+      ${saveVsMtm>0?`<div class="tsave">Save ${fmt(saveVsMtm)}/mo</div>`:`<div class="tsave flex">Most flexible</div>`}
+    </div>`;
+  }).join('');
 
   const addons = CONFIG.ADDON_DEFS.map(a=>{
     const on = selectedPlan.addons.includes(a.key);
@@ -1026,14 +979,18 @@ function renderPlanBuilder(elId, inFlow){
       <div class="d">${a.desc}</div></div></div>`;
   }).join('');
 
-  // discount code only appears inside the application flow (not on the public page)
+  // discount code only appears inside the application flow, hidden behind a link
+  const codeOpen = !!(selectedPlan.discountCode || pct);
   const codeBlock = inFlow ? `
-      <div class="pb-label" style="margin-top:18px;">Discount code</div>
-      <div class="code-row">
-        <input id="codeInput_${elId}" class="code-in" placeholder="Enter code" value="${esc(selectedPlan.discountCode||'')}" />
-        <button class="code-btn" data-apply="${elId}">Apply</button>
-      </div>
-      <div class="code-msg" id="codeMsg_${elId}">${pct?`Code applied: ${pct}% off`:''}</div>` : '';
+      <button type="button" class="code-link" id="codeLink_${elId}" ${codeOpen?'style="display:none"':''}>Have a discount code?</button>
+      <div class="code-wrap" id="codeWrap_${elId}" style="display:${codeOpen?'block':'none'}">
+        <div class="pb-label" style="margin-top:14px;">Discount code</div>
+        <div class="code-row">
+          <input id="codeInput_${elId}" class="code-in" placeholder="Enter code" value="${esc(selectedPlan.discountCode||'')}" />
+          <button class="code-btn" data-apply="${elId}">Apply</button>
+        </div>
+        <div class="code-msg" id="codeMsg_${elId}">${pct?`Code applied: ${pct}% off`:''}</div>
+      </div>` : '';
 
   el.innerHTML = `<div class="pb${inFlow?' flow':''}">
     <div class="pb-l">
@@ -1074,6 +1031,8 @@ function renderPlanBuilder(elId, inFlow){
   };
   const cb = el.querySelector('.code-btn'); if(cb) cb.addEventListener('click', applyCode);
   const ci = el.querySelector('.code-in'); if(ci) ci.addEventListener('keydown', e=>{ if(e.key==='Enter') applyCode(); });
+  const cl = document.getElementById('codeLink_'+elId);
+  if(cl) cl.addEventListener('click', ()=>{ const w=document.getElementById('codeWrap_'+elId); if(w){ w.style.display='block'; cl.style.display='none'; const i=document.getElementById('codeInput_'+elId); if(i) i.focus(); } });
 }
 function applyWithPlan(){ application.plan = planSnapshot(); openOnboarding(); }
 function planSnapshot(){ return {
@@ -1088,7 +1047,7 @@ function planSnapshot(){ return {
   dueAtMoveIn:planDueAtMoveIn()
 }; }
 
-renderPlanBuilder('planBuilder'); // initial render on the page
+/* plan builder now renders inside the flow only */
 
 /* ---------- nav scroll + menu ---------- */
 const nav = document.getElementById('nav');
@@ -1125,8 +1084,8 @@ if(!reduce){
 /* ============================================================
    ONBOARDING (same flow, restyled)
    ============================================================ */
-let step = 0; const TOTAL = 7;
-const stepLabels = ['Your details','Your plan','Background check','Photo ID','Agreement','Payment','Welcome'];
+let step = 0; const TOTAL = 9;
+const stepLabels = ['Your details','Your lifestyle','Your plan','A few details','Background check','Photo ID','Agreement','Payment','Welcome'];
 const application = { fullName:'',email:'',phone:'',dob:'',currentAddress:'',occupation:'',company:'',moveIn:'',
   referral:'',about:'', plan:null,
   bgAuthorize:false, bgCheckFile:null, idType:'passport', idFile:null,
@@ -1149,36 +1108,50 @@ function updateBar(){
   document.getElementById('backBtn').style.visibility = step===0?'hidden':'visible';
   const n=document.getElementById('nextBtn');
   if(step===TOTAL-1){ n.textContent='Done'; document.getElementById('backBtn').style.visibility='hidden'; }
-  else if(step===4) n.textContent='Sign & continue →';
-  else if(step===5) n.textContent = CONFIG.PAYMENT_MODE==='stripe' ? 'Authorize & submit →' : 'Submit & finish →';
+  else if(step===6) n.textContent='Sign & continue →';
+  else if(step===7) n.textContent = CONFIG.PAYMENT_MODE==='stripe' ? 'Authorize & submit →' : 'Submit & finish →';
   else n.textContent='Continue →';
 }
-function renderStep(){ setErr(''); const b=document.getElementById('sbody'); b.scrollTop=0; b.innerHTML=TPL[step](); bindStep(); updateBar(); }
+function renderStep(){ setErr(''); const b=document.getElementById('sbody'); b.innerHTML=TPL[step](); bindStep(); updateBar();
+  // always start each step at the very top (sbody scroller on desktop, sheet on mobile, modal otherwise)
+  requestAnimationFrame(()=>{ b.scrollTop=0;
+    const sh=document.querySelector('.sheet'); if(sh) sh.scrollTop=0;
+    const m=document.querySelector('.ov-modal'); if(m) m.scrollTop=0;
+  });
+}
 
 const TPL = {
   0: ()=>`
     <h3>Tell us who you are</h3>
-    <p class="desc">A few details to begin. Everything is encrypted and seen only by the LiveWork Miami team.</p>
+    <p class="desc">Just the basics to begin. Everything is encrypted and seen only by the LiveWork Miami team.</p>
     <div class="field"><label>Full legal name <span class="rq">*</span></label><input id="f_fullName" value="${esc(application.fullName)}" placeholder="As it appears on your ID" /></div>
-    <div class="two">
-      <div class="field"><label>Email <span class="rq">*</span></label><input id="f_email" type="email" value="${esc(application.email)}" placeholder="you@email.com" /></div>
-      <div class="field"><label>Phone <span class="rq">*</span></label><input id="f_phone" type="tel" value="${esc(application.phone)}" placeholder="(305) 000-0000" /></div>
+    <div class="field"><label>Email <span class="rq">*</span></label><input id="f_email" type="email" value="${esc(application.email)}" placeholder="you@email.com" /></div>
+    <div class="field"><label>Phone <span class="rq">*</span></label><input id="f_phone" type="tel" value="${esc(application.phone)}" placeholder="(305) 000-0000" /></div>`,
+
+  1: ()=>`
+    <h3>A few quiet questions</h3>
+    <p class="desc">Tell us what life costs you today. Next, we will show what this lifts off your week, in time and money.</p>
+    <div class="calc-grid flow" id="flowCalcGrid">${calcGridHTML()}</div>`,
+
+  2: ()=>{ const sum=calcSummary(); return `
+    <h3>Your plan, and what it saves you</h3>
+    <p class="desc">Here is the time and overhead this lifts off your week. Configure your residence below, and deselect anything you do not want.</p>
+    <div class="flow-savings">
+      <div class="fs-num">${sum.hrsMonth}<small>hours / month, reclaimed</small></div>
+      <div class="fs-side">About ${fmt(sum.cash)} a month in spend and ${fmt(sum.timeVal)} of your time, handled for you.</div>
     </div>
-    <div class="two">
-      <div class="field"><label>Date of birth <span class="rq">*</span></label><input id="f_dob" type="date" value="${esc(application.dob)}" /></div>
-      <div class="field"><label>Target move-in</label><input id="f_moveIn" type="date" value="${esc(application.moveIn)}" /></div>
-    </div>
+    <div id="flowPlan"></div>`; },
+
+  3: ()=>`
+    <h3>A few more details</h3>
+    <p class="desc">This helps us prepare your residence and complete your file.</p>
+    <div class="field"><label>Target move-in</label><input id="f_moveIn" type="date" value="${esc(application.moveIn)}" /></div>
     <div class="field"><label>Current address <span class="rq">*</span></label><input id="f_currentAddress" value="${esc(application.currentAddress)}" placeholder="Street, city, state" /></div>
     <div class="field"><label>Occupation <span class="rq">*</span></label><input id="f_occupation" value="${esc(application.occupation)}" placeholder="Founder, investor, etc." /></div>
     <div class="field"><label>Who referred you, or how did you find us?</label><input id="f_referral" value="${esc(application.referral)}" placeholder="A member's name, event, or source" /></div>
     <div class="field"><label>Tell us a little about yourself and why you find this type of living arrangement interesting <span class="rq">*</span></label><textarea id="f_about" placeholder="A few sentences. We hand-select every member.">${esc(application.about)}</textarea></div>`,
 
-  1: ()=>`
-    <h3>Choose your plan</h3>
-    <p class="desc">Pick your term and the services you want. All three services together is a flat ${fmt(CONFIG.ALL_THREE_FLAT)}.</p>
-    <div id="flowPlan"></div>`,
-
-  2: ()=>`
+  4: ()=>`
     <h3>Background check</h3>
     <p class="desc">Every member is vetted. We keep this effortless on your end.</p>
     <div class="note-box">
@@ -1190,7 +1163,7 @@ const TPL = {
       ${drop('bg','PDF of a recent screening report',application.bgCheckFile)}
     </div>`,
 
-  3: ()=>`
+  5: ()=>`
     <h3>Photo identification</h3>
     <p class="desc">Upload a clear photo of your passport or driver's license to confirm your identity.</p>
     <div class="field"><label>ID type <span class="rq">*</span></label>
@@ -1198,7 +1171,7 @@ const TPL = {
     <div class="field"><label>Upload your ID <span class="rq">*</span></label>${drop('id','Clear photo or scan, all corners visible',application.idFile)}</div>
     <div class="note-box">Make sure the photo, name, and dates are fully legible. Blurry uploads slow approval.</div>`,
 
-  4: ()=>`
+  6: ()=>`
     <h3>Membership agreement</h3>
     <p class="desc">Please read in full, complete the details, then type your full legal name to sign.</p>
     <div class="agree">${AGREEMENT()}</div>
@@ -1224,12 +1197,12 @@ const TPL = {
 
     <label class="chk"><input type="checkbox" id="f_agreeAll" ${application.agreeAll?'checked':''} /><span>I have read and agree to this Membership Agreement in full.</span></label>
     <label class="chk"><input type="checkbox" id="f_agreeAccess" ${application.agreeAccess?'checked':''} /><span>I understand membership does not include building access. To get a fob, key, building entry, or parking spot, I must be added to and sign the building lease, which is a separate agreement, and I am responsible for all related fees.</span></label>
-    <label class="chk"><input type="checkbox" id="f_agreePay" ${application.agreePay?'checked':''} /><span>I agree to pay the membership fee through the application and payment process on this site, in advance of each membership period.</span></label>
-    <label class="chk"><input type="checkbox" id="f_agreeSign" ${application.agreeSign?'checked':''} /><span>I consent to sign electronically, and I agree my typed name is my legal signature (E-SIGN / Florida UETA).</span></label>`,
+    <label class="chk"><input type="checkbox" id="f_agreePay" ${application.agreePay?'checked':''} /><span>I understand the deposit, first month, and any last month due prior to move-in, and that membership is a revocable license, not a lease.</span></label>
+    <label class="chk"><input type="checkbox" id="f_agreeSign" ${application.agreeSign?'checked':''} /><span>Typing my name above is my legal electronic signature on this Agreement.</span></label>`,
 
-  5: ()=>{ const p = application.plan || planSnapshot(); const m = p.monthlyTotal; const due = p.dueAtMoveIn; return `
+  7: ()=>{ const p = application.plan || planSnapshot(); const m = p.monthlyTotal; const due = p.dueAtMoveIn; return `
     <h3>Payment</h3>
-    <p class="desc">Reserve your residence. There is nothing to pay on this page.</p>
+    <p class="desc">Securely pay with ACH or wire to secure your membership.</p>
     <div class="charge">
       <div class="li"><span>First month${p.addons.length?' (with services)':''}</span><span>${fmt(m)}</span></div>
       ${p.hasLastMonth?`<div class="li"><span>Last month (held)</span><span>${fmt(m)}</span></div>`:''}
@@ -1240,26 +1213,20 @@ const TPL = {
     <div class="merc">
       <div class="merc-h">How payment works</div>
       <ol class="merc-steps">
-        <li>You submit below and we receive your selection.</li>
-        <li>We email you a secure invoice from <b>Mercury</b>, our bank.</li>
-        <li>You complete payment in Mercury by your preferred method. Your residence is confirmed once it is received.</li>
+        <li>We email you a secure link from our banking system, Mercury.</li>
+        <li>You complete payment by ACH or wire inside Mercury.</li>
+        <li>Your residence is confirmed once payment is received.</li>
       </ol>
       <p class="merc-note">No bank or card details are entered on this site.</p>
     </div>
 
-    <div class="field"><label>Preferred payment method <span class="rq">*</span></label>
-      <div class="seg">
-        <label class="seg-o ${application.paymentMethod==='ach'?'on':''}"><input type="radio" name="paym" value="ach" ${application.paymentMethod==='ach'?'checked':''}><span>ACH transfer</span></label>
-        <label class="seg-o ${application.paymentMethod==='wire'?'on':''}"><input type="radio" name="paym" value="wire" ${application.paymentMethod==='wire'?'checked':''}><span>Wire transfer</span></label>
-      </div>
-    </div>
-    <label class="chk"><input type="checkbox" id="f_paymentAck" ${application.paymentAck?'checked':''} /><span>I understand I will receive a Mercury invoice to complete payment, and my residence is confirmed once payment is received.</span></label>`; },
+    <label class="chk"><input type="checkbox" id="f_paymentAck" ${application.paymentAck?'checked':''} /><span>I understand I will receive a secure Mercury link to complete payment, and my residence is confirmed once payment is received.</span></label>`; },
 
-  6: ()=>`
+  8: ()=>`
     <div class="donewrap">
       <div class="donering"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
       <h3>You're all set</h3>
-      <p class="desc" style="max-width:46ch;margin:8px auto 0;">Thank you, ${esc((application.fullName||'').split(' ')[0]||'and welcome')}. Your application is in. We will email you a secure Mercury invoice at <b style="color:var(--accent)">${esc(application.email)}</b> to complete payment, along with your move-in details.</p>
+      <p class="desc" style="max-width:46ch;margin:8px auto 0;">Thank you, ${esc((application.fullName||'').split(' ')[0]||'and welcome')}. Your application is in. We will email you a secure Mercury link at <b style="color:var(--accent)">${esc(application.email)}</b> to complete payment, along with your move-in details.</p>
       <div class="sig" style="margin-top:24px;color:var(--ink);">Warm regards, Mike<small style="color:var(--ink-soft);">Founder, LiveWork Miami</small></div>
     </div>`
 };
@@ -1272,16 +1239,20 @@ function drop(key,sub,existing){ const has=existing?'has':''; const name=existin
     <input type="file" id="file_${key}" accept="image/*,.pdf" style="display:none" />`; }
 
 function bindStep(){
-  if(step===1){ renderPlanBuilder('flowPlan', true); }
-  if(step===2){ const c=document.getElementById('f_bgAuthorize'); if(c) c.addEventListener('change', e=> application.bgAuthorize=e.target.checked); bindDrop('bg', f=> application.bgCheckFile=f); }
-  if(step===3){ bindDrop('id', f=> application.idFile=f);
+  if(step===1){
+    document.querySelectorAll('#flowCalcGrid .cq').forEach(cq=>{
+      const q=cq.dataset.q;
+      cq.querySelectorAll('.opt').forEach(btn=> btn.addEventListener('click', ()=>{
+        cq.querySelectorAll('.opt').forEach(b=>b.classList.remove('sel'));
+        btn.classList.add('sel'); calcState[q]=Number(btn.dataset.v); setErr('');
+      }));
+    });
+  }
+  if(step===2){ renderPlanBuilder('flowPlan', true); }
+  if(step===4){ const c=document.getElementById('f_bgAuthorize'); if(c) c.addEventListener('change', e=> application.bgAuthorize=e.target.checked); bindDrop('bg', f=> application.bgCheckFile=f); }
+  if(step===5){ bindDrop('id', f=> application.idFile=f);
     document.getElementById('f_idType').addEventListener('change', e=> application.idType=e.target.value); }
-  if(step===5){
-    document.querySelectorAll('input[name="paym"]').forEach(r=> r.addEventListener('change', e=>{
-      application.paymentMethod=e.target.value;
-      document.querySelectorAll('.seg-o').forEach(o=>o.classList.remove('on'));
-      e.target.closest('.seg-o').classList.add('on');
-    }));
+  if(step===7){
     const cs=document.getElementById('f_paymentAck'); if(cs) cs.addEventListener('change', e=> application.paymentAck=e.target.checked);
   }
 }
@@ -1293,45 +1264,46 @@ function bindDrop(key,onFile){ const d=document.getElementById('drop_'+key), inp
   d.addEventListener('drop', e=>{ if(e.dataTransfer.files[0]) show(e.dataTransfer.files[0]); }); }
 
 function collectStep(){
-  if(step===0) ['fullName','email','phone','dob','moveIn','currentAddress','occupation','referral','about'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
-  if(step===1){ application.plan = planSnapshot(); }
-  if(step===2){ const c=document.getElementById('f_bgAuthorize'); if(c) application.bgAuthorize=c.checked; }
-  if(step===3){ const s=document.getElementById('f_idType'); if(s) application.idType=s.value; }
-  if(step===4){
+  if(step===0) ['fullName','email','phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+  if(step===1){ if(!recsApplied && calcAllAnswered()){ selectedPlan.addons = calcRecommendations(); recsApplied=true; } }
+  if(step===2){ application.plan = planSnapshot(); }
+  if(step===3) ['moveIn','currentAddress','occupation','referral','about'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+  if(step===4){ const c=document.getElementById('f_bgAuthorize'); if(c) application.bgAuthorize=c.checked; }
+  if(step===5){ const s=document.getElementById('f_idType'); if(s) application.idType=s.value; }
+  if(step===6){
     ['signature','printedName','mailingAddress','ec1Name','ec1Phone','ec2Name','ec2Phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
     application.signedAt=(document.getElementById('f_signedAt')||{}).value||today();
     ['agreeAll','agreeAccess','agreePay','agreeSign'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.checked; });
   }
-  if(step===5){ const r=document.querySelector('input[name="paym"]:checked'); if(r) application.paymentMethod=r.value;
-    const cs=document.getElementById('f_paymentAck'); if(cs) application.paymentAck=cs.checked; }
+  if(step===7){ const cs=document.getElementById('f_paymentAck'); if(cs) application.paymentAck=cs.checked; }
 }
 function validateStep(){ collectStep();
   if(step===0){ if(!application.fullName) return 'Please enter your full legal name.';
     if(!/^\S+@\S+\.\S+$/.test(application.email)) return 'Please enter a valid email address.';
-    if(!application.phone) return 'Please enter your phone number.';
-    if(!application.dob) return 'Please enter your date of birth.';
-    if(!application.currentAddress) return 'Please enter your current address.';
+    if(!application.phone) return 'Please enter your phone number.'; }
+  if(step===1){ if(!calcAllAnswered()) return 'Please answer all four questions to continue.'; }
+  if(step===3){ if(!application.currentAddress) return 'Please enter your current address.';
     if(!application.occupation) return 'Please tell us your occupation.';
     if(!application.about) return 'Please tell us a little about yourself.'; }
-  if(step===2 && !application.bgAuthorize) return 'Please authorize the background check to continue.';
-  if(step===3 && !application.idFile) return 'Please upload a photo of your ID.';
-  if(step===4){
+  if(step===4 && !application.bgAuthorize) return 'Please authorize the background check to continue.';
+  if(step===5 && !application.idFile) return 'Please upload a photo of your ID.';
+  if(step===6){
     if(!application.signature) return 'Please type your full name to sign.';
-    if(application.signature.toLowerCase()!==application.fullName.toLowerCase()) return 'Your signature should match the legal name from step 1.';
+    if(application.signature.toLowerCase()!==application.fullName.toLowerCase()) return 'Your signature should match the legal name from the first step.';
     if(!application.printedName) return 'Please enter your printed name.';
     if(!application.mailingAddress) return 'Please enter your mailing address.';
     if(!application.ec1Name || !application.ec1Phone) return 'Please add at least one emergency contact (name and phone).';
     if(!(application.agreeAll && application.agreeAccess && application.agreePay && application.agreeSign)) return 'Please check all four boxes to agree and sign.';
   }
-  if(step===5){
+  if(step===7){
     if(CONFIG.PAYMENT_MODE==='stripe'){ if(!application.bankConnected) return 'Please connect your bank to continue.'; }
-    else { if(!application.paymentAck) return 'Please confirm you understand the invoice will be sent.'; }
+    else { if(!application.paymentAck) return 'Please confirm you understand the secure link will be sent.'; }
   }
   return null;
 }
 async function nextStep(){ if(step===TOTAL-1){ closeOnboarding(); return; }
   const e=validateStep(); if(e){ setErr(e); return; } setErr('');
-  await saveProgress(); if(step===5){ await submitApplication(); } step++; renderStep(); }
+  await saveProgress(); if(step===7){ await submitApplication(); } step++; renderStep(); }
 function prevStep(){ if(step>0){ collectStep(); step--; renderStep(); } }
 
 /* ============================================================
@@ -1439,7 +1411,7 @@ async function sendApplicantEmail(){
     deposit:       fmt(p.deposit),
     last_month:    p.hasLastMonth ? fmt(p.monthlyTotal) : 'Not applicable',
     due_at_movein: fmt(p.dueAtMoveIn),
-    pay_method:    application.paymentMethod === 'wire' ? 'Wire transfer' : 'ACH transfer',
+    pay_method:    'ACH or wire (selected in Mercury)',
     reply_to:      application.email || ''
   };
   await emailjs.send(E.serviceId, E.templateId, params);
