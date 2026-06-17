@@ -174,9 +174,9 @@ function render(){
   const list = document.getElementById('list');
   if(!rows.length){ list.innerHTML = '<div class="empty">No applications match.</div>'; return; }
   list.innerHTML = rows.map(a=>{
-    const docs = Object.entries(a.documents||{}).map(([k,v])=> v.url
-      ? `<a href="${v.url}" target="_blank" rel="noopener">${k==='id'?'ID':'Screening'} ↗</a>`
-      : `<span class="chk n">${k} (n/a)</span>`).join(' &nbsp; ') || '<span class="chk n">None</span>';
+    const docs = Object.entries(a.documents||{}).map(([k,v])=>{ const lbl = k==='id'?'ID':k==='payment'?'Payment proof':'Screening';
+      return v.url ? `<a href="${v.url}" target="_blank" rel="noopener">${lbl} ↗</a>` : `<span class="chk n">${lbl} (n/a)</span>`; }).join(' &nbsp; ') || '<span class="chk n">None</span>';
+    const payLabel = { ach:'ACH', wire:'Wire', applepay:'Apple Pay', venmo:'Venmo', paypal:'PayPal F&F' }[a.paymentMethod] || '—';
     const when = a.updatedAt ? new Date(a.updatedAt).toLocaleDateString() : '';
     return `<div class="card">
       <div class="card-top">
@@ -189,8 +189,8 @@ function render(){
         <div class="f"><label>Signed</label><div>${a.signature?esc(a.signature)+'<br>'+esc(a.signedAt):'<span class="chk n">Not signed</span>'}</div></div>
         <div class="f"><label>Checks</label><div>
           <span class="chk ${a.bgAuthorize?'y':'n'}">${a.bgAuthorize?'✓':'·'} Background</span><br>
-          <span class="chk ${a.bankConnected?'y':'n'}">${a.bankConnected?'✓':'·'} Bank linked</span><br>
-          <span class="chk ${a.moveInCharge?'y':'n'}">${a.moveInCharge?'✓ Charged '+fmt(a.moveInCharge.amount):'· Not charged'}</span></div></div>
+          <span class="chk y">Invoice via ${payLabel}</span><br>
+          <span class="chk ${a.moveInCharge?'y':'n'}">${a.moveInCharge?'✓ Charged '+fmt(a.moveInCharge.amount):'· Send Mercury invoice, confirm payment'}</span></div></div>
         <div class="f"><label>Documents</label><div>${docs}</div></div>
         <div class="f"><label>Emergency</label><div>${a.ec1Name?esc(a.ec1Name)+'<br>'+esc(a.ec1Phone):'—'}</div></div>
         <div class="f"><label>Updated</label><div>${when}</div></div>

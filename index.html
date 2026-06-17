@@ -18,15 +18,17 @@
    dark cinematic intermissions. Photography leads.
    ============================================================ */
 :root{
-  --paper:    #FBFAF7;   /* warm paper white  */
-  --sand:     #F0EADF;   /* alt section       */
-  --ink:      #17191E;   /* near-black text   */
-  --ink-soft: #5A5C63;   /* muted text        */
-  --hair:     rgba(23,25,30,.14);
-  --accent:   #0D7368;   /* deep ocean teal   */
-  --accent-2: #C0913A;   /* warm sun gold (sparingly) */
-  --dark:     #0E1013;   /* cinematic dark    */
-  --dark-soft:#9FA2AA;
+  --paper:    #FCFAF5;   /* warm champagne paper */
+  --sand:     #EFE7D7;   /* champagne beige      */
+  --ink:      #1C1A16;   /* warm charcoal        */
+  --ink-soft: #6B6457;   /* warm muted           */
+  --hair:     rgba(28,26,22,.13);
+  --accent:   #A6803E;   /* soft antique gold    */
+  --accent-2: #C8A765;   /* light champagne gold */
+  --dark:     #211C15;   /* warm espresso (cinematic, not nightclub) */
+  --dark-soft:#B7AE9C;
+  --glass:    rgba(255,255,255,.55);
+  --glass-line: rgba(255,255,255,.6);
   --maxw: 1240px;
 
   --f-disp: 'Fraunces', Georgia, serif;
@@ -63,7 +65,7 @@ h1,h2,h3{ font-family:var(--f-disp); font-weight:400; line-height:1.05; letter-s
   display:inline-flex; align-items:center; gap:.6em;
   transition:transform .5s var(--ease), background .4s, color .4s, box-shadow .4s; }
 .btn-solid{ background:var(--ink); color:var(--paper); }
-.btn-solid:hover{ background:var(--accent); transform:translateY(-2px); box-shadow:0 14px 30px -12px rgba(13,115,104,.5); }
+.btn-solid:hover{ background:var(--accent); transform:translateY(-2px); box-shadow:0 14px 30px -12px rgba(166,128,62,.5); }
 .btn-line{ background:transparent; color:var(--ink); border:1px solid var(--hair); }
 .btn-line:hover{ border-color:var(--ink); transform:translateY(-2px); }
 .btn-light{ background:var(--paper); color:var(--ink); }
@@ -103,24 +105,28 @@ h1,h2,h3{ font-family:var(--f-disp); font-weight:400; line-height:1.05; letter-s
 .hero{ position:relative; height:100svh; min-height:600px; overflow:hidden;
   display:flex; align-items:flex-end; }
 .hero-media{ position:absolute; inset:0; z-index:0; overflow:hidden; }
-.hero-media img{ width:100%; height:120%; object-fit:cover;
+.hero-media img, .hero-video{ width:100%; height:120%; object-fit:cover;
   animation:kenburns 22s ease-out forwards; will-change:transform; }
+.hero-video{ position:absolute; inset:0; height:100%; }
 @keyframes kenburns{ from{ transform:scale(1.12) translateY(0); } to{ transform:scale(1) translateY(-2%); } }
+/* brighter, warmer scrim — readable but airy, not nightclub */
 .hero-media::after{ content:""; position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(8,10,14,.34) 0%, rgba(8,10,14,.06) 32%, rgba(8,10,14,.10) 62%, rgba(8,10,14,.66) 100%); }
+  background:linear-gradient(180deg, rgba(33,28,21,.30) 0%, rgba(33,28,21,.04) 30%, rgba(33,28,21,.06) 58%, rgba(33,28,21,.52) 100%); }
 .hero-inner{ position:relative; z-index:2; color:#fff; padding-bottom:8vh; width:100%; }
 .hero .eyebrow{ opacity:0; transform:translateY(14px); animation:rise .9s var(--ease-out) .3s forwards; }
-.hero h1{ font-size:clamp(2.7rem, 6.4vw, 5.6rem); font-weight:300; letter-spacing:-.025em;
-  max-width:15ch; margin:20px 0 0; text-wrap:balance;
-  text-shadow:0 1px 36px rgba(8,10,14,.3); }
+.hero h1{ font-size:clamp(2.8rem, 6.8vw, 6rem); font-weight:300; letter-spacing:-.025em;
+  max-width:15ch; margin:18px 0 0; text-wrap:balance;
+  text-shadow:0 1px 40px rgba(20,16,10,.34); }
 .hero h1 em{ font-style:italic; font-weight:400; }
 .hero h1 .l{ display:block; opacity:0; transform:translateY(22px); animation:rise 1s var(--ease-out) forwards; }
 .hero h1 .l:nth-child(1){ animation-delay:.42s; }
 .hero h1 .l:nth-child(2){ animation-delay:.54s; }
-.hero p.sub{ font-size:clamp(1rem,1.5vw,1.18rem); max-width:46ch; margin:26px 0 32px; color:rgba(255,255,255,.92);
-  font-weight:400; opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .7s forwards; }
+.hero .audience{ font-family:var(--f-disp); font-style:italic; font-weight:400; font-size:clamp(1.05rem,1.9vw,1.4rem);
+  color:rgba(255,255,255,.94); margin:22px 0 0; opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .66s forwards; }
+.hero p.sub{ font-size:clamp(1rem,1.5vw,1.16rem); max-width:48ch; margin:18px 0 32px; color:rgba(255,255,255,.9);
+  font-weight:400; opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .8s forwards; }
 .hero-cta{ display:flex; gap:14px; flex-wrap:wrap;
-  opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .82s forwards; }
+  opacity:0; transform:translateY(16px); animation:rise 1s var(--ease-out) .92s forwards; }
 @keyframes rise{ to{ opacity:1; transform:none; } }
 .hero-scroll{ position:absolute; left:32px; bottom:26px; z-index:3; display:flex; align-items:center; gap:12px;
   color:rgba(255,255,255,.7); font-size:.68rem; letter-spacing:.28em; text-transform:uppercase;
@@ -206,12 +212,34 @@ section{ position:relative; }
    AMENITIES — clean editorial grid
    ============================================================ */
 .amen{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--hair);
-  border:1px solid var(--hair); border-radius:3px; overflow:hidden; }
-.amen .a{ background:var(--paper); padding:34px 26px; transition:background .4s; }
+  border:1px solid var(--hair); border-radius:6px; overflow:hidden; }
+.amen .a{ background:var(--paper); padding:32px 26px; transition:background .4s; }
 .amen .a:hover{ background:var(--sand); }
-.amen .a .n{ font-family:var(--f-disp); font-style:italic; color:var(--accent); font-size:.95rem; }
-.amen .a h4{ font-family:var(--f-disp); font-weight:400; font-size:1.3rem; margin:12px 0 6px; letter-spacing:-.01em; }
+.amen .a .ai{ font-size:1.5rem; display:block; margin-bottom:12px; }
+.amen .a h4{ font-family:var(--f-disp); font-weight:400; font-size:1.28rem; margin:0 0 6px; letter-spacing:-.01em; }
 .amen .a p{ font-size:.9rem; color:var(--ink-soft); }
+
+/* ---- neighborhood ---- */
+.hood{ display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:30px; align-items:stretch; }
+.hood-l{ background:var(--sand); border-radius:8px; padding:34px; }
+.hood-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:24px; }
+.hood-head h3{ font-family:var(--f-disp); font-weight:300; font-size:1.7rem; margin-top:8px; }
+.weather{ display:flex; align-items:center; gap:11px; padding:11px 16px; border-radius:100px; }
+.glass{ background:var(--glass); backdrop-filter:blur(14px) saturate(1.3); border:1px solid var(--glass-line); box-shadow:0 6px 24px -12px rgba(0,0,0,.18); }
+.weather .w-temp{ font-family:var(--f-disp); font-weight:400; font-size:1.5rem; line-height:1; }
+.weather .w-meta{ display:flex; flex-direction:column; line-height:1.1; }
+.weather .w-meta span{ font-size:.82rem; font-weight:600; }
+.weather .w-meta small{ font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); }
+.walks{ list-style:none; }
+.walks li{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:14px;
+  padding:15px 0; border-bottom:1px solid var(--hair); }
+.walks li:last-child{ border-bottom:none; }
+.walks .wk-i{ font-size:1.15rem; }
+.walks .wk-n{ font-weight:500; font-size:1rem; }
+.walks .wk-t{ font-family:var(--f-disp); font-style:italic; color:var(--accent); font-size:.95rem; white-space:nowrap; }
+.hood-map{ border-radius:8px; overflow:hidden; border:1px solid var(--hair); min-height:380px; }
+.hood-map iframe{ width:100%; height:100%; min-height:380px; border:0; filter:saturate(.92) contrast(1.02); }
+@media (max-width:820px){ .hood{ grid-template-columns:1fr; } .hood-map{ min-height:300px; } }
 
 /* ============================================================
    MEMBERSHIP / STEPS / PRICE
@@ -302,8 +330,8 @@ section{ position:relative; }
 .pb-r .total small{ font-family:var(--f-body); font-size:1rem; color:rgba(255,255,255,.55); }
 .pb-r .total s{ color:rgba(255,255,255,.4); font-size:1.7rem; font-weight:300; }
 .pb-r .brk{ font-size:.84rem; color:rgba(255,255,255,.6); line-height:1.5; margin:4px 0; }
-.pb-r .save{ display:inline-block; font-size:.74rem; font-weight:600; letter-spacing:.04em; color:#9be8df; background:rgba(13,115,104,.28);
-  border:1px solid rgba(155,232,223,.35); border-radius:100px; padding:5px 13px; margin:10px 0 16px; }
+.pb-r .save{ display:inline-block; font-size:.74rem; font-weight:600; letter-spacing:.04em; color:#e9d3a0; background:rgba(166,128,62,.28);
+  border:1px solid rgba(216,194,140,.35); border-radius:100px; padding:5px 13px; margin:10px 0 16px; }
 .pb-r .dep{ font-size:.82rem; color:rgba(255,255,255,.6); margin-bottom:18px; }
 .move-in{ border-top:1px solid rgba(255,255,255,.14); margin:16px 0 20px; padding-top:14px; }
 .move-in .mi{ display:flex; justify-content:space-between; font-size:.86rem; color:rgba(255,255,255,.68); padding:5px 0; }
@@ -339,6 +367,7 @@ section{ position:relative; }
 .closing-inner h2{ font-size:clamp(2.2rem,5vw,4rem); font-weight:300; margin:18px auto 22px; text-wrap:balance; }
 .closing-inner h2 em{ font-style:italic; }
 .closing-inner p{ color:rgba(255,255,255,.86); font-size:1.12rem; max-width:50ch; margin:0 auto 32px; }
+.closing-inner .next-avail{ font-size:.78rem; letter-spacing:.06em; color:rgba(255,255,255,.66); margin:18px auto 0; max-width:none; }
 .sig{ margin-top:36px; font-family:var(--f-disp); font-style:italic; font-size:1.4rem; color:#fff; }
 .sig small{ display:block; font-family:var(--f-body); font-style:normal; font-size:.7rem; letter-spacing:.24em;
   text-transform:uppercase; color:rgba(255,255,255,.6); margin-top:8px; }
@@ -383,14 +412,14 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   background:#fff; border:1px solid var(--hair); border-radius:3px; padding:13px 14px;
   transition:border-color .3s, box-shadow .3s; }
 .field input:focus, .field textarea:focus, .field select:focus{ outline:none; border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(13,115,104,.1); }
+  box-shadow:0 0 0 3px rgba(166,128,62,.1); }
 .field textarea{ resize:vertical; min-height:88px; }
 .two{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 
 .drop{ border:1.5px dashed var(--hair); border-radius:4px; padding:26px; text-align:center; cursor:pointer;
   transition:border-color .3s, background .3s; }
-.drop:hover{ border-color:var(--accent); background:rgba(13,115,104,.03); }
-.drop.has{ border-style:solid; border-color:var(--accent); background:rgba(13,115,104,.05); }
+.drop:hover{ border-color:var(--accent); background:rgba(166,128,62,.03); }
+.drop.has{ border-style:solid; border-color:var(--accent); background:rgba(166,128,62,.05); }
 .drop svg{ width:28px; height:28px; stroke:var(--accent); fill:none; stroke-width:1.5; margin:0 auto 10px; }
 .drop .dt{ font-size:.94rem; font-weight:600; }
 .drop .ds{ font-size:.8rem; color:var(--ink-soft); margin-top:4px; }
@@ -419,8 +448,21 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
 .charge .li.tot{ font-family:var(--f-disp); font-size:1.2rem; padding-top:14px; }
 .bankbtn{ width:100%; justify-content:center; }
 .bankok{ display:none; align-items:center; gap:11px; padding:15px 18px; border-radius:4px;
-  background:rgba(13,115,104,.08); border:1px solid rgba(13,115,104,.3); font-weight:600; font-size:.92rem; }
+  background:rgba(166,128,62,.08); border:1px solid rgba(166,128,62,.3); font-weight:600; font-size:.92rem; }
 .bankok.show{ display:flex; }
+
+/* Mercury invoice step */
+.merc{ border:1px solid var(--hair); border-radius:8px; padding:22px 24px; margin-bottom:18px; background:var(--sand); }
+.merc-h{ font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; margin-bottom:14px; }
+.merc-steps{ margin:0 0 0 1.1em; padding:0; }
+.merc-steps li{ font-size:.94rem; color:var(--ink); margin-bottom:9px; line-height:1.5; }
+.merc-note{ font-size:.82rem; color:var(--ink-soft); margin-top:6px; }
+.seg{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.seg-o{ display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;
+  border:1px solid var(--hair); border-radius:6px; padding:15px 12px; font-weight:500; transition:border-color .25s, background .25s; }
+.seg-o input{ display:none; }
+.seg-o:hover{ border-color:var(--ink); }
+.seg-o.on{ border-color:var(--ink); background:var(--ink); color:#fff; }
 .bankok svg{ width:20px; height:20px; stroke:var(--accent); fill:none; stroke-width:2.4; }
 
 .donewrap{ text-align:center; padding:24px 10px; }
@@ -482,24 +524,30 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
 <nav class="nav" id="nav">
   <a href="#top" class="wordmark">LiveWork <i>Miami</i></a>
   <div class="nav-links" id="navLinks">
-    <a href="#life" onclick="closeMenu()">The Residence</a>
-    <a href="#network" onclick="closeMenu()">The Network</a>
+    <a href="#scene" onclick="closeMenu()">The Residence</a>
+    <a href="#outside" onclick="closeMenu()">The Neighborhood</a>
     <a href="#membership" onclick="closeMenu()">Membership</a>
-    <button class="btn nav-apply" onclick="openOnboarding();closeMenu()">Apply</button>
+    <button class="btn nav-apply" onclick="openOnboarding();closeMenu()">Request membership</button>
   </div>
   <button class="burger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 
 <!-- ===================== HERO ===================== -->
 <header class="hero" id="top">
-  <div class="hero-media"><img data-key="hero" alt="A high-floor view over Brickell at golden hour" /></div>
+  <!-- To use drone footage: drop photos/hero.mp4 in and uncomment the <video> below.
+       It will play over the photo poster. The photo alone works fine without it. -->
+  <div class="hero-media">
+    <!-- <video class="hero-video" autoplay muted loop playsinline poster="photos/hero.jpg"><source src="photos/hero.mp4" type="video/mp4"></video> -->
+    <img data-key="hero" alt="The rooftop pool above Brickell" />
+  </div>
   <div class="wrap hero-inner">
-    <span class="eyebrow light">Brickell · Miami · By Invitation</span>
-    <h1><span class="l">Live among the people</span><span class="l">building <em>what's next.</em></span></h1>
-    <p class="sub">A members residence on a high floor of Brickell's DUA tower. Meals, cleaning, and laundry handled daily. Your network, multiplied. Your time, returned.</p>
+    <span class="eyebrow light">LiveWork Miami · Brickell</span>
+    <h1><span class="l">More than</span><span class="l">a place <em>to live.</em></span></h1>
+    <p class="audience" id="audience">For founders, executives, creatives, and the quietly exceptional.</p>
+    <p class="sub">A private residence membership on a high floor of Brickell's DUA tower. The building, the network, the wellness, the calm. One membership is open.</p>
     <div class="hero-cta">
-      <button class="btn btn-light" onclick="openOnboarding()">Apply for membership</button>
-      <a href="#life" class="btn btn-ghost-light">Take the tour</a>
+      <button class="btn btn-light" onclick="openOnboarding()">Request membership</button>
+      <a href="#scene" class="btn btn-ghost-light">Take the tour</a>
     </div>
   </div>
   <a href="#intro" class="hero-scroll"><span class="ln"></span>Scroll</a>
@@ -510,11 +558,11 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   <div class="wrap intro">
     <div class="col" data-reveal>
       <span class="eyebrow">The idea</span>
-      <p class="statement" style="margin-top:18px;">A living space among impact-driven, success-driven people. A place where <em>one plus one equals five.</em></p>
+      <p class="statement" style="margin-top:18px;">You are not renting a room. You are stepping into a <em>way of living</em> that most of Brickell never gets access to.</p>
     </div>
     <div class="col" data-reveal data-d="1">
-      <p>Upgrade your mind, body, and business. Live a rewarding, productive life in tranquility, and capitalize on the synergy of the people you live with and the friends they bring.</p>
-      <p>A luxurious residence high above Brickell with sunset and city views, while your meals are prepared fresh and your cleaning, laundry, utilities, and maintenance simply run on their own.</p>
+      <p>A high-floor residence where the building, the wellness, the network, and the daily details are handled for you. Membership is limited and personal. When a place opens, one person is invited in.</p>
+      <p>Your meals, your cleaning, your laundry, your packages, quietly taken care of. What you keep is your time, your focus, and a calm, beautiful place to come home to.</p>
     </div>
   </div>
 </section>
@@ -541,20 +589,22 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   <div class="wrap">
     <div class="lede" data-reveal>
       <span class="eyebrow">The Residence</span>
-      <h2>Automate your life. Keep the time for what <em>you love.</em></h2>
-      <p>A full-time House Manager, Chef, and Cleaner runs the household so you never think about it. Show up, live well, and reclaim more than twenty hours every month.</p>
+      <h2>Your life, quietly <em>taken care of.</em></h2>
+      <p>A private suite that is yours, inside a home that runs itself. Show up, live well, and let the details disappear.</p>
     </div>
 
     <div class="row" data-reveal>
-      <div class="figure ph"><img data-key="life1" alt="The residence interior" loading="lazy" /></div>
+      <div class="figure ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_1200/v1781709276/Room_View_IMG_7413_vszowx.jpg" alt="The private suite" loading="lazy" /></div>
       <div class="row-copy">
-        <span class="ix">i. The service</span>
-        <h3>A household that runs itself</h3>
-        <p>Your meals prepared, your laundry done, your linens fresh, your packages received, your errands handled. The logistics of life, quietly taken care of.</p>
+        <span class="ix">i. Your private suite</span>
+        <h3>A space that is entirely yours</h3>
+        <p>A serene, light-filled suite with a private balcony and your own full bathroom. Kept immaculate, reset and ready, with the small logistics of life handled before you notice them.</p>
         <ul class="ticks">
-          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Full-time House Manager, Chef, and Cleaner</li>
-          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Laundry, cleaning, mail, and maintenance on a rhythm</li>
-          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Twenty-plus hours returned to you every month</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Queen adjustable Tempur-Pedic bed (a $6,000 mattress)</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Your own private full bathroom</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Private balcony with gorgeous views</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Generous closet space and a full-length mirror</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Cleaning, laundry, and linens handled on a rhythm</li>
         </ul>
       </div>
     </div>
@@ -562,13 +612,13 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
     <div class="row flip" data-reveal>
       <div class="figure ph"><img data-key="food" alt="Chef-prepared meals" loading="lazy" /></div>
       <div class="row-copy">
-        <span class="ix">ii. The food</span>
-        <h3>Healthy, fresh, and genuinely incredible</h3>
-        <p>We source from the cleanest options possible: local, vetted farms without pesticides or antibiotics, rounded out with the best from Whole Foods and Trader Joe's. You never plan or order. You just say what you like.</p>
+        <span class="ix">ii. The table</span>
+        <h3>Healthy, fresh, genuinely incredible</h3>
+        <p>A private chef sources from clean, vetted farms and the best of Whole Foods and Trader Joe's. You never plan or order. You simply say what you like.</p>
         <ul class="ticks">
-          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Fresh meals prepared Monday through Friday</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Fresh meals prepared through the week</li>
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Meal prep stocked for nights and weekends</li>
-          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Sourced from clean, vetted local farms</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Clean ingredients, sourced with intention</li>
         </ul>
       </div>
     </div>
@@ -576,11 +626,11 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
     <div class="row" data-reveal>
       <div class="figure ph"><img data-key="pool" alt="Rooftop pool" loading="lazy" /></div>
       <div class="row-copy">
-        <span class="ix">iii. The building</span>
-        <h3>The best address in Brickell</h3>
-        <p>We vetted over fifty of Miami's best residences with realtors and our team, and fell for DUA. Two blocks from the center of Brickell, moments from the highway, surrounded by everything. The value is unmatched.</p>
+        <span class="ix">iii. The address</span>
+        <h3>The best building in Brickell</h3>
+        <p>We toured more than fifty of Miami's finest residences and chose DUA. A landmark tower, two blocks from the heart of Brickell, with wellness and views most of the city only visits.</p>
         <ul class="ticks">
-          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Three pools, including a rooftop with skyline views</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Three pools, including a rooftop above the skyline</li>
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Cold plunge, jacuzzi, sauna, and steam</li>
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Private theater, billiards, and resident events</li>
         </ul>
@@ -589,38 +639,84 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   </div>
 </section>
 
-<!-- ===================== CINEMA (The Network) ===================== -->
-<section class="cinema" id="network">
-  <div class="cinema-media"><img data-key="network" alt="A member dinner at golden hour" loading="lazy" /></div>
-  <div class="wrap cinema-inner" data-reveal>
-    <span class="eyebrow light">The Network</span>
-    <h2>The who's-who of Miami, and guests from <em>around the world.</em></h2>
-    <p>Last year brought gatherings across the calendar, from a private penthouse to venues of more than a thousand people. The room is always full of people worth knowing.</p>
-    <p>The real value is the relationships: the chance to build a net worth, and a life, alongside people who are genuinely making it happen.</p>
-    <div class="statline">
-      <div class="s"><b>20+</b><span>Hours saved monthly</span></div>
-      <div class="s"><b>1 + 1 = 5</b><span>The synergy principle</span></div>
-      <div class="s"><b>By invite</b><span>Every member vetted</span></div>
+<!-- ===================== INSIDE THE RESIDENCE ===================== -->
+<section class="sand pad" id="inside-res">
+  <div class="wrap">
+    <div class="lede" data-reveal style="margin-bottom:36px;">
+      <span class="eyebrow">Inside the residence</span>
+      <h2>The suite, and the spaces <em>you'll share.</em></h2>
+      <p>Your private room and full bath, plus a bright living room and full kitchen at the heart of the home.</p>
+    </div>
+    <div class="gallery" data-reveal>
+      <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Room_Photo_IMG_2858_hgbav5.jpg" alt="Your private suite" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Living_room_kitchen_table_fdluos.jpg" alt="Living and dining area" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Kitchen_IMG_7416_ahgfzp.jpg" alt="Full kitchen" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Couch_IMG_7414_hzvzcd.jpg" alt="The living room" loading="lazy" /></figure>
     </div>
   </div>
 </section>
 
-<!-- ===================== AMENITIES ===================== -->
-<section class="pad">
-  <div class="wrap">
-    <div class="lede" data-reveal style="margin-bottom:46px;">
-      <span class="eyebrow">DUA · Brickell</span>
-      <h2>Everything, within reach.</h2>
+<!-- ===================== CINEMA (The Community) ===================== -->
+<section class="cinema" id="network">
+  <div class="cinema-media"><img data-key="network" alt="A member dinner at golden hour" loading="lazy" /></div>
+  <div class="wrap cinema-inner" data-reveal>
+    <span class="eyebrow light">The Community</span>
+    <h2>You will be in <em>very good company.</em></h2>
+    <p>Members are founders, investors, and creatives who lead with kindness and bring something real to the room. Dinners, rooftop evenings, and quiet introductions that tend to change things.</p>
+    <p>It is not about who you meet. It is about who you become around them.</p>
+    <div class="statline">
+      <div class="s"><b>Private</b><span>Invitation only</span></div>
+      <div class="s"><b>Vetted</b><span>Every member</span></div>
+      <div class="s"><b>Brickell</b><span>The heart of it</span></div>
     </div>
+  </div>
+</section>
+
+<!-- ===================== EVERYTHING OUTSIDE YOUR DOOR ===================== -->
+<section class="pad" id="outside">
+  <div class="wrap">
+    <div class="lede" data-reveal style="margin-bottom:44px;">
+      <span class="eyebrow">Everything outside your door</span>
+      <h2>Step out, and the city <em>is already yours.</em></h2>
+      <p>Wellness in the building. The best of Brickell on foot. And a quiet, walkable life most of Miami drives across town for.</p>
+    </div>
+
     <div class="amen" data-reveal>
-      <div class="a"><span class="n">01</span><h4>Three pools</h4><p>Including a rooftop pool with skyline views</p></div>
-      <div class="a"><span class="n">02</span><h4>Cold plunge</h4><p>Coed cold plunge, jacuzzi, and hot tub</p></div>
-      <div class="a"><span class="n">03</span><h4>Sauna &amp; steam</h4><p>On-site sauna and steam room</p></div>
-      <div class="a"><span class="n">04</span><h4>Pool bar</h4><p>Resort-style pools with bar and restaurant</p></div>
-      <div class="a"><span class="n">05</span><h4>Movie theater</h4><p>Private screening room and billiards</p></div>
-      <div class="a"><span class="n">06</span><h4>Comedy night</h4><p>Wednesday networking and comedy</p></div>
-      <div class="a"><span class="n">07</span><h4>Dance night</h4><p>Saturday dance party in the building</p></div>
-      <div class="a"><span class="n">08</span><h4>Steps to Equinox</h4><p>Three blocks to Brickell Heights</p></div>
+      <div class="a"><span class="ai">🏊</span><h4>Three pools</h4><p>Including a rooftop pool above the skyline</p></div>
+      <div class="a"><span class="ai">🧊</span><h4>Cold plunge</h4><p>Cold plunge, jacuzzi, and hot tub</p></div>
+      <div class="a"><span class="ai">🧖</span><h4>Sauna &amp; steam</h4><p>On-site sauna and steam room</p></div>
+      <div class="a"><span class="ai">🍸</span><h4>Pool bar</h4><p>Resort-style pools with bar and dining</p></div>
+      <div class="a"><span class="ai">🎬</span><h4>Theater</h4><p>Private screening room and billiards</p></div>
+      <div class="a"><span class="ai">🏋️</span><h4>Fitness</h4><p>Building gym, steps to Equinox</p></div>
+      <div class="a"><span class="ai">🎤</span><h4>Resident events</h4><p>Comedy, networking, evenings out</p></div>
+      <div class="a"><span class="ai">🚶</span><h4>Walkable</h4><p>The most walkable corner of Miami</p></div>
+    </div>
+
+    <!-- neighborhood: walking times + map + live weather -->
+    <div class="hood" data-reveal>
+      <div class="hood-l">
+        <div class="hood-head">
+          <div>
+            <span class="eyebrow">On foot from your door</span>
+            <h3>A few minutes to everything.</h3>
+          </div>
+          <div class="weather glass" id="weather">
+            <span class="w-temp" id="wTemp">—</span>
+            <span class="w-meta"><span id="wDesc">Brickell</span><small>right now</small></span>
+          </div>
+        </div>
+        <ul class="walks">
+          <li><span class="wk-i">🏋️</span><span class="wk-n">Equinox Brickell Heights</span><span class="wk-t">6 min walk</span></li>
+          <li><span class="wk-i">🛒</span><span class="wk-n">Whole Foods Market</span><span class="wk-t">7 min walk</span></li>
+          <li><span class="wk-i">🛍️</span><span class="wk-n">Brickell City Centre</span><span class="wk-t">9 min walk</span></li>
+          <li><span class="wk-i">🚆</span><span class="wk-n">Metromover (free transit)</span><span class="wk-t">4 min walk</span></li>
+          <li><span class="wk-i">💪</span><span class="wk-n">Stretch Zone</span><span class="wk-t">2 min walk</span></li>
+        </ul>
+      </div>
+      <div class="hood-map">
+        <iframe title="Brickell map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=-80.2010%2C25.7585%2C-80.1875%2C25.7700&layer=mapnik&marker=25.7642%2C-80.1942"></iframe>
+      </div>
     </div>
   </div>
 </section>
@@ -631,11 +727,11 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
     <div class="lede" data-reveal>
       <span class="eyebrow">Membership</span>
       <h2>How you join.</h2>
-      <p>Membership is by application. The process is quick, secure, and built to keep the community exceptional. Here is exactly how it works.</p>
+      <p>Membership is by request and review. The process is quiet, secure, and quick. Here is exactly how it works.</p>
     </div>
 
     <div class="steps" data-reveal>
-      <div class="step"><div class="n">01</div><h4>Apply</h4><p>Share your details and a little about who you are and what you're building.</p></div>
+      <div class="step"><div class="n">01</div><h4>Request</h4><p>Share your details and a little about who you are and what you're building.</p></div>
       <div class="step"><div class="n">02</div><h4>Verify</h4><p>Complete a background check and upload your ID. Vetting is what protects the community.</p></div>
       <div class="step"><div class="n">03</div><h4>Sign</h4><p>Review and sign the membership agreement and the house standards.</p></div>
       <div class="step"><div class="n">04</div><h4>Move in</h4><p>Securely connect your bank to authorize membership. Your residence is confirmed.</p></div>
@@ -705,10 +801,11 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
 <section class="closing">
   <div class="closing-media"><img data-key="closing" alt="Miami sunset from the residence" loading="lazy" /></div>
   <div class="closing-inner" data-reveal>
-    <span class="eyebrow light">Lead with kindness</span>
-    <h2>Good people. A network <em>worth billions.</em></h2>
-    <p>We only accept people who bring value to this community. If that is you, the door is open.</p>
-    <button class="btn btn-light" onclick="openOnboarding()">Apply for membership</button>
+    <span class="eyebrow light">By invitation</span>
+    <h2>One membership is <em>open.</em></h2>
+    <p>We keep this small on purpose. If the life here is the one you have been quietly looking for, we would like to meet you.</p>
+    <button class="btn btn-light" onclick="openOnboarding()">Request membership</button>
+    <p class="next-avail" id="nextAvail"></p>
     <div class="sig">Warm regards, Mike Krilivsky<small>Founder, LiveWork Miami</small></div>
   </div>
 </section>
@@ -786,7 +883,11 @@ const CONFIG = {
   DISCOUNT_CODES: { 'JAMES16': 16 },
   // Standard tenant screening (credit + criminal + eviction). ~$35, applicant-paid, same-day PDF.
   BG_CHECK_URL: 'https://www.mysmartmove.com/',
-  // Your Stripe publishable key (safe to expose; starts pk_live_ or pk_test_)
+  // PAYMENT_MODE: 'mercury' = member picks ACH/Wire, you get an email, you send a Mercury invoice.
+  //              'stripe'  = automated bank-connect via Stripe (needs keys + EIN).
+  PAYMENT_MODE: 'mercury',
+  PAYMENT: { email: 'michaelkrilivsky@gmail.com' },
+  // Your Stripe publishable key (only used when PAYMENT_MODE is 'stripe')
   STRIPE_PUBLISHABLE_KEY: 'pk_test_REPLACE_ME',
   API: {
     saveApplication: '/api/application',
@@ -832,6 +933,27 @@ document.querySelectorAll('img[data-key]').forEach(img=>{
 /* ---------- misc ---------- */
 const fmt = n => '$' + Number(n).toLocaleString('en-US');
 document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ---- live Brickell weather (open-meteo, no key) ---- */
+(async function(){
+  const el = document.getElementById('weather'); if(!el) return;
+  try{
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.7642&longitude=-80.1942&current=temperature_2m,weather_code&temperature_unit=fahrenheit');
+    const d = await r.json(); const c = d.current;
+    const codes = { 0:'Clear', 1:'Mostly clear', 2:'Partly cloudy', 3:'Overcast', 45:'Fog', 48:'Fog',
+      51:'Drizzle', 53:'Drizzle', 55:'Drizzle', 61:'Light rain', 63:'Rain', 65:'Heavy rain',
+      80:'Showers', 81:'Showers', 82:'Showers', 95:'Storms', 96:'Storms', 99:'Storms' };
+    document.getElementById('wTemp').textContent = Math.round(c.temperature_2m) + '°';
+    document.getElementById('wDesc').textContent = (codes[c.weather_code] || 'Brickell') + ' in Brickell';
+  }catch(e){ el.style.display='none'; }
+})();
+
+/* ---- next available membership (1st of next month) ---- */
+(function(){
+  const el = document.getElementById('nextAvail'); if(!el) return;
+  const d = new Date(); d.setMonth(d.getMonth()+1, 1);
+  el.textContent = 'Next residence available ' + d.toLocaleDateString('en-US',{month:'long', year:'numeric'}) + ' · reviewed in the order received';
+})();
 
 /* ============================================================
    SAVINGS CALCULATOR + PLAN BUILDER
@@ -1005,13 +1127,14 @@ if(!reduce){
    ONBOARDING (same flow, restyled)
    ============================================================ */
 let step = 0; const TOTAL = 7;
-const stepLabels = ['Your details','Your plan','Background check','Photo ID','Agreement','Connect bank','Welcome'];
+const stepLabels = ['Your details','Your plan','Background check','Photo ID','Agreement','Payment','Welcome'];
 const application = { fullName:'',email:'',phone:'',dob:'',currentAddress:'',occupation:'',company:'',moveIn:'',
   referral:'',about:'', plan:null,
   bgAuthorize:false, bgCheckFile:null, idType:'passport', idFile:null,
   signature:'', printedName:'', signedAt:'', mailingAddress:'',
   ec1Name:'', ec1Phone:'', ec2Name:'', ec2Phone:'',
   agreeAll:false, agreeAccess:false, agreePay:false, agreeSign:false,
+  paymentMethod:'ach', paymentAck:false,
   bankConnected:false, stripeCustomerId:null, paymentMethodId:null };
 
 function openOnboarding(){ const o=document.getElementById('overlay'); o.classList.add('open'); o.setAttribute('aria-hidden','false');
@@ -1028,7 +1151,7 @@ function updateBar(){
   const n=document.getElementById('nextBtn');
   if(step===TOTAL-1){ n.textContent='Done'; document.getElementById('backBtn').style.visibility='hidden'; }
   else if(step===4) n.textContent='Sign & continue →';
-  else if(step===5) n.textContent='Authorize & submit →';
+  else if(step===5) n.textContent = CONFIG.PAYMENT_MODE==='stripe' ? 'Authorize & submit →' : 'Submit & finish →';
   else n.textContent='Continue →';
 }
 function renderStep(){ setErr(''); const b=document.getElementById('sbody'); b.scrollTop=0; b.innerHTML=TPL[step](); bindStep(); updateBar(); }
@@ -1108,26 +1231,39 @@ const TPL = {
     <label class="chk"><input type="checkbox" id="f_agreePay" ${application.agreePay?'checked':''} /><span>I agree to pay the membership fee through the application and payment process on this site, in advance of each membership period.</span></label>
     <label class="chk"><input type="checkbox" id="f_agreeSign" ${application.agreeSign?'checked':''} /><span>I consent to sign electronically, and I agree my typed name is my legal signature (E-SIGN / Florida UETA).</span></label>`,
 
-  5: ()=>{ const p = application.plan || planSnapshot(); const m = p.monthlyTotal; return `
-    <h3>Connect your bank</h3>
-    <p class="desc">Securely link your bank to confirm your residence. We never see or store your login.</p>
+  5: ()=>{ const p = application.plan || planSnapshot(); const m = p.monthlyTotal; const due = p.dueAtMoveIn; return `
+    <h3>Payment</h3>
+    <p class="desc">Reserve your residence. There is nothing to pay on this page.</p>
     <div class="charge">
       <div class="li"><span>First month${p.addons.length?' (with services)':''}</span><span>${fmt(m)}</span></div>
       ${p.hasLastMonth?`<div class="li"><span>Last month (held)</span><span>${fmt(m)}</span></div>`:''}
       <div class="li"><span>Deposit (one month)</span><span>${fmt(p.deposit)}</span></div>
-      <div class="li tot"><span>Due prior to move-in</span><span>${fmt(p.dueAtMoveIn)}</span></div>
+      <div class="li tot"><span>Due prior to move-in</span><span>${fmt(due)}</span></div>
     </div>
-    <p style="font-size:.86rem;color:var(--ink-soft);margin-bottom:16px;">${p.discountPct?`Includes your ${p.discountPct}% discount. `:''}After move-in, ${fmt(m)} is collected each membership period by ACH. You receive a notice before each charge and can cancel in writing with 30 days notice.</p>
-    <button class="btn btn-solid bankbtn" id="bankBtn" onclick="connectBank()">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
-      Connect bank securely</button>
-    <div class="bankok" id="bankok"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Bank connected and authorized. You're all set to submit.</span></div>`; },
+
+    <div class="merc">
+      <div class="merc-h">How payment works</div>
+      <ol class="merc-steps">
+        <li>You submit below and we receive your selection.</li>
+        <li>We email you a secure invoice from <b>Mercury</b>, our bank.</li>
+        <li>You complete payment in Mercury by your preferred method. Your residence is confirmed once it is received.</li>
+      </ol>
+      <p class="merc-note">No bank or card details are entered on this site.</p>
+    </div>
+
+    <div class="field"><label>Preferred payment method <span class="rq">*</span></label>
+      <div class="seg">
+        <label class="seg-o ${application.paymentMethod==='ach'?'on':''}"><input type="radio" name="paym" value="ach" ${application.paymentMethod==='ach'?'checked':''}><span>ACH transfer</span></label>
+        <label class="seg-o ${application.paymentMethod==='wire'?'on':''}"><input type="radio" name="paym" value="wire" ${application.paymentMethod==='wire'?'checked':''}><span>Wire transfer</span></label>
+      </div>
+    </div>
+    <label class="chk"><input type="checkbox" id="f_paymentAck" ${application.paymentAck?'checked':''} /><span>I understand I will receive a Mercury invoice to complete payment, and my residence is confirmed once payment is received.</span></label>`; },
 
   6: ()=>`
     <div class="donewrap">
       <div class="donering"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-      <h3>Application submitted</h3>
-      <p class="desc" style="max-width:42ch;margin:8px auto 0;">Thank you, ${esc((application.fullName||'').split(' ')[0]||'and welcome')}. Your application and documents are in. The team will review and reach out at <b style="color:var(--accent)">${esc(application.email)}</b> with next steps.</p>
+      <h3>You're all set</h3>
+      <p class="desc" style="max-width:46ch;margin:8px auto 0;">Thank you, ${esc((application.fullName||'').split(' ')[0]||'and welcome')}. Your application is in. We will email you a secure Mercury invoice at <b style="color:var(--accent)">${esc(application.email)}</b> to complete payment, along with your move-in details.</p>
       <div class="sig" style="margin-top:24px;color:var(--ink);">Warm regards, Mike<small style="color:var(--ink-soft);">Founder, LiveWork Miami</small></div>
     </div>`
 };
@@ -1144,7 +1280,14 @@ function bindStep(){
   if(step===2){ const c=document.getElementById('f_bgAuthorize'); if(c) c.addEventListener('change', e=> application.bgAuthorize=e.target.checked); bindDrop('bg', f=> application.bgCheckFile=f); }
   if(step===3){ bindDrop('id', f=> application.idFile=f);
     document.getElementById('f_idType').addEventListener('change', e=> application.idType=e.target.value); }
-  if(step===5 && application.bankConnected){ document.getElementById('bankBtn').style.display='none'; document.getElementById('bankok').classList.add('show'); }
+  if(step===5){
+    document.querySelectorAll('input[name="paym"]').forEach(r=> r.addEventListener('change', e=>{
+      application.paymentMethod=e.target.value;
+      document.querySelectorAll('.seg-o').forEach(o=>o.classList.remove('on'));
+      e.target.closest('.seg-o').classList.add('on');
+    }));
+    const cs=document.getElementById('f_paymentAck'); if(cs) cs.addEventListener('change', e=> application.paymentAck=e.target.checked);
+  }
 }
 function bindDrop(key,onFile){ const d=document.getElementById('drop_'+key), inp=document.getElementById('file_'+key);
   const show=f=>{ onFile(f); d.classList.add('has'); document.getElementById('fn_'+key).textContent=f.name; };
@@ -1163,6 +1306,8 @@ function collectStep(){
     application.signedAt=(document.getElementById('f_signedAt')||{}).value||today();
     ['agreeAll','agreeAccess','agreePay','agreeSign'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.checked; });
   }
+  if(step===5){ const r=document.querySelector('input[name="paym"]:checked'); if(r) application.paymentMethod=r.value;
+    const cs=document.getElementById('f_paymentAck'); if(cs) application.paymentAck=cs.checked; }
 }
 function validateStep(){ collectStep();
   if(step===0){ if(!application.fullName) return 'Please enter your full legal name.';
@@ -1182,7 +1327,10 @@ function validateStep(){ collectStep();
     if(!application.ec1Name || !application.ec1Phone) return 'Please add at least one emergency contact (name and phone).';
     if(!(application.agreeAll && application.agreeAccess && application.agreePay && application.agreeSign)) return 'Please check all four boxes to agree and sign.';
   }
-  if(step===5 && !application.bankConnected) return 'Please connect your bank to continue.';
+  if(step===5){
+    if(CONFIG.PAYMENT_MODE==='stripe'){ if(!application.bankConnected) return 'Please connect your bank to continue.'; }
+    else { if(!application.paymentAck) return 'Please confirm you understand the invoice will be sent.'; }
+  }
   return null;
 }
 async function nextStep(){ if(step===TOTAL-1){ closeOnboarding(); return; }
@@ -1264,12 +1412,14 @@ async function submitApplication(){
         backgroundCheck: bg && { name:application.bgCheckFile.name, type:application.bgCheckFile.type, base64:bg },
         id:              id && { name:application.idFile.name, type:application.idFile.type, base64:id }
       },
-      // tell the server to run the move-in charge (deposit + first month)
-      chargeMoveIn: true
+      // member pays via Mercury invoice after submit; no automatic charge unless in Stripe mode
+      chargeMoveIn: CONFIG.PAYMENT_MODE === 'stripe'
     });
   }catch(e){ console.warn('[submit] demo mode:', e.message); }
 }
-function serializable(a){ const c={...a}; c.bgCheckFileName=a.bgCheckFile?a.bgCheckFile.name:null; c.idFileName=a.idFile?a.idFile.name:null; delete c.bgCheckFile; delete c.idFile; return c; }
+function serializable(a){ const c={...a};
+  c.bgCheckFileName=a.bgCheckFile?a.bgCheckFile.name:null; c.idFileName=a.idFile?a.idFile.name:null;
+  delete c.bgCheckFile; delete c.idFile; delete c.paymentScreenshot; return c; }
 
 /* ===== utils ===== */
 function esc(s){ return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -1277,10 +1427,10 @@ function today(){ return new Date().toISOString().slice(0,10); }
 
 function AGREEMENT(){ return `
   <h4>Membership Agreement &mdash; 1300 S Miami Ave, Apt 3506</h4>
-  <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: Michael Krilivsky. Premises: 1300 S Miami Ave, Apt 3506, Miami, FL 33130. Effective date: on signature.</p>
+  <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: LiveWork Miami, operated by mikek.ai LLC, a Florida limited liability company. Premises: 1300 S Miami Ave, Apt 3506, Miami, FL 33130. Effective date: on signature.</p>
 
   <h4>1. Parties and premises</h4>
-  <p>This Membership Agreement (the "Agreement") is entered into on the date of electronic signature (the "Effective Date") by and between Michael Krilivsky (the "Operator") and the individual signing below (the "Member"). The premises are located at 1300 S Miami Ave, Apt 3506, Miami, Florida 33130 (the "Premises").</p>
+  <p>This Membership Agreement (the "Agreement") is entered into on the date of electronic signature (the "Effective Date") by and between mikek.ai LLC, a Florida limited liability company doing business as LiveWork Miami, by its authorized representative Michael Krilivsky (the "Operator"), and the individual signing below (the "Member"). The premises are located at 1300 S Miami Ave, Apt 3506, Miami, Florida 33130 (the "Premises").</p>
 
   <h4>2. Nature of agreement; no tenancy created</h4>
   <p>This Agreement grants the Member a revocable license to use the Premises and the included services. It is a membership, not a lease, sublease, or rental. Nothing in this Agreement creates a tenancy, leasehold, subtenancy, possessory interest, or any landlord-tenant relationship. The Member acquires no right of exclusive possession. Use of any bedroom or bathroom is for the Member's customary use only and is non-exclusive.</p>

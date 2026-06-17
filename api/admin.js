@@ -41,6 +41,7 @@ export default async function handler(req, res) {
           occupation: a.occupation || '', company: a.company || '', about: a.about || '',
           plan: a.plan || null, status: a.status || 'in_progress',
           bankConnected: !!a.bankConnected, bgAuthorize: !!a.bgAuthorize,
+          paymentMethod: a.paymentMethod || null, paymentSent: !!a.paymentSent,
           signature: a.signature || '', signedAt: a.signedAt || '',
           ec1Name: a.ec1Name || '', ec1Phone: a.ec1Phone || '',
           moveInCharge: a.moveInCharge || null,
