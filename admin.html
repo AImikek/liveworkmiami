@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LiveWork Miami · Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{ --paper:#FBFAF7; --sand:#F0EADF; --ink:#17191E; --soft:#5A5C63; --hair:rgba(23,25,30,.14);
+  --accent:#0D7368; --f-d:'Fraunces',serif; --f-b:'Manrope',sans-serif; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:var(--f-b); background:var(--paper); color:var(--ink); line-height:1.5; -webkit-font-smoothing:antialiased; }
+.wrap{ max-width:1100px; margin:0 auto; padding:0 24px; }
+h1,h2,h3{ font-family:var(--f-d); font-weight:400; letter-spacing:-.01em; }
+header{ border-bottom:1px solid var(--hair); padding:22px 0; position:sticky; top:0; background:rgba(251,250,247,.9); backdrop-filter:blur(14px); z-index:10; }
+header .wrap{ display:flex; align-items:center; justify-content:space-between; }
+.brand{ font-family:var(--f-d); font-size:1.2rem; } .brand i{ font-style:italic; }
+.brand b{ font-family:var(--f-b); font-size:.62rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--accent); margin-left:8px; vertical-align:middle; }
+.btn{ font-family:var(--f-b); font-weight:600; font-size:.85rem; cursor:pointer; border:1px solid var(--hair);
+  background:#fff; color:var(--ink); border-radius:4px; padding:9px 16px; transition:.2s; }
+.btn:hover{ border-color:var(--ink); }
+.btn.solid{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.btn.solid:hover{ background:var(--accent); border-color:var(--accent); }
+.btn.sm{ padding:7px 12px; font-size:.8rem; }
+.btn.ok{ color:var(--accent); border-color:var(--accent); }
+.btn.no{ color:#C0392B; border-color:rgba(192,57,43,.4); }
+
+/* login */
+.gate{ max-width:380px; margin:18vh auto; text-align:center; padding:0 24px; }
+.gate h2{ font-size:1.8rem; font-weight:300; margin-bottom:8px; }
+.gate p{ color:var(--soft); margin-bottom:24px; }
+.gate input{ width:100%; font-family:var(--f-b); font-size:1rem; padding:13px 14px; border:1px solid var(--hair); border-radius:4px; margin-bottom:12px; }
+.gate input:focus{ outline:none; border-color:var(--accent); }
+.gate .btn{ width:100%; }
+.gate .err{ color:#C0392B; font-size:.85rem; min-height:1.2em; margin-top:10px; }
+
+/* dashboard */
+main{ padding:34px 0 80px; display:none; }
+.head{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:8px; }
+.head h1{ font-size:2.2rem; font-weight:300; }
+.summary{ display:flex; gap:26px; margin:18px 0 28px; flex-wrap:wrap; }
+.summary .s b{ font-family:var(--f-d); font-weight:300; font-size:1.7rem; display:block; }
+.summary .s span{ font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--soft); }
+.toolbar{ display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+.toolbar input{ flex:1; min-width:200px; font-family:var(--f-b); font-size:.92rem; padding:11px 13px; border:1px solid var(--hair); border-radius:4px; }
+.toolbar input:focus{ outline:none; border-color:var(--accent); }
+.toolbar select{ font-family:var(--f-b); font-size:.9rem; padding:11px 13px; border:1px solid var(--hair); border-radius:4px; background:#fff; }
+
+.card{ border:1px solid var(--hair); border-radius:8px; padding:22px 24px; margin-bottom:14px; background:#fff; }
+.card-top{ display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; align-items:flex-start; }
+.card-top .who h3{ font-size:1.3rem; }
+.card-top .who .meta{ color:var(--soft); font-size:.88rem; margin-top:2px; }
+.pill{ font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:5px 11px; border-radius:100px; white-space:nowrap; }
+.pill.submitted{ background:rgba(13,115,104,.12); color:var(--accent); }
+.pill.in_progress{ background:var(--sand); color:var(--soft); }
+.pill.approved{ background:#0D7368; color:#fff; }
+.pill.declined{ background:rgba(192,57,43,.12); color:#C0392B; }
+.grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px 22px; margin:18px 0; }
+.f label{ font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--soft); display:block; margin-bottom:3px; }
+.f div{ font-size:.92rem; }
+.f a{ color:var(--accent); font-weight:600; text-decoration:none; }
+.f a:hover{ text-decoration:underline; }
+.tags{ display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+.tag{ font-size:.72rem; background:var(--sand); border-radius:100px; padding:3px 10px; }
+.chk{ font-size:.85rem; } .chk.y{ color:var(--accent); } .chk.n{ color:var(--soft); }
+.actions{ display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid var(--hair); padding-top:16px; margin-top:4px; }
+.empty{ text-align:center; color:var(--soft); padding:60px 0; }
+.loading{ text-align:center; color:var(--soft); padding:50px 0; }
+.note{ font-size:.8rem; color:var(--soft); margin-top:14px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div class="gate" id="gate">
+  <div class="brand" style="font-size:1.4rem; margin-bottom:18px;">LiveWork <i>Miami</i><b>Admin</b></div>
+  <h2>Admin access</h2>
+  <p>Enter the admin password to view applications.</p>
+  <input type="password" id="pw" placeholder="Admin password" />
+  <button class="btn solid" onclick="login()">Enter</button>
+  <div class="err" id="loginErr"></div>
+</div>
+
+<!-- DASHBOARD -->
+<header id="hdr" style="display:none;">
+  <div class="wrap">
+    <span class="brand">LiveWork <i>Miami</i><b>Admin</b></span>
+    <div style="display:flex; gap:10px;">
+      <button class="btn sm" onclick="load()">Refresh</button>
+      <button class="btn sm" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <div class="head"><h1>Applications</h1></div>
+    <div class="summary" id="summary"></div>
+    <div class="toolbar">
+      <input id="search" placeholder="Search name, email, company…" oninput="render()" />
+      <select id="filter" onchange="render()">
+        <option value="all">All statuses</option>
+        <option value="submitted">Submitted</option>
+        <option value="approved">Approved</option>
+        <option value="in_progress">In progress</option>
+        <option value="declined">Declined</option>
+      </select>
+    </div>
+    <div id="list"><div class="loading">Loading…</div></div>
+    <p class="note">Documents open as secure links that expire after one hour. Charges pull by ACH and settle in 1–4 business days.</p>
+  </div>
+</main>
+
+<script>
+let PW = '';
+let APPS = [];
+const fmt = n => '$' + Number(n||0).toLocaleString('en-US');
+const esc = s => (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+async function api(body){
+  const r = await fetch('/api/admin', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ password:PW, ...body }) });
+  if(!r.ok){ const e = await r.json().catch(()=>({})); throw new Error(e.error || ('HTTP '+r.status)); }
+  return r.json();
+}
+
+async function login(){
+  PW = document.getElementById('pw').value;
+  try{
+    await load();
+    document.getElementById('gate').style.display='none';
+    document.getElementById('hdr').style.display='block';
+    document.getElementById('main').style.display='block';
+  }catch(e){
+    document.getElementById('loginErr').textContent = e.message==='Unauthorized' ? 'Incorrect password.' : (e.message + ' — is the backend deployed with ADMIN_PASSWORD set?');
+  }
+}
+function logout(){ PW=''; APPS=[]; location.reload(); }
+
+async function load(){
+  const { apps } = await api({ action:'list' });
+  APPS = apps || [];
+  renderSummary(); render();
+}
+function renderSummary(){
+  const sub = APPS.filter(a=>a.status==='submitted').length;
+  const appr = APPS.filter(a=>a.status==='approved').length;
+  const paid = APPS.filter(a=>a.moveInCharge).length;
+  document.getElementById('summary').innerHTML = `
+    <div class="s"><b>${APPS.length}</b><span>Total</span></div>
+    <div class="s"><b>${sub}</b><span>Awaiting review</span></div>
+    <div class="s"><b>${appr}</b><span>Approved</span></div>
+    <div class="s"><b>${paid}</b><span>Move-in charged</span></div>`;
+}
+
+function planSummary(p){
+  if(!p) return '<span class="chk n">No plan</span>';
+  const addons = (p.addons||[]).map(k=>({cleaning:'Cleaning',chef:'Chef',management:'Mgmt'}[k]||k));
+  const tags = addons.map(a=>`<span class="tag">${a}</span>`).join('') || '<span class="tag">Base only</span>';
+  return `<div>${esc(p.termLabel||'')} · <b>${fmt(p.monthlyTotal)}</b>/mo${p.discountPct?` · ${p.discountPct}% off`:''}</div>
+    <div class="tags">${tags}</div>
+    <div style="font-size:.8rem;color:var(--soft);margin-top:4px;">Due prior to move-in: ${fmt(p.dueAtMoveIn)}</div>`;
+}
+
+function render(){
+  const q = (document.getElementById('search').value||'').toLowerCase();
+  const f = document.getElementById('filter').value;
+  let rows = APPS.filter(a=>{
+    if(f!=='all' && a.status!==f) return false;
+    if(q){ const hay = (a.fullName+' '+a.email+' '+a.company+' '+a.occupation).toLowerCase(); if(!hay.includes(q)) return false; }
+    return true;
+  });
+  const list = document.getElementById('list');
+  if(!rows.length){ list.innerHTML = '<div class="empty">No applications match.</div>'; return; }
+  list.innerHTML = rows.map(a=>{
+    const docs = Object.entries(a.documents||{}).map(([k,v])=> v.url
+      ? `<a href="${v.url}" target="_blank" rel="noopener">${k==='id'?'ID':'Screening'} ↗</a>`
+      : `<span class="chk n">${k} (n/a)</span>`).join(' &nbsp; ') || '<span class="chk n">None</span>';
+    const when = a.updatedAt ? new Date(a.updatedAt).toLocaleDateString() : '';
+    return `<div class="card">
+      <div class="card-top">
+        <div class="who"><h3>${esc(a.fullName||'(no name)')}</h3>
+          <div class="meta">${esc(a.occupation||'')}${a.company?` · ${esc(a.company)}`:''} · ${esc(a.email)} · ${esc(a.phone)}</div></div>
+        <span class="pill ${a.status}">${(a.status||'').replace('_',' ')}</span>
+      </div>
+      <div class="grid">
+        <div class="f"><label>Plan</label>${planSummary(a.plan)}</div>
+        <div class="f"><label>Signed</label><div>${a.signature?esc(a.signature)+'<br>'+esc(a.signedAt):'<span class="chk n">Not signed</span>'}</div></div>
+        <div class="f"><label>Checks</label><div>
+          <span class="chk ${a.bgAuthorize?'y':'n'}">${a.bgAuthorize?'✓':'·'} Background</span><br>
+          <span class="chk ${a.bankConnected?'y':'n'}">${a.bankConnected?'✓':'·'} Bank linked</span><br>
+          <span class="chk ${a.moveInCharge?'y':'n'}">${a.moveInCharge?'✓ Charged '+fmt(a.moveInCharge.amount):'· Not charged'}</span></div></div>
+        <div class="f"><label>Documents</label><div>${docs}</div></div>
+        <div class="f"><label>Emergency</label><div>${a.ec1Name?esc(a.ec1Name)+'<br>'+esc(a.ec1Phone):'—'}</div></div>
+        <div class="f"><label>Updated</label><div>${when}</div></div>
+      </div>
+      ${a.about?`<div class="f" style="margin-bottom:14px;"><label>About</label><div style="font-size:.9rem;color:var(--soft);">${esc(a.about)}</div></div>`:''}
+      <div class="actions">
+        <button class="btn sm ok" onclick="setStatus('${a.id}','approved')">Approve</button>
+        <button class="btn sm no" onclick="setStatus('${a.id}','declined')">Decline</button>
+        <button class="btn sm" onclick="charge('${a.id}','movein')" ${a.bankConnected?'':'disabled style=opacity:.4'}>Charge move-in</button>
+        <button class="btn sm" onclick="charge('${a.id}','monthly')" ${a.bankConnected?'':'disabled style=opacity:.4'}>Charge one month</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function setStatus(id, status){
+  if(status==='declined' && !confirm('Decline this application?')) return;
+  try{ await api({ action:'setStatus', id, status }); await load(); }
+  catch(e){ alert('Error: '+e.message); }
+}
+async function charge(id, chargeType){
+  const label = chargeType==='movein' ? 'move-in (first + last/deposit)' : 'one month';
+  if(!confirm(`Charge ${label} by ACH for this member?`)) return;
+  try{ const r = await api({ action:'charge', id, chargeType }); alert('Charge started. '+(r.amount?fmt(r.amount):'')); await load(); }
+  catch(e){ alert('Charge error: '+e.message); }
+}
+document.getElementById('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
+</script>
+</body>
+</html>

@@ -243,81 +243,89 @@ section{ position:relative; }
 @media (max-width:760px){ .gallery{ grid-template-columns:1fr 1fr; } }
 
 /* ---- savings calculator ---- */
-.calc{ margin-top:54px; background:var(--paper); border:1px solid var(--hair); border-radius:6px; padding:40px; }
-.calc-top h3{ font-size:clamp(1.5rem,2.6vw,2rem); font-weight:400; margin:14px 0 8px; }
-.calc-top p{ color:var(--ink-soft); }
-.calc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:30px; }
-.cq label{ display:block; font-weight:600; font-size:.95rem; margin-bottom:12px; }
-.cq label .sub{ display:block; font-weight:400; font-size:.8rem; color:var(--ink-soft); margin-top:2px; }
-.opts{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-.opt{ font-family:var(--f-body); font-weight:600; font-size:.9rem; cursor:pointer;
-  background:#fff; border:1px solid var(--hair); border-radius:3px; padding:12px 6px; color:var(--ink);
-  transition:border-color .25s, background .25s, color .25s, transform .25s; }
-.opt:hover{ border-color:var(--accent); transform:translateY(-1px); }
-.opt.sel{ background:var(--accent); border-color:var(--accent); color:#fff; }
-.calc-out{ margin-top:30px; border-top:1px solid var(--hair); padding-top:26px; }
-.calc-out .big{ font-family:var(--f-disp); font-weight:400; font-size:clamp(1.4rem,2.6vw,2rem); line-height:1.2; letter-spacing:-.01em; }
-.calc-out .big b{ color:var(--accent); font-weight:500; }
-.calc-out .lines{ display:flex; gap:30px; flex-wrap:wrap; margin-top:18px; }
-.calc-out .lines .ln b{ font-family:var(--f-disp); font-weight:400; font-size:1.5rem; display:block; }
-.calc-out .lines .ln span{ font-size:.74rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); }
-.calc-out .rec{ margin-top:20px; font-size:.98rem; color:var(--ink-soft); }
-.calc-out .rec b{ color:var(--ink); }
+.calc{ margin-top:54px; background:transparent; padding:0; }
+.calc-top h3{ font-size:clamp(1.7rem,3vw,2.4rem); font-weight:300; margin:14px 0 10px; }
+.calc-top p{ color:var(--ink-soft); font-size:1.05rem; }
+.calc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:34px 50px; margin-top:40px; }
+.cq label{ display:block; font-weight:500; font-size:1rem; margin-bottom:14px; }
+.cq label .sub{ display:block; font-weight:400; font-size:.82rem; color:var(--ink-soft); margin-top:3px; }
+.opts{ display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
+.opt{ font-family:var(--f-body); font-weight:500; font-size:.92rem; cursor:pointer;
+  background:transparent; border:1px solid var(--hair); border-radius:100px; padding:12px 6px; color:var(--ink-soft);
+  transition:border-color .3s var(--ease), color .3s, background .3s, transform .3s var(--ease); }
+.opt:hover{ border-color:var(--ink); color:var(--ink); transform:translateY(-1px); }
+.opt.sel{ background:var(--ink); border-color:var(--ink); color:#fff; }
+.calc-out{ margin-top:44px; border-top:1px solid var(--hair); padding-top:36px; }
+.calc-hero{ display:flex; align-items:baseline; gap:30px; flex-wrap:wrap; }
+.calc-hero .ch-main{ display:flex; align-items:baseline; gap:14px; }
+.calc-hero .ch-num{ font-family:var(--f-disp); font-weight:300; font-size:clamp(3rem,7vw,5rem); line-height:1; letter-spacing:-.03em; color:var(--accent); }
+.calc-hero .ch-unit{ font-family:var(--f-disp); font-style:italic; font-weight:400; font-size:clamp(1.1rem,2vw,1.5rem); color:var(--ink); }
+.calc-hero .ch-side{ flex:1; min-width:240px; color:var(--ink-soft); font-size:1.02rem; max-width:34ch; }
+.calc-out .rec{ margin-top:24px; font-size:1rem; color:var(--ink-soft); }
+.calc-out .rec b{ color:var(--ink); font-weight:600; }
 
-/* ---- plan builder ---- */
-.builder{ margin-top:46px; }
-.builder-head h3{ font-size:clamp(1.5rem,2.6vw,2rem); font-weight:400; margin:14px 0 8px; }
-.builder-head p{ color:var(--ink-soft); margin-bottom:26px; }
-.pb{ display:grid; grid-template-columns:1.3fr .7fr; gap:0; border:1px solid var(--hair); border-radius:6px; overflow:hidden; }
-.pb-l{ padding:34px; }
-.pb-label{ font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; margin-bottom:12px; }
-.terms{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:28px; }
-.term{ cursor:pointer; border:1px solid var(--hair); border-radius:4px; padding:14px 10px; text-align:center; background:#fff;
-  transition:border-color .25s, background .25s; }
-.term:hover{ border-color:var(--accent); }
-.term.sel{ border-color:var(--accent); background:rgba(13,115,104,.06); }
-.term .t{ font-weight:600; font-size:.9rem; }
-.term .pr{ font-family:var(--f-disp); font-size:1.25rem; margin-top:4px; }
+/* ---- configurator ---- */
+.builder{ margin-top:64px; }
+.builder-head h3{ font-size:clamp(1.7rem,3vw,2.4rem); font-weight:300; margin:14px 0 10px; }
+.builder-head p{ color:var(--ink-soft); margin-bottom:30px; font-size:1.05rem; }
+.pb{ display:grid; grid-template-columns:1.32fr .68fr; gap:0; border:1px solid var(--hair); border-radius:8px; overflow:hidden; }
+.pb-l{ padding:40px; }
+.pb-label{ font-size:.7rem; letter-spacing:.24em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; margin-bottom:14px; }
+.terms{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:34px; }
+.term{ position:relative; cursor:pointer; border:1px solid var(--hair); border-radius:6px; padding:20px 12px; text-align:center; background:transparent;
+  transition:border-color .3s var(--ease), background .3s, box-shadow .3s; }
+.term:hover{ border-color:var(--ink); }
+.term.sel{ border-color:var(--ink); background:var(--ink); }
+.term.sel .t{ color:rgba(255,255,255,.7); }
+.term.sel .pr{ color:#fff; }
+.term.sel .pr small{ color:rgba(255,255,255,.6); }
+.term .t{ font-weight:500; font-size:.82rem; letter-spacing:.02em; color:var(--ink-soft); }
+.term .pr{ font-family:var(--f-disp); font-weight:300; font-size:1.5rem; margin-top:6px; letter-spacing:-.01em; }
 .term .pr small{ font-family:var(--f-body); font-size:.7rem; color:var(--ink-soft); }
-.addon{ display:flex; gap:14px; align-items:flex-start; border:1px solid var(--hair); border-radius:4px;
-  padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color .25s, background .25s; }
-.addon:hover{ border-color:var(--accent); }
-.addon.sel{ border-color:var(--accent); background:rgba(13,115,104,.05); }
-.addon .box{ width:22px; height:22px; flex:0 0 auto; border:1.5px solid var(--hair); border-radius:4px; margin-top:2px;
-  display:grid; place-items:center; transition:background .25s, border-color .25s; }
+.term .best{ position:absolute; top:-9px; left:50%; transform:translateX(-50%); font-size:.6rem; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; color:#fff; background:var(--accent); padding:3px 10px; border-radius:100px; white-space:nowrap; }
+.addon{ display:flex; gap:16px; align-items:flex-start; border:1px solid var(--hair); border-radius:6px;
+  padding:18px 20px; margin-bottom:11px; cursor:pointer; transition:border-color .3s var(--ease), background .3s; }
+.addon:hover{ border-color:var(--ink); }
+.addon.sel{ border-color:var(--ink); background:var(--sand); }
+.addon .box{ width:22px; height:22px; flex:0 0 auto; border:1.5px solid var(--hair); border-radius:50%; margin-top:2px;
+  display:grid; place-items:center; transition:background .3s, border-color .3s; }
 .addon.sel .box{ background:var(--accent); border-color:var(--accent); }
-.addon .box svg{ width:13px; height:13px; stroke:#fff; fill:none; stroke-width:3; opacity:0; transition:opacity .2s; }
+.addon .box svg{ width:12px; height:12px; stroke:#fff; fill:none; stroke-width:3; opacity:0; transition:opacity .2s; }
 .addon.sel .box svg{ opacity:1; }
-.addon .meta .nm{ font-weight:600; font-size:.98rem; display:flex; justify-content:space-between; gap:10px; }
-.addon .meta .nm .p{ color:var(--accent); white-space:nowrap; }
-.addon .meta .d{ font-size:.85rem; color:var(--ink-soft); margin-top:3px; }
-.pb-r{ padding:34px; background:var(--ink); color:var(--paper); display:flex; flex-direction:column; justify-content:center; }
-.pb-r .lab{ font-size:.7rem; letter-spacing:.26em; text-transform:uppercase; color:rgba(255,255,255,.55); }
-.pb-r .total{ font-family:var(--f-disp); font-weight:300; font-size:3.2rem; letter-spacing:-.02em; margin:6px 0 2px; }
-.pb-r .total small{ font-family:var(--f-body); font-size:1rem; color:rgba(255,255,255,.6); }
-.pb-r .brk{ font-size:.86rem; color:rgba(255,255,255,.62); line-height:1.5; margin:6px 0 4px; }
-.pb-r .save{ display:inline-block; font-size:.78rem; font-weight:600; color:#9be8df; background:rgba(13,115,104,.3);
-  border:1px solid rgba(155,232,223,.4); border-radius:100px; padding:4px 12px; margin:8px 0 18px; }
+.addon .meta .nm{ font-weight:600; font-size:1rem; display:flex; justify-content:space-between; gap:10px; }
+.addon .meta .nm .p{ color:var(--ink-soft); font-weight:500; white-space:nowrap; }
+.addon .meta .d{ font-size:.86rem; color:var(--ink-soft); margin-top:4px; line-height:1.5; }
+.pb-r{ padding:40px; background:var(--ink); color:var(--paper); display:flex; flex-direction:column; justify-content:center; }
+.pb-r .lab{ font-size:.68rem; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.5); }
+.pb-r .total{ font-family:var(--f-disp); font-weight:200; font-size:3.6rem; letter-spacing:-.03em; margin:8px 0 4px; }
+.pb-r .total small{ font-family:var(--f-body); font-size:1rem; color:rgba(255,255,255,.55); }
+.pb-r .total s{ color:rgba(255,255,255,.4); font-size:1.7rem; font-weight:300; }
+.pb-r .brk{ font-size:.84rem; color:rgba(255,255,255,.6); line-height:1.5; margin:4px 0; }
+.pb-r .save{ display:inline-block; font-size:.74rem; font-weight:600; letter-spacing:.04em; color:#9be8df; background:rgba(13,115,104,.28);
+  border:1px solid rgba(155,232,223,.35); border-radius:100px; padding:5px 13px; margin:10px 0 16px; }
 .pb-r .dep{ font-size:.82rem; color:rgba(255,255,255,.6); margin-bottom:18px; }
-.pb-r .total s{ color:rgba(255,255,255,.45); font-size:1.6rem; font-weight:300; }
-.move-in{ border-top:1px solid rgba(255,255,255,.16); margin:14px 0 18px; padding-top:12px; }
-.move-in .mi{ display:flex; justify-content:space-between; font-size:.86rem; color:rgba(255,255,255,.72); padding:4px 0; }
-.move-in .mi.tot{ color:#fff; font-weight:600; border-top:1px solid rgba(255,255,255,.16); margin-top:6px; padding-top:10px; font-size:.96rem; }
+.move-in{ border-top:1px solid rgba(255,255,255,.14); margin:16px 0 20px; padding-top:14px; }
+.move-in .mi{ display:flex; justify-content:space-between; font-size:.86rem; color:rgba(255,255,255,.68); padding:5px 0; }
+.move-in .mi.tot{ color:#fff; font-weight:600; border-top:1px solid rgba(255,255,255,.14); margin-top:7px; padding-top:11px; font-size:.98rem; }
 .code-row{ display:flex; gap:8px; }
 .code-in{ flex:1; font-family:var(--f-body); font-size:.9rem; color:var(--ink); background:#fff; border:1px solid var(--hair);
-  border-radius:3px; padding:11px 12px; text-transform:uppercase; }
-.code-in:focus{ outline:none; border-color:var(--accent); }
+  border-radius:4px; padding:12px 13px; text-transform:uppercase; letter-spacing:.04em; }
+.code-in:focus{ outline:none; border-color:var(--ink); }
 .code-btn{ font-family:var(--f-body); font-weight:600; font-size:.85rem; cursor:pointer; border:1px solid var(--ink);
-  background:var(--ink); color:#fff; border-radius:3px; padding:0 18px; transition:background .25s; }
+  background:var(--ink); color:#fff; border-radius:4px; padding:0 20px; transition:background .25s; }
 .code-btn:hover{ background:var(--accent); border-color:var(--accent); }
-.code-msg{ font-size:.8rem; color:var(--accent); font-weight:600; margin-top:8px; min-height:1em; }
+.code-msg{ font-size:.8rem; color:var(--accent); font-weight:600; margin-top:9px; min-height:1em; }
 .code-msg.bad{ color:#C0392B; }
 .pb-r .btn{ width:100%; justify-content:center; }
-@media (max-width:760px){ .calc{ padding:26px; } .calc-grid{ grid-template-columns:1fr; } .opts{ grid-template-columns:repeat(4,1fr); }
-  .pb{ grid-template-columns:1fr; } .terms{ grid-template-columns:1fr; } }
+/* optional upload block in background step */
+.opt-up{ margin-top:20px; padding-top:18px; border-top:1px solid var(--hair); }
+.opt-up-label{ font-size:.8rem; color:var(--ink-soft); margin-bottom:10px; }
+@media (max-width:760px){ .calc{ padding:0; } .calc-grid{ grid-template-columns:1fr; gap:28px; } .opts{ grid-template-columns:repeat(4,1fr); }
+  .pb{ grid-template-columns:1fr; } .terms{ grid-template-columns:1fr; } .calc-hero{ gap:16px; } }
 /* inside the application modal: always stack so the summary + button are visible */
-.pb.flow{ grid-template-columns:1fr; border-radius:4px; }
-.pb.flow .pb-l{ padding:22px; }
+.pb.flow{ grid-template-columns:1fr; border-radius:6px; }
+.pb.flow .pb-l{ padding:24px; }
 .pb.flow .pb-r{ padding:24px 22px; }
 
 /* ============================================================
@@ -633,16 +641,16 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
       <div class="step"><div class="n">04</div><h4>Move in</h4><p>Securely connect your bank to authorize membership. Your residence is confirmed.</p></div>
     </div>
 
-    <!-- SAVINGS CALCULATOR -->
+    <!-- VALUE / TIME CALCULATOR -->
     <div class="calc" data-reveal>
       <div class="calc-top">
-        <span class="eyebrow">What you spend now</span>
-        <h3>See what your time and money are really worth.</h3>
-        <p>Answer four quick questions. We'll show what this is costing you today, then build your plan.</p>
+        <span class="eyebrow">The value of your time</span>
+        <h3>What you stop doing.</h3>
+        <p>Four quiet questions. We will show the hours and overhead this lifts off your week.</p>
       </div>
       <div class="calc-grid" id="calcGrid">
         <div class="cq" data-q="food">
-          <label>Monthly food spend <span class="sub">groceries plus eating out</span></label>
+          <label>Monthly food spend <span class="sub">groceries and dining out</span></label>
           <div class="opts">
             <button class="opt" data-v="400">$400</button>
             <button class="opt" data-v="700">$700</button>
@@ -651,7 +659,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
           </div>
         </div>
         <div class="cq" data-q="time">
-          <label>Hours a week on groceries plus cooking <span class="sub">shopping, ordering, prep, cleanup</span></label>
+          <label>Hours a week on food <span class="sub">shopping, ordering, prep, cleanup</span></label>
           <div class="opts">
             <button class="opt" data-v="3">3 hrs</button>
             <button class="opt" data-v="6">6 hrs</button>
@@ -660,7 +668,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
           </div>
         </div>
         <div class="cq" data-q="laundry">
-          <label>Monthly laundry <span class="sub">service, products, machines, time</span></label>
+          <label>Monthly laundry <span class="sub">service, products, time</span></label>
           <div class="opts">
             <button class="opt" data-v="40">$40</button>
             <button class="opt" data-v="100">$100</button>
@@ -669,7 +677,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
           </div>
         </div>
         <div class="cq" data-q="cleaning">
-          <label>Monthly cleaning <span class="sub">products, supplies, and service</span></label>
+          <label>Monthly cleaning <span class="sub">products and service</span></label>
           <div class="opts">
             <button class="opt" data-v="80">$80</button>
             <button class="opt" data-v="200">$200</button>
@@ -681,12 +689,12 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
       <div class="calc-out" id="calcOut" hidden></div>
     </div>
 
-    <!-- PLAN BUILDER -->
+    <!-- CONFIGURATOR -->
     <div class="builder" data-reveal>
       <div class="builder-head">
-        <span class="eyebrow">Build your membership</span>
-        <h3>Your plan, your price.</h3>
-        <p>Choose a term and the services you want. All three together is a flat $4,000.</p>
+        <span class="eyebrow">Configure your residence</span>
+        <h3>Your terms. Your service. Your number.</h3>
+        <p>Choose a commitment and the services you want handled. All three together is a flat $4,000.</p>
       </div>
       <div id="planBuilder"></div>
     </div>
@@ -861,14 +869,12 @@ function renderCalcOut(){
   const out = document.getElementById('calcOut');
   out.hidden = false;
   out.innerHTML = `
-    <p class="big">Right now that is about <b>${fmt(cash)}/month</b> and roughly <b>${hrsMonth} hours</b> a month, worth about <b>${fmt(timeVal)}</b> of your time.</p>
-    <div class="lines">
-      <div class="ln"><b>${fmt(cash)}</b><span>Cash / month</span></div>
-      <div class="ln"><b>${hrsMonth} hrs</b><span>Time / month</span></div>
-      <div class="ln"><b>${fmt(cash + timeVal)}</b><span>Total value / month</span></div>
+    <div class="calc-hero">
+      <div class="ch-main"><span class="ch-num">${hrsMonth}</span><span class="ch-unit">hours a month, reclaimed</span></div>
+      <div class="ch-side">About ${fmt(cash)} a month in spend and ${fmt(timeVal)} of your time, handled for you.</div>
     </div>
-    ${recNames.length ? `<p class="rec">Based on your answers, we pre-selected <b>${recNames.join(', ')}</b> below. Adjust anything you like.</p>`
-                      : `<p class="rec">Build your plan below.</p>`}`;
+    ${recNames.length ? `<p class="rec">We have set up <b>${recNames.join(', ')}</b> below to match. Refine anything you like.</p>`
+                      : `<p class="rec">Configure your residence below.</p>`}`;
 }
 
 /* ---- plan builder (used on the page and inside the flow) ---- */
@@ -887,6 +893,7 @@ function renderPlanBuilder(elId, inFlow){
 
   const terms = TERM_ORDER.map(k=>`
     <div class="term ${selectedPlan.term===k?'sel':''}" data-term="${k}">
+      ${k==='12'?'<span class="best">Best value</span>':''}
       <div class="t">${termLabel(k)}</div><div class="pr">${fmt(CONFIG.BASE_BY_TERM[k])}<small>/mo</small></div>
     </div>`).join('');
 
@@ -1001,7 +1008,7 @@ let step = 0; const TOTAL = 7;
 const stepLabels = ['Your details','Your plan','Background check','Photo ID','Agreement','Connect bank','Welcome'];
 const application = { fullName:'',email:'',phone:'',dob:'',currentAddress:'',occupation:'',company:'',moveIn:'',
   referral:'',about:'', plan:null,
-  bgCheckFile:null, idType:'passport', idFile:null,
+  bgAuthorize:false, bgCheckFile:null, idType:'passport', idFile:null,
   signature:'', printedName:'', signedAt:'', mailingAddress:'',
   ec1Name:'', ec1Phone:'', ec2Name:'', ec2Phone:'',
   agreeAll:false, agreeAccess:false, agreePay:false, agreeSign:false,
@@ -1054,13 +1061,15 @@ const TPL = {
 
   2: ()=>`
     <h3>Background check</h3>
-    <p class="desc">Everyone here is vetted. That is what keeps the community exceptional and safe.</p>
+    <p class="desc">Every member is vetted. We keep this effortless on your end.</p>
     <div class="note-box">
-      Run a standard <b>tenant screening report</b> (credit, criminal, and eviction history), then upload the PDF here. We recommend <b>TransUnion SmartMove</b>, the same report luxury buildings use. It is about $35, runs online, and delivers a PDF the same day.<br><br>
-      <a href="${CONFIG.BG_CHECK_URL}" target="_blank" rel="noopener">Open the screening site →</a><br><br>
-      <b>Tip:</b> save the completed report as a PDF, then upload it below.
+      We run a standard tenant screening (credit, criminal, and eviction history) through <b>TransUnion SmartMove</b>, the same report luxury buildings use. After you authorize below, we email you a secure link to complete it in a couple of minutes. The screening fee is about $35.
     </div>
-    <div class="field"><label>Upload your screening report (PDF) <span class="rq">*</span></label>${drop('bg','PDF of your completed tenant screening report',application.bgCheckFile)}</div>`,
+    <label class="chk"><input type="checkbox" id="f_bgAuthorize" ${application.bgAuthorize?'checked':''} /><span>I authorize LiveWork Miami to run a tenant screening report (credit, criminal, and eviction) and understand I will receive a secure link to complete it.</span></label>
+    <div class="opt-up">
+      <div class="opt-up-label">Already have a recent report? Upload it (optional)</div>
+      ${drop('bg','PDF of a recent screening report',application.bgCheckFile)}
+    </div>`,
 
   3: ()=>`
     <h3>Photo identification</h3>
@@ -1132,7 +1141,7 @@ function drop(key,sub,existing){ const has=existing?'has':''; const name=existin
 
 function bindStep(){
   if(step===1){ renderPlanBuilder('flowPlan', true); }
-  if(step===2) bindDrop('bg', f=> application.bgCheckFile=f);
+  if(step===2){ const c=document.getElementById('f_bgAuthorize'); if(c) c.addEventListener('change', e=> application.bgAuthorize=e.target.checked); bindDrop('bg', f=> application.bgCheckFile=f); }
   if(step===3){ bindDrop('id', f=> application.idFile=f);
     document.getElementById('f_idType').addEventListener('change', e=> application.idType=e.target.value); }
   if(step===5 && application.bankConnected){ document.getElementById('bankBtn').style.display='none'; document.getElementById('bankok').classList.add('show'); }
@@ -1147,6 +1156,7 @@ function bindDrop(key,onFile){ const d=document.getElementById('drop_'+key), inp
 function collectStep(){
   if(step===0) ['fullName','email','phone','dob','moveIn','currentAddress','occupation','company','referral','about'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===1){ application.plan = planSnapshot(); }
+  if(step===2){ const c=document.getElementById('f_bgAuthorize'); if(c) application.bgAuthorize=c.checked; }
   if(step===3){ const s=document.getElementById('f_idType'); if(s) application.idType=s.value; }
   if(step===4){
     ['signature','printedName','mailingAddress','ec1Name','ec1Phone','ec2Name','ec2Phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
@@ -1162,7 +1172,7 @@ function validateStep(){ collectStep();
     if(!application.currentAddress) return 'Please enter your current address.';
     if(!application.occupation) return 'Please tell us your occupation.';
     if(!application.about) return 'Please tell us a little about yourself.'; }
-  if(step===2 && !application.bgCheckFile) return 'Please upload your FDLE background check results.';
+  if(step===2 && !application.bgAuthorize) return 'Please authorize the background check to continue.';
   if(step===3 && !application.idFile) return 'Please upload a photo of your ID.';
   if(step===4){
     if(!application.signature) return 'Please type your full name to sign.';

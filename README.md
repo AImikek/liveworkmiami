@@ -5,16 +5,26 @@ with Stripe ACH and Firebase on the backend.
 
 ```
 index.html              the site + onboarding flow (front-end)
-photos/                 the 6 site photos
+admin.html              admin dashboard — review applicants, approve, charge
+photos/                 the site photos
 api/
   application.js        save application + upload files to Firestore/Storage
   bank-session.js       create Stripe bank-connect session (ACH mandate)
   charge.js             move-in charge + approve-then-charge monthly flow
   cron-monthly.js       emails you Approve/Decline links each month
-lib/                    shared Firebase, Stripe, and util helpers
+  admin.js              powers admin.html (password-protected)
+lib/                    shared Firebase, Stripe, pricing, and util helpers
 vercel.json             schedules the monthly cron
 .env.example            the environment variables you need to set
 ```
+
+## Admin dashboard
+
+Visit `your-domain.com/admin.html`, enter your `ADMIN_PASSWORD`, and you get every
+applicant: their plan, signature, background/bank status, document links (secure,
+expire in 1 hour), and buttons to **approve**, **decline**, **charge move-in**, or
+**charge one month**. This is the easiest way to review and act on applications without
+opening Firebase.
 
 ## How the money works
 
