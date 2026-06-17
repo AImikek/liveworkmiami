@@ -80,13 +80,13 @@ export default async function handler(req, res) {
     const snap = await db.collection('memberApplications').doc(applicationId).get();
     if (!snap.exists) return res.status(404).json({ error: 'Application not found' });
     const app = snap.data();
-    const { stripeCustomerId: customerId, paymentMethodId, fullName } = app;
+    const { stripeCustomerId: customerId, paymentMethodId, fullName, plan } = app;
     if (!customerId || !paymentMethodId) return res.status(400).json({ error: 'No connected bank on file' });
+    const monthly = (plan && plan.monthlyTotal) ? Number(plan.monthlyTotal) : PRICING.MEMBERSHIP_FEE;
 
-    // ---- 1) MOVE-IN: deposit + first month (+ optional last month) ----
+    // ---- 1) MOVE-IN: deposit + first month ----
     if (type === 'movein') {
-      let amount = PRICING.MEMBERSHIP_FEE + PRICING.SECURITY_DEPOSIT;
-      if (PRICING.COLLECT_LAST_MONTH) amount += PRICING.MEMBERSHIP_FEE;
+      const amount = monthly + PRICING.SECURITY_DEPOSIT;
       const pi = await chargeBank({
         customerId, paymentMethodId, amountDollars: amount,
         description: 'LiveWork Miami move-in (deposit + first month)',
@@ -99,7 +99,7 @@ export default async function handler(req, res) {
     // ---- 3) MONTHLY direct charge (optional auto path) ----
     if (type === 'monthly') {
       const pi = await chargeBank({
-        customerId, paymentMethodId, amountDollars: PRICING.MEMBERSHIP_FEE,
+        customerId, paymentMethodId, amountDollars: monthly,
         description: 'LiveWork Miami monthly membership',
         metadata: { applicationId, kind: 'monthly' },
       });

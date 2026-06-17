@@ -17,7 +17,6 @@ export default async function handler(req, res) {
 
   const origin = process.env.SITE_ORIGIN || `https://${req.headers.host}`;
   const notify = process.env.NOTIFY_EMAIL;
-  const amount = PRICING.MEMBERSHIP_FEE;
 
   // "Active" = submitted + has a connected bank.
   const snap = await db.collection('memberApplications')
@@ -27,6 +26,7 @@ export default async function handler(req, res) {
   for (const doc of snap.docs) {
     const app = doc.data();
     if (!app.stripeCustomerId || !app.paymentMethodId || app.membershipActive === false) continue;
+    const amount = (app.plan && app.plan.monthlyTotal) ? Number(app.plan.monthlyTotal) : PRICING.MEMBERSHIP_FEE;
 
     const token = randomToken();
     await db.collection('pendingCharges').add({
