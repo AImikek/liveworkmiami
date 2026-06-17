@@ -315,6 +315,10 @@ section{ position:relative; }
 .pb-r .btn{ width:100%; justify-content:center; }
 @media (max-width:760px){ .calc{ padding:26px; } .calc-grid{ grid-template-columns:1fr; } .opts{ grid-template-columns:repeat(4,1fr); }
   .pb{ grid-template-columns:1fr; } .terms{ grid-template-columns:1fr; } }
+/* inside the application modal: always stack so the summary + button are visible */
+.pb.flow{ grid-template-columns:1fr; border-radius:4px; }
+.pb.flow .pb-l{ padding:22px; }
+.pb.flow .pb-r{ padding:24px 22px; }
 
 /* ============================================================
    CLOSING
@@ -772,8 +776,8 @@ const CONFIG = {
   TIME_VALUE_PER_HR: 50,       // used by the savings calculator
   // Discount codes: CODE -> percent off. Share a code with a member to apply it.
   DISCOUNT_CODES: { 'JAMES16': 16 },
-  // Florida criminal-history background check
-  BG_CHECK_URL: 'https://www.fdle.state.fl.us/criminal-history-records/florida-checks',
+  // Standard tenant screening (credit + criminal + eviction). ~$35, applicant-paid, same-day PDF.
+  BG_CHECK_URL: 'https://www.mysmartmove.com/',
   // Your Stripe publishable key (safe to expose; starts pk_live_ or pk_test_)
   STRIPE_PUBLISHABLE_KEY: 'pk_test_REPLACE_ME',
   API: {
@@ -868,6 +872,7 @@ function renderCalcOut(){
 }
 
 /* ---- plan builder (used on the page and inside the flow) ---- */
+const TERM_ORDER = ['12','6','mtm'];   // display order: 12 → 6 → month-to-month
 function renderPlanBuilder(elId, inFlow){
   const el = document.getElementById(elId);
   if(!el) return;
@@ -880,9 +885,9 @@ function renderPlanBuilder(elId, inFlow){
   const last = planHasLastMonth();
   const due = planDueAtMoveIn();
 
-  const terms = Object.entries(CONFIG.BASE_BY_TERM).map(([k,v])=>`
+  const terms = TERM_ORDER.map(k=>`
     <div class="term ${selectedPlan.term===k?'sel':''}" data-term="${k}">
-      <div class="t">${termLabel(k)}</div><div class="pr">${fmt(v)}<small>/mo</small></div>
+      <div class="t">${termLabel(k)}</div><div class="pr">${fmt(CONFIG.BASE_BY_TERM[k])}<small>/mo</small></div>
     </div>`).join('');
 
   const addons = CONFIG.ADDON_DEFS.map(a=>{
@@ -893,18 +898,22 @@ function renderPlanBuilder(elId, inFlow){
       <div class="d">${a.desc}</div></div></div>`;
   }).join('');
 
-  el.innerHTML = `<div class="pb">
-    <div class="pb-l">
-      <div class="pb-label">Commitment</div>
-      <div class="terms">${terms}</div>
-      <div class="pb-label">Add-on services</div>
-      ${addons}
+  // discount code only appears inside the application flow (not on the public page)
+  const codeBlock = inFlow ? `
       <div class="pb-label" style="margin-top:18px;">Discount code</div>
       <div class="code-row">
         <input id="codeInput_${elId}" class="code-in" placeholder="Enter code" value="${esc(selectedPlan.discountCode||'')}" />
         <button class="code-btn" data-apply="${elId}">Apply</button>
       </div>
-      <div class="code-msg" id="codeMsg_${elId}">${pct?`Code applied: ${pct}% off`:''}</div>
+      <div class="code-msg" id="codeMsg_${elId}">${pct?`Code applied: ${pct}% off`:''}</div>` : '';
+
+  el.innerHTML = `<div class="pb${inFlow?' flow':''}">
+    <div class="pb-l">
+      <div class="pb-label">Commitment</div>
+      <div class="terms">${terms}</div>
+      <div class="pb-label">Add-on services</div>
+      ${addons}
+      ${codeBlock}
     </div>
     <div class="pb-r">
       <span class="lab">Your membership</span>
@@ -915,7 +924,7 @@ function renderPlanBuilder(elId, inFlow){
         <div class="mi"><span>First month</span><span>${fmt(net)}</span></div>
         ${last?`<div class="mi"><span>Last month (held)</span><span>${fmt(net)}</span></div>`:''}
         <div class="mi"><span>Deposit</span><span>${fmt(dep)}</span></div>
-        <div class="mi tot"><span>Due at move-in</span><span>${fmt(due)}</span></div>
+        <div class="mi tot"><span>Due prior to move-in</span><span>${fmt(due)}</span></div>
       </div>
       ${inFlow ? `<p style="font-size:.82rem;color:rgba(255,255,255,.6);margin-top:6px;">Continue below to keep this plan. You can change it before signing.</p>`
                : `<button class="btn btn-light" onclick="applyWithPlan()" style="margin-top:6px;">Apply with this plan</button>`}
@@ -932,7 +941,7 @@ function renderPlanBuilder(elId, inFlow){
     const v = document.getElementById('codeInput_'+elId).value.trim();
     selectedPlan.discountCode = v;
     const ok = discountPct({...selectedPlan, discountCode:v}) > 0;
-    if(v && !ok){ document.getElementById('codeMsg_'+elId).textContent = 'Code not recognized'; document.getElementById('codeMsg_'+elId).classList.add('bad'); return; }
+    if(v && !ok){ const mEl=document.getElementById('codeMsg_'+elId); mEl.textContent='Code not recognized'; mEl.classList.add('bad'); return; }
     renderPlanBuilder(elId, inFlow);
   };
   const cb = el.querySelector('.code-btn'); if(cb) cb.addEventListener('click', applyCode);
@@ -1047,11 +1056,11 @@ const TPL = {
     <h3>Background check</h3>
     <p class="desc">Everyone here is vetted. That is what keeps the community exceptional and safe.</p>
     <div class="note-box">
-      Run a <b>Florida criminal history background check</b> through the FDLE (the state's official records site), then upload the result PDF here.<br><br>
-      <a href="${CONFIG.BG_CHECK_URL}" target="_blank" rel="noopener">Open the FDLE background check →</a><br><br>
-      <b>Tip:</b> save or print the results as a PDF, then upload it below.
+      Run a standard <b>tenant screening report</b> (credit, criminal, and eviction history), then upload the PDF here. We recommend <b>TransUnion SmartMove</b>, the same report luxury buildings use. It is about $35, runs online, and delivers a PDF the same day.<br><br>
+      <a href="${CONFIG.BG_CHECK_URL}" target="_blank" rel="noopener">Open the screening site →</a><br><br>
+      <b>Tip:</b> save the completed report as a PDF, then upload it below.
     </div>
-    <div class="field"><label>Upload your FDLE results (PDF) <span class="rq">*</span></label>${drop('bg','PDF of your completed FDLE background check',application.bgCheckFile)}</div>`,
+    <div class="field"><label>Upload your screening report (PDF) <span class="rq">*</span></label>${drop('bg','PDF of your completed tenant screening report',application.bgCheckFile)}</div>`,
 
   3: ()=>`
     <h3>Photo identification</h3>
@@ -1097,7 +1106,7 @@ const TPL = {
       <div class="li"><span>First month${p.addons.length?' (with services)':''}</span><span>${fmt(m)}</span></div>
       ${p.hasLastMonth?`<div class="li"><span>Last month (held)</span><span>${fmt(m)}</span></div>`:''}
       <div class="li"><span>Deposit (one month)</span><span>${fmt(p.deposit)}</span></div>
-      <div class="li tot"><span>Due at move-in</span><span>${fmt(p.dueAtMoveIn)}</span></div>
+      <div class="li tot"><span>Due prior to move-in</span><span>${fmt(p.dueAtMoveIn)}</span></div>
     </div>
     <p style="font-size:.86rem;color:var(--ink-soft);margin-bottom:16px;">${p.discountPct?`Includes your ${p.discountPct}% discount. `:''}After move-in, ${fmt(m)} is collected each membership period by ACH. You receive a notice before each charge and can cancel in writing with 30 days notice.</p>
     <button class="btn btn-solid bankbtn" id="bankBtn" onclick="connectBank()">
@@ -1219,16 +1228,18 @@ async function connectBank(){
     if(String(e.message||'').startsWith('HTTP') || e instanceof TypeError){
       // backend not deployed yet → demo so the flow is viewable
       console.warn('[connectBank] demo mode:', e.message);
-      setTimeout(()=>{ application.bankConnected = true; markBankConnected(); }, 1200);
+      setTimeout(()=>{ application.bankConnected = true; markBankConnected(true); }, 1200);
     } else {
       btn.disabled=false; btn.style.opacity='1'; btn.innerHTML='Connect bank securely';
       setErr(e.message || 'Could not connect bank. Please try again.');
     }
   }
 }
-function markBankConnected(){
+function markBankConnected(demo){
   const btn=document.getElementById('bankBtn'); if(btn) btn.style.display='none';
-  document.getElementById('bankok').classList.add('show'); setErr('');
+  const ok=document.getElementById('bankok'); ok.classList.add('show');
+  if(demo){ ok.querySelector('span').textContent = 'Demo mode: connect Stripe keys to enable real bank linking. (No bank was actually connected.)'; }
+  setErr('');
 }
 
 async function submitApplication(){
