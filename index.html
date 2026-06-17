@@ -290,6 +290,22 @@ section{ position:relative; }
 .fit-card.no li::before{ background:var(--hair); }
 @media (max-width:760px){ .fit-grid{ grid-template-columns:1fr; gap:18px; } }
 /* in-flow lifestyle questions + savings summary */
+.value-compare{ display:grid; grid-template-columns:1fr auto 1fr; align-items:stretch; gap:14px; margin:4px 0 16px; }
+.value-compare.dim{ opacity:.85; }
+.vc-col{ border:1px solid var(--hair); border-radius:10px; padding:18px 18px 16px; text-align:center; }
+.vc-col.today{ background:var(--paper); }
+.vc-col.live{ border-color:rgba(166,128,62,.45); background:linear-gradient(180deg, rgba(166,128,62,.07), transparent); }
+.vc-h{ font-size:.68rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; margin-bottom:8px; }
+.vc-big{ font-family:var(--f-disp); font-weight:300; font-size:2rem; line-height:1; letter-spacing:-.02em; }
+.vc-col.live .vc-big{ color:var(--accent); }
+.vc-big small{ font-size:.7rem; font-style:normal; color:var(--ink-soft); margin-left:3px; }
+.vc-sub{ font-size:.82rem; color:var(--ink); margin-top:6px; min-height:2.2em; }
+.vc-time{ font-family:var(--f-disp); font-style:italic; font-size:.95rem; color:var(--accent); margin-top:8px; }
+.vc-foot{ font-size:.74rem; color:var(--ink-soft); margin-top:8px; line-height:1.35; }
+.vc-arrow{ display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-size:1.3rem; }
+.value-line{ font-size:.95rem; color:var(--ink); line-height:1.5; margin:0 0 22px; padding:14px 18px; background:var(--sand); border-radius:8px; }
+@media (max-width:560px){ .value-compare{ grid-template-columns:1fr; }
+  .vc-arrow{ transform:rotate(90deg); padding:2px 0; } .vc-sub{ min-height:0; } }
 .calc-grid.flow{ grid-template-columns:1fr; gap:24px; margin-top:8px; }
 .flow-savings{ background:var(--sand); border-radius:8px; padding:22px 24px; margin-bottom:22px; display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 26px; }
 .flow-savings .fs-num{ font-family:var(--f-disp); font-weight:300; font-size:2.6rem; line-height:1; letter-spacing:-.02em; color:var(--accent); display:flex; align-items:baseline; gap:10px; }
@@ -508,7 +524,8 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
    RESPONSIVE — mobile first quality
    ============================================================ */
 @media (max-width:900px){
-  .nav-links{ position:fixed; inset:0; flex-direction:column; justify-content:center; gap:30px;
+  .nav-links{ position:fixed; inset:0; z-index:80; flex-direction:column; justify-content:center; align-items:center; gap:28px;
+    padding:calc(84px + env(safe-area-inset-top)) 24px calc(32px + env(safe-area-inset-bottom)); overflow-y:auto;
     background:var(--paper); transform:translateX(100%); transition:transform .5s var(--ease); }
   .nav-links.show{ transform:none; }
   .nav-links a{ color:var(--ink) !important; font-size:1.4rem; font-family:var(--f-disp); }
@@ -655,7 +672,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
       <div class="row-copy">
         <span class="ix">iii. The address</span>
         <h3>The best building in Brickell</h3>
-        <p>We toured more than fifty of Miami's finest residences and chose DUA. A landmark tower, two blocks from the heart of Brickell, with wellness and views most of the city only visits.</p>
+        <p>We toured more than fifty of Miami's finest residences and chose DUA. A landmark tower, two blocks from the heart of Brickell, with wellness, easy parking, close to the highway, and views most of the city only visits.</p>
         <ul class="ticks">
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Three pools, including a rooftop above the skyline</li>
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>13-person outdoor cold plunge and jacuzzi, sauna, and steam</li>
@@ -719,17 +736,13 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
       <div class="a"><span class="ai">🚶</span><h4>Walkable</h4><p>The most walkable corner of Miami</p></div>
     </div>
 
-    <!-- neighborhood: walking times + live weather -->
+    <!-- neighborhood: walking times -->
     <div class="hood" data-reveal>
       <div class="hood-l">
         <div class="hood-head">
           <div>
             <span class="eyebrow">On foot from your door</span>
             <h3>A few minutes to everything.</h3>
-          </div>
-          <div class="weather glass" id="weather">
-            <span class="w-temp" id="wTemp">—</span>
-            <span class="w-meta"><span id="wDesc">Brickell</span><small>right now</small></span>
           </div>
         </div>
         <ul class="walks">
@@ -769,7 +782,6 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
       <div class="fit-card no">
         <div class="fit-h"><span class="fit-i">—</span>Probably not a fit if you</div>
         <ul>
-          <li>Want frequent overnight guests</li>
           <li>Smoke or party heavily at home</li>
           <li>Are messy in shared spaces</li>
           <li>Need unclear or flexible payment timing</li>
@@ -786,11 +798,11 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
     <div class="lede" data-reveal>
       <span class="eyebrow">Membership</span>
       <h2>How you join.</h2>
-      <p>Membership is by request and review. The process is quiet, secure, and quick. Here is exactly how it works.</p>
+      <p>Membership is by request and review. The process is secure and quick. Here is exactly how it works.</p>
     </div>
 
     <div class="steps" data-reveal>
-      <div class="step"><div class="n">01</div><h4>Request</h4><p>Share your details and a little about who you are and what you're building.</p></div>
+      <div class="step"><div class="n">01</div><h4>Request</h4><p>Share your details and a little about who you are and what you're up to.</p></div>
       <div class="step"><div class="n">02</div><h4>Verify</h4><p>Complete a background check and upload your ID. Vetting is what protects the community.</p></div>
       <div class="step"><div class="n">03</div><h4>Sign</h4><p>Review and sign the membership agreement and the house standards.</p></div>
       <div class="step"><div class="n">04</div><h4>Move in</h4><p>Securely pay with ACH or wire to secure your membership. Your residence is confirmed.</p></div>
@@ -944,20 +956,6 @@ document.querySelectorAll('img[data-key]').forEach(img=>{
 const fmt = n => '$' + Number(n).toLocaleString('en-US');
 document.getElementById('yr').textContent = new Date().getFullYear();
 
-/* ---- live Brickell weather (open-meteo, no key) ---- */
-(async function(){
-  const el = document.getElementById('weather'); if(!el) return;
-  try{
-    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.7642&longitude=-80.1942&current=temperature_2m,weather_code&temperature_unit=fahrenheit');
-    const d = await r.json(); const c = d.current;
-    const codes = { 0:'Clear', 1:'Mostly clear', 2:'Partly cloudy', 3:'Overcast', 45:'Fog', 48:'Fog',
-      51:'Drizzle', 53:'Drizzle', 55:'Drizzle', 61:'Light rain', 63:'Rain', 65:'Heavy rain',
-      80:'Showers', 81:'Showers', 82:'Showers', 95:'Storms', 96:'Storms', 99:'Storms' };
-    document.getElementById('wTemp').textContent = Math.round(c.temperature_2m) + '°';
-    document.getElementById('wDesc').textContent = (codes[c.weather_code] || 'Brickell') + ' in Brickell';
-  }catch(e){ el.style.display='none'; }
-})();
-
 /* ---- next available membership (1st of next month) ---- */
 (function(){
   const el = document.getElementById('nextAvail'); if(!el) return;
@@ -1041,7 +1039,45 @@ function renderPlanBuilder(elId, inFlow){
         <div class="code-msg" id="codeMsg_${elId}">${pct?`Code applied: ${pct}% off`:''}</div>
       </div>` : '';
 
-  el.innerHTML = `<div class="pb${inFlow?' flow':''}">
+  // ---- live value comparison (flow only): show spend + time today vs with LiveWork ----
+  let valueBlock = '';
+  if(inFlow){
+    const sum = calcSummary();
+    const termBaseNet = CONFIG.BASE_BY_TERM[selectedPlan.term] * (1 - pct/100);
+    const servicesCost = Math.max(0, Math.round(net - termBaseNet));
+    const names = selectedPlan.addons.map(k=>{ const d=CONFIG.ADDON_DEFS.find(x=>x.key===k); return d?d.name:k; });
+    const answered = calcAllAnswered();
+    let line;
+    if(!answered){
+      line = `Pick the services you want below. Each one hands real hours back to your week.`;
+    } else if(servicesCost===0){
+      line = `Today you spend about ${fmt(sum.cash)} and roughly ${sum.hrsMonth} hours a month on food, laundry, and cleaning. Add a service below and we handle it, and you keep those hours.`;
+    } else if(sum.timeVal > servicesCost){
+      line = `Your services cost ${fmt(servicesCost)} a month and hand back about ${sum.hrsMonth} hours, worth roughly ${fmt(sum.timeVal)} of your time. You come out ahead, before counting the errands you simply never run again.`;
+    } else {
+      line = `Everything cooked, cleaned, and handled for ${fmt(servicesCost)} a month, with about ${sum.hrsMonth} hours given back to you.`;
+    }
+    valueBlock = `<div class="value-compare ${answered?'':'dim'}">
+      <div class="vc-col today">
+        <div class="vc-h">Today, on your own</div>
+        <div class="vc-big">${fmt(sum.cash)}<small>/mo</small></div>
+        <div class="vc-sub">food, laundry &amp; cleaning</div>
+        <div class="vc-time">${answered?`+ ~${sum.hrsMonth} hrs/mo of your time`:'+ your time, every week'}</div>
+        <div class="vc-foot">you plan, shop, cook, and clean</div>
+      </div>
+      <div class="vc-arrow">→</div>
+      <div class="vc-col live">
+        <div class="vc-h">With LiveWork</div>
+        <div class="vc-big">${fmt(servicesCost)}<small>/mo</small></div>
+        <div class="vc-sub">${names.length?names.join(', '):'add a service below'}</div>
+        <div class="vc-time">${answered?`${sum.hrsMonth} hrs/mo back`:'your hours, back'}</div>
+        <div class="vc-foot">cooked, cleaned, handled</div>
+      </div>
+    </div>
+    <p class="value-line">${line}</p>`;
+  }
+
+  el.innerHTML = valueBlock + `<div class="pb${inFlow?' flow':''}">
     <div class="pb-l">
       <div class="pb-label">Commitment</div>
       <div class="terms">${terms}</div>
@@ -1211,18 +1247,14 @@ const TPL = {
     <div class="field"><label>Anything else I should know?</label><textarea id="f_anythingElse" placeholder="Optional. Anything you'd like to share.">${esc(application.anythingElse)}</textarea></div>`,
 
   4: ()=>`
-    <h3>The value of your time</h3>
+    <h3>A few quick questions</h3>
     <p class="desc">Tell us what life costs you today. Next, we will show what this lifts off your week, in time and money.</p>
     <div class="calc-grid flow" id="flowCalcGrid">${calcGridHTML()}</div>`,
 
-  5: ()=>{ const sum=calcSummary(); return `
+  5: ()=>`
     <h3>Your plan, and what it saves you</h3>
-    <p class="desc">Here is the time and overhead this lifts off your week. Configure your residence below, and deselect anything you do not want.</p>
-    <div class="flow-savings">
-      <div class="fs-num">${sum.hrsMonth}<small>hours / month, reclaimed</small></div>
-      <div class="fs-side">About ${fmt(sum.cash)} a month in spend and ${fmt(sum.timeVal)} of your time, handled for you.</div>
-    </div>
-    <div id="flowPlan"></div>`; },
+    <p class="desc">Here is your current life next to LiveWork. Deselect anything you do not want, and watch the numbers move.</p>
+    <div id="flowPlan"></div>`,
 
   6: ()=>`
     <h3>Background check</h3>
