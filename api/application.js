@@ -27,19 +27,25 @@ export default async function handler(req, res) {
                    : db.collection('memberApplications').doc();
 
     // Upload any files first, collecting their storage paths.
+    // Non-fatal: if Storage isn't enabled yet, the application still saves and
+    // the notification still fires — we just skip retaining the documents.
     const fileMeta = {};
     if (files) {
       for (const [kind, f] of Object.entries(files)) {
         if (!f || !f.base64) continue;
-        const safe = (f.name || kind).replace(/[^\w.\-]/g, '_');
-        const path = `applications/${ref.id}/${kind}-${Date.now()}-${safe}`;
-        const file = bucket.file(path);
-        await file.save(Buffer.from(f.base64, 'base64'), {
-          contentType: f.type || 'application/octet-stream',
-          // Private by default. These are sensitive documents — do NOT make public.
-          resumable: false,
-        });
-        fileMeta[kind] = { path, name: f.name, uploadedAt: new Date().toISOString() };
+        try {
+          const safe = (f.name || kind).replace(/[^\w.\-]/g, '_');
+          const path = `applications/${ref.id}/${kind}-${Date.now()}-${safe}`;
+          const file = bucket.file(path);
+          await file.save(Buffer.from(f.base64, 'base64'), {
+            contentType: f.type || 'application/octet-stream',
+            // Private by default. These are sensitive documents — do NOT make public.
+            resumable: false,
+          });
+          fileMeta[kind] = { path, name: f.name, uploadedAt: new Date().toISOString() };
+        } catch (e) {
+          console.error(`file upload failed for ${kind} (Storage may not be enabled):`, e.message);
+        }
       }
     }
 
