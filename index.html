@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>LiveWork Miami · A members residence in Brickell</title>
-<meta name="description" content="A members-only co-living residence on the 35th floor of Brickell's DUA luxury tower. Meals, cleaning, and laundry handled daily. Your network, multiplied." />
+<meta name="description" content="A members-only penthouse residence atop Brickell's DUA luxury tower. Meals, cleaning, and laundry handled daily. Your network, multiplied." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -589,7 +589,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
     <span class="eyebrow light">LiveWork Miami · Brickell</span>
     <h1><span class="l">More than</span><span class="l">a place <em>to live.</em></span></h1>
     <p class="audience" id="audience">For founders, executives, creatives, and the quietly exceptional.</p>
-    <p class="sub">A private residence membership on the 35th floor of Brickell's DUA luxury tower. The building, the network, the wellness, the calm. One membership is open.</p>
+    <p class="sub">A penthouse residence membership atop Brickell's DUA luxury tower. The building, the network, the wellness, the calm. One membership is open.</p>
     <div class="hero-cta">
       <button class="btn btn-light" onclick="openOnboarding()">Request membership</button>
       <a href="#scene" class="btn btn-ghost-light">Take the tour</a>
@@ -638,7 +638,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
     </div>
 
     <div class="row" data-reveal>
-      <div class="figure ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_1200/v1781709276/Room_View_IMG_7413_vszowx.jpg" alt="The private suite" loading="lazy" /></div>
+      <div class="figure ph"><img src='photos/suite.jpg' alt="The private suite" loading="lazy" /></div>
       <div class="row-copy">
         <span class="ix">i. Your private suite</span>
         <h3>A space that is entirely yours</h3>
@@ -687,11 +687,17 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
 <section class="sand pad" id="inside-res">
   <div class="wrap">
     <div class="lede" data-reveal style="margin-bottom:36px;">
-      <span class="eyebrow">Inside the residence</span>
-      <h2>The suite, and the spaces <em>you'll share.</em></h2>
-      <p>Your private room and full bath, plus a bright living room and full kitchen at the heart of the home.</p>
+      <span class="eyebrow">Inside the penthouse</span>
+      <h2>The penthouse, and the spaces <em>you'll share.</em></h2>
+      <p>A wraparound balcony over the skyline, your private suite and bath, and bright living spaces at the top of the tower.</p>
     </div>
     <div class="gallery" data-reveal>
+      <figure class="gtile ph"><img src='photos/ph1.jpg' alt="Penthouse balcony with ocean view" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src='photos/ph2.jpg' alt="The great room" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src='photos/ph3.jpg' alt="Living and dining with wraparound views" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src='photos/ph4.jpg' alt="Marble kitchen" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src='photos/ph5.jpg' alt="Master bath" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src='photos/ph6.jpg' alt="The skyline from the penthouse" loading="lazy" /></figure>
       <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Room_Photo_IMG_2858_hgbav5.jpg" alt="Your private suite" loading="lazy" /></figure>
       <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Living_room_kitchen_table_fdluos.jpg" alt="Living and dining area" loading="lazy" /></figure>
       <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Kitchen_IMG_7416_ahgfzp.jpg" alt="Full kitchen" loading="lazy" /></figure>
@@ -810,7 +816,7 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
 
     <div class="join-cta" data-reveal>
       <button class="btn btn-solid" onclick="openOnboarding()">Request membership →</button>
-      <p class="join-note">Takes a few minutes. You will configure your residence and see your number inside.</p>
+      <p class="join-note">Takes about a minute. If it feels aligned, we'll set up a quick call.</p>
     </div>
   </div>
 </section>
@@ -1169,8 +1175,16 @@ if(!reduce){
 /* ============================================================
    ONBOARDING (same flow, restyled)
    ============================================================ */
-let step = 0; const TOTAL = 11;
-const stepLabels = ['Contact','Timing','Lifestyle','Social','Your time','Your plan','Background check','Photo ID','Agreement','Payment','Welcome'];
+/* Two flows over the same step templates:
+   'apply'   — the short public request (default): contact, timing, about you, done.
+   'onboard' — the full post-call onboarding (plan, checks, agreement, payment),
+               opened by sending an approved applicant to liveworkmiami.com/?onboard=1 */
+const FLOWS = {
+  apply:   { seq:[0,1,3,10], labels:['Contact','Timing','About you','Done'] },
+  onboard: { seq:[0,4,5,6,7,8,9,10], labels:['Contact','Your time','Your plan','Background check','Photo ID','Agreement','Payment','Welcome'] }
+};
+let MODE = /[?&]onboard/.test(location.search) ? 'onboard' : 'apply';
+let pos = 0; let step = FLOWS[MODE].seq[0];
 const application = { fullName:'',email:'',phone:'',
   moveIn:'',lengthOfStay:'',inMiami:'',
   occupation:'',schedule:'',wfh:'',guests:'',cleanliness:'',
@@ -1184,20 +1198,24 @@ const application = { fullName:'',email:'',phone:'',
   bankConnected:false, stripeCustomerId:null, paymentMethodId:null };
 
 function openOnboarding(){ const o=document.getElementById('overlay'); o.classList.add('open'); o.setAttribute('aria-hidden','false');
-  document.body.style.overflow='hidden'; step=0; renderStep(); }
+  document.body.style.overflow='hidden'; pos=0; step=FLOWS[MODE].seq[0]; renderStep(); }
 function closeOnboarding(){ const o=document.getElementById('overlay'); o.classList.remove('open'); o.setAttribute('aria-hidden','true');
   document.body.style.overflow=''; }
 addEventListener('keydown', e=>{ if(e.key==='Escape') closeOnboarding(); });
+if(MODE==='onboard') addEventListener('load', ()=> openOnboarding());
 
 function setErr(m){ const el=document.getElementById('err'); if(m){ el.textContent=m; el.classList.add('show'); } else el.classList.remove('show'); }
 function updateBar(){
-  document.querySelectorAll('#bar .b').forEach((p,i)=>{ p.classList.remove('active','done'); if(i<step)p.classList.add('done'); else if(i===step)p.classList.add('active'); });
-  document.getElementById('slabel').textContent = `Step ${Math.min(step+1,TOTAL)} of ${TOTAL} · ${stepLabels[step]}`;
-  document.getElementById('backBtn').style.visibility = step===0?'hidden':'visible';
+  const F=FLOWS[MODE], N=F.seq.length;
+  const bar=document.getElementById('bar');
+  if(bar.children.length!==N) bar.innerHTML=F.seq.map(()=>'<div class="b"><i></i></div>').join('');
+  [...bar.children].forEach((p,i)=>{ p.classList.remove('active','done'); if(i<pos)p.classList.add('done'); else if(i===pos)p.classList.add('active'); });
+  document.getElementById('slabel').textContent = `Step ${Math.min(pos+1,N)} of ${N} · ${F.labels[pos]}`;
+  document.getElementById('backBtn').style.visibility = pos===0?'hidden':'visible';
   const n=document.getElementById('nextBtn');
-  if(step===TOTAL-1){ n.textContent='Done'; document.getElementById('backBtn').style.visibility='hidden'; }
+  if(pos===N-1){ n.textContent='Done'; document.getElementById('backBtn').style.visibility='hidden'; }
+  else if(F.seq[pos+1]===10){ n.textContent = step===9 ? (CONFIG.PAYMENT_MODE==='stripe'?'Authorize & submit →':'Submit & finish →') : 'Submit →'; }
   else if(step===8) n.textContent='Sign & continue →';
-  else if(step===9) n.textContent = CONFIG.PAYMENT_MODE==='stripe' ? 'Authorize & submit →' : 'Submit & finish →';
   else n.textContent='Continue →';
 }
 function renderStep(){ setErr(''); const b=document.getElementById('sbody'); b.innerHTML=TPL[step](); bindStep(); updateBar();
@@ -1240,7 +1258,8 @@ const TPL = {
 
   3: ()=>`
     <h3>A little about you</h3>
-    <p class="desc">This helps us get to know you before our call. Enter NA if you do not have one.</p>
+    <p class="desc">This helps me get to know you before our call. Enter NA if you do not have one.</p>
+    <div class="field"><label>Occupation <span class="rq">*</span></label><input id="f_occupation" value="${esc(application.occupation)}" placeholder="Founder, investor, etc." /></div>
     <div class="field"><label>Instagram — enter NA if none <span class="rq">*</span></label><input id="f_instagram" value="${esc(application.instagram)}" placeholder="@handle or NA" /></div>
     <div class="field"><label>LinkedIn — enter NA if none <span class="rq">*</span></label><input id="f_linkedin" value="${esc(application.linkedin)}" placeholder="Profile URL or NA" /></div>
     <div class="field"><label>Website — enter NA if none <span class="rq">*</span></label><input id="f_website" value="${esc(application.website)}" placeholder="yoursite.com or NA" /></div>
@@ -1327,7 +1346,13 @@ const TPL = {
 
     <label class="chk"><input type="checkbox" id="f_paymentAck" ${application.paymentAck?'checked':''} /><span>I understand I will receive a secure Mercury link to complete payment, and my residence is confirmed once payment is received.</span></label>`; },
 
-  10: ()=>`
+  10: ()=> MODE==='apply' ? `
+    <div class="donewrap">
+      <div class="donering"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h3>Request received</h3>
+      <p class="desc" style="max-width:46ch;margin:8px auto 0;">Thank you, ${esc((application.fullName||'').split(' ')[0]||'and welcome')}. I personally review every request, and if the timing and fit look right I will reach out at <b style="color:var(--accent)">${esc(application.email)}</b> to set up a quick call.</p>
+      <div class="sig" style="margin-top:24px;color:var(--ink);">Warm regards, Mike<small style="color:var(--ink-soft);">Founder, LiveWork Miami</small></div>
+    </div>` : `
     <div class="donewrap">
       <div class="donering"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
       <h3>You're all set</h3>
@@ -1373,7 +1398,7 @@ function collectStep(){
   if(step===0) ['fullName','email','phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===1) ['moveIn','lengthOfStay','inMiami'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===2) ['occupation','schedule','wfh','guests','cleanliness'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
-  if(step===3) ['instagram','linkedin','website','anythingElse'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+  if(step===3) ['occupation','instagram','linkedin','website','anythingElse'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===4){ if(!recsApplied && calcAllAnswered()){ selectedPlan.addons = calcRecommendations(); recsApplied=true; } }
   if(step===5){ application.plan = planSnapshot(); }
   if(step===6){ const c=document.getElementById('f_bgAuthorize'); if(c) application.bgAuthorize=c.checked; }
@@ -1397,7 +1422,8 @@ function validateStep(){ collectStep();
     if(!application.wfh) return 'Please let us know if you work from home.';
     if(!application.guests) return 'Please choose your overnight guest expectations.';
     if(!application.cleanliness) return 'Please choose your cleanliness style.'; }
-  if(step===3){ if(!application.instagram) return 'Please add Instagram, or enter NA.';
+  if(step===3){ if(!application.occupation) return 'Please tell us your occupation.';
+    if(!application.instagram) return 'Please add Instagram, or enter NA.';
     if(!application.linkedin) return 'Please add LinkedIn, or enter NA.';
     if(!application.website) return 'Please add a website, or enter NA.'; }
   if(step===4){ if(!calcAllAnswered()) return 'Please answer all four questions to continue.'; }
@@ -1417,10 +1443,13 @@ function validateStep(){ collectStep();
   }
   return null;
 }
-async function nextStep(){ if(step===TOTAL-1){ closeOnboarding(); return; }
+async function nextStep(){ const F=FLOWS[MODE];
+  if(pos===F.seq.length-1){ closeOnboarding(); return; }
   const e=validateStep(); if(e){ setErr(e); return; } setErr('');
-  await saveProgress(); if(step===9){ await submitApplication(); } step++; renderStep(); }
-function prevStep(){ if(step>0){ collectStep(); step--; renderStep(); } }
+  await saveProgress();
+  if(F.seq[pos+1]===10){ await submitApplication(); }
+  pos++; step=F.seq[pos]; renderStep(); }
+function prevStep(){ if(pos>0){ collectStep(); pos--; step=FLOWS[MODE].seq[pos]; renderStep(); } }
 
 /* ============================================================
    BACKEND CALLS — talk to the Vercel functions in /api.
@@ -1537,6 +1566,7 @@ async function sendApplicantEmail(){
     last_month:    p.hasLastMonth ? fmt(p.monthlyTotal) : 'Not applicable',
     due_at_movein: fmt(p.dueAtMoveIn),
     pay_method:    'ACH or wire (selected in Mercury)',
+    application_stage: MODE==='apply' ? 'Initial request (short form)' : 'Full onboarding',
     reply_to:      application.email || ''
   };
   await emailjs.send(E.serviceId, E.templateId, params);
