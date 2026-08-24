@@ -634,18 +634,17 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
     <div class="lede" data-reveal>
       <span class="eyebrow">The Residence</span>
       <h2>Your life, quietly <em>taken care of.</em></h2>
-      <p>A private suite that is yours, inside a home that runs itself. Show up, live well, and let the details disappear.</p>
+      <p>A private room that is yours, inside a home that runs itself. Show up, live well, and let the details disappear.</p>
     </div>
 
     <div class="row" data-reveal>
-      <div class="figure ph"><img src='photos/suite.jpg' alt="The private suite" loading="lazy" /></div>
+      <div class="figure ph"><img src='photos/suite.jpg' alt="The private room" loading="lazy" /></div>
       <div class="row-copy">
-        <span class="ix">i. Your private suite</span>
+        <span class="ix">i. Your private room</span>
         <h3>A space that is entirely yours</h3>
-        <p>A serene, light-filled suite with a private balcony and your own full bathroom. Kept immaculate, reset and ready, with the small logistics of life handled before you notice them.</p>
+        <p>A serene, light-filled room with private balcony access. Kept immaculate, reset and ready, with the small logistics of life handled before you notice them.</p>
         <ul class="ticks">
-          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Queen adjustable Tempur-Pedic bed (a $6,000 mattress)</li>
-          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Your own private full bathroom</li>
+          <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Queen bed with premium bedding (one room features a $6,000 adjustable Tempur-Pedic)</li>
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Private balcony with gorgeous views</li>
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Closet space and a full-length mirror</li>
           <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Cleaning, laundry, and linens handled on a rhythm</li>
@@ -689,16 +688,16 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
     <div class="lede" data-reveal style="margin-bottom:36px;">
       <span class="eyebrow">Inside the penthouse</span>
       <h2>The penthouse, and the spaces <em>you'll share.</em></h2>
-      <p>A wraparound balcony over the skyline, your private suite and bath, and bright living spaces at the top of the tower.</p>
+      <p>A wraparound balcony over the skyline, your private room, and fully furnished common areas at the top of the tower.</p>
     </div>
     <div class="gallery" data-reveal>
       <figure class="gtile ph"><img src='photos/ph1.jpg' alt="Penthouse balcony with ocean view" loading="lazy" /></figure>
       <figure class="gtile ph"><img src='photos/ph2.jpg' alt="The great room" loading="lazy" /></figure>
       <figure class="gtile ph"><img src='photos/ph3.jpg' alt="Living and dining with wraparound views" loading="lazy" /></figure>
       <figure class="gtile ph"><img src='photos/ph4.jpg' alt="Marble kitchen" loading="lazy" /></figure>
-      <figure class="gtile ph"><img src='photos/ph5.jpg' alt="Master bath" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src='photos/ph5.jpg' alt="Designer bathroom" loading="lazy" /></figure>
       <figure class="gtile ph"><img src='photos/ph6.jpg' alt="The skyline from the penthouse" loading="lazy" /></figure>
-      <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Room_Photo_IMG_2858_hgbav5.jpg" alt="Your private suite" loading="lazy" /></figure>
+      <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Room_Photo_IMG_2858_hgbav5.jpg" alt="Your private room" loading="lazy" /></figure>
       <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Living_room_kitchen_table_fdluos.jpg" alt="Living and dining area" loading="lazy" /></figure>
       <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Kitchen_IMG_7416_ahgfzp.jpg" alt="Full kitchen" loading="lazy" /></figure>
       <figure class="gtile ph"><img src="https://res.cloudinary.com/da4p5qui8/image/upload/f_auto,q_auto,w_800/v1781709276/Couch_IMG_7414_hzvzcd.jpg" alt="The living room" loading="lazy" /></figure>
@@ -899,7 +898,7 @@ const CONFIG = {
   // Every membership includes: cleaning, laundry, receiving orders, meal prep.
   BASE_BY_TERM: { '12': 4000, '6': 4500, 'mtm': 5500 },
   INCLUDED_SERVICES: [
-    { name:'Cleaning',         desc:'Your suite and shared spaces kept immaculate on a rhythm.' },
+    { name:'Cleaning',         desc:'Your room and shared spaces kept immaculate on a rhythm.' },
     { name:'Laundry',          desc:'Washed, folded, and returned. Fresh linens and towels.' },
     { name:'Receiving orders', desc:'Packages and deliveries received, opened if you like, and put away.' },
     { name:'Meal prep',        desc:'Fresh meals prepared from Whole Foods, Trader Joe\'s, Publix, Costco, and local farms.' },
@@ -1111,10 +1110,20 @@ if(!reduce){
    'apply'   — the short public request (default): contact, timing, about you, done.
    'onboard' — the full post-call onboarding (plan, checks, agreement, payment),
                opened by sending an approved applicant to liveworkmiami.com/?onboard=1 */
+const STEP_LABELS = {0:'Contact',1:'Timing',2:'Lifestyle',3:'About you',4:'Your time',5:'Your plan',6:'Background check',7:'Photo ID',8:'Agreement',9:'Payment',10:'Welcome'};
 const FLOWS = {
   apply:   { seq:[0,1,3,10], labels:['Contact','Timing','About you','Done'] },
   onboard: { seq:[0,5,6,7,8,9,10], labels:['Contact','Your plan','Background check','Photo ID','Agreement','Payment','Welcome'] }
 };
+/* The completion flow only asks for what it does not already have (from a
+   previous session on this device); missing timing/about steps are inserted. */
+function buildOnboardSeq(){
+  const seq=[0];
+  if(!application.moveIn || !application.lengthOfStay || !application.inMiami) seq.push(1);
+  if(!application.occupation || !application.instagram) seq.push(3);
+  seq.push(5,6,7,8,9,10);
+  return seq;
+}
 let MODE = (/[?&]onboard/.test(location.search) || /^\/welcome\/?$/.test(location.pathname)) ? 'onboard' : 'apply';
 let pos = 0; let step = FLOWS[MODE].seq[0];
 const application = { fullName:'',email:'',phone:'',
@@ -1129,8 +1138,23 @@ const application = { fullName:'',email:'',phone:'',
   paymentMethod:'ach', paymentAck:false,
   bankConnected:false, stripeCustomerId:null, paymentMethodId:null };
 
+/* Prefill from a previous session on this device (short form -> /welcome). */
+try{
+  const saved = JSON.parse(localStorage.getItem('lwm_app')||'null');
+  if(saved && typeof saved==='object'){
+    for(const k of Object.keys(saved)){
+      if(!(k in application)) continue;
+      const v=saved[k];
+      if(k==='plan' && v && typeof v==='object'){ application.plan=v; if(v.term) selectedPlan.term=v.term; }
+      else if(typeof v==='string' || typeof v==='boolean'){ application[k]=v; }
+    }
+  }
+}catch(_){}
+
 function openOnboarding(){ const o=document.getElementById('overlay'); o.classList.add('open'); o.setAttribute('aria-hidden','false');
-  document.body.style.overflow='hidden'; pos=0; step=FLOWS[MODE].seq[0]; renderStep(); }
+  document.body.style.overflow='hidden';
+  if(MODE==='onboard'){ FLOWS.onboard.seq=buildOnboardSeq(); FLOWS.onboard.labels=FLOWS.onboard.seq.map(id=>STEP_LABELS[id]); }
+  pos=0; step=FLOWS[MODE].seq[0]; renderStep(); }
 function closeOnboarding(){ const o=document.getElementById('overlay'); o.classList.remove('open'); o.setAttribute('aria-hidden','true');
   document.body.style.overflow=''; }
 addEventListener('keydown', e=>{ if(e.key==='Escape') closeOnboarding(); });
@@ -1398,10 +1422,16 @@ function fileToBase64(file){ return new Promise((res,rej)=>{ const fr=new FileRe
   fr.onload=()=>res(fr.result.split(',')[1]); fr.onerror=rej; fr.readAsDataURL(file); }); }
 
 async function saveProgress(){
+  persistLocal();
   try{
     const out = await api(CONFIG.API.saveApplication, { id:APP_ID, step, data:serializable(application) });
     if(out && out.id) APP_ID = out.id;
   }catch(e){ console.warn('[saveProgress] backend not reachable, demo mode', e.message); }
+}
+/* Remember the application on this device so the /welcome completion link
+   opens prefilled (name, email, phone, timing) instead of asking again. */
+function persistLocal(){
+  try{ localStorage.setItem('lwm_app', JSON.stringify(serializable(application))); }catch(_){}
 }
 
 async function connectBank(){
@@ -1516,7 +1546,7 @@ function AGREEMENT(){ return `
   <p>This Membership Agreement (the "Agreement") is entered into on the date of electronic signature (the "Effective Date") by and between mikek.ai LLC, a Florida limited liability company doing business as LiveWork Miami, by its authorized representative Michael Krilivsky (the "Operator"), and the individual signing below (the "Member"). The premises are located at 1300 S Miami Ave, PH 4910, Miami, Florida 33130 (the "Premises").</p>
 
   <h4>2. Nature of agreement; no tenancy created</h4>
-  <p>This Agreement grants the Member a revocable license to use the Premises and the included services. It is a membership, not a lease, sublease, or rental. Nothing in this Agreement creates a tenancy, leasehold, subtenancy, or any landlord-tenant relationship, and the Member does not receive the possessory rights of a tenant. The Member's assigned bedroom and bathroom are reserved for the Member's own private use during the membership term.</p>
+  <p>This Agreement grants the Member a revocable license to use the Premises and the included services. It is a membership, not a lease, sublease, or rental. Nothing in this Agreement creates a tenancy, leasehold, subtenancy, or any landlord-tenant relationship, and the Member does not receive the possessory rights of a tenant. The Member's assigned bedroom is reserved for the Member's own private use during the membership term.</p>
 
   <h4>3. Building access requires a separate lease</h4>
   <p>Membership does not include access to the building, a fob, a key, a parking spot, or the residence entry systems. To receive any of these, the Member must be added to and sign the building lease, a completely separate agreement between the Member and the landlord and/or building management. The Member is solely responsible for all fees associated with building access, including parking, fob, key, building or association deposits, application or processing fees, and any recurring charges. These are separate from and in addition to the membership fee. If the Member is not approved on the lease, fails to maintain it, or is removed from it, building access will not be available and this may affect continued membership.</p>
@@ -1531,7 +1561,7 @@ function AGREEMENT(){ return `
   <p>Separate from the membership fee, the Member is responsible for all of their own costs, including parking (if needed), fob, key, and replacement or activation fees, building/HOA/landlord deposits, application fees and recurring charges, and the Member's own insurance, personal belongings, and personal services.</p>
 
   <h4>7. Services and access included</h4>
-  <p>An assigned, primary-use bedroom and private bathroom for the Member's own regular use. The Member's room is reserved for the Member and is not assigned to or used by anyone else during the membership term. Access to shared living spaces and building amenities per building rules. Hydrogen water.</p>
+  <p>An assigned, primary-use bedroom for the Member's own regular use. The Member's room is reserved for the Member and is not assigned to or used by anyone else during the membership term. Access to shared living spaces and building amenities per building rules. Hydrogen water.</p>
 
   <h4>8. Member responsibilities and conduct</h4>
   <p>Assist with basic cleanliness and organization when the house manager is unavailable. Maintain respectful conduct and avoid disruption to the household or the Operator's business operations. Guests require prior written approval and remain the Member's full responsibility. Comply with the house standards provided at move-in and with all building and HOA rules.</p>
