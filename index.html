@@ -777,6 +777,18 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   </div>
 </section>
 
+<!-- ===================== RATES ===================== -->
+<section class="sand pad" id="rates">
+  <div class="wrap">
+    <div class="lede" data-reveal style="margin-bottom:40px;">
+      <span class="eyebrow">Membership rates</span>
+      <h2>One rate. <em>Everything included.</em></h2>
+      <p>Cleaning, laundry, receiving orders, and meal prep are part of every membership. Pick your commitment and see your number.</p>
+    </div>
+    <div id="homePlan" data-reveal></div>
+  </div>
+</section>
+
 <!-- ===================== FIT ===================== -->
 <section class="pad" id="fit">
   <div class="wrap">
@@ -1082,7 +1094,7 @@ function planSnapshot(){ return {
   dueAtMoveIn:planDueAtMoveIn()
 }; }
 
-/* plan builder now renders inside the flow only */
+renderPlanBuilder('homePlan', false); // homepage rates display
 
 /* ---------- nav scroll + menu ---------- */
 const nav = document.getElementById('nav');
@@ -1129,9 +1141,10 @@ const FLOWS = {
   onboard: { seq:[0,5,6,7,8,9,10], labels:['Contact','Your plan','Background check','Photo ID','Agreement','Payment','Welcome'] }
 };
 /* The completion flow only asks for what it does not already have (from a
-   previous session on this device); missing timing/about steps are inserted. */
+   previous session on this device); known steps are skipped entirely. */
 function buildOnboardSeq(){
-  const seq=[0];
+  const seq=[];
+  if(!application.fullName || !application.email || !application.phone) seq.push(0);
   if(!application.moveIn || !application.lengthOfStay || !application.inMiami) seq.push(1);
   if(!application.occupation || !application.instagram) seq.push(3);
   seq.push(5,6,7,8,9,10);
