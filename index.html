@@ -895,18 +895,16 @@ const PHOTOS = {
    CONFIG  —  EDIT YOUR NUMBERS
    ============================================================ */
 const CONFIG = {
-  // Base monthly rate by commitment term
-  BASE_BY_TERM: { '12': 2500, '6': 2750, 'mtm': 3000 },
-  // Each add-on is +$500/mo
-  ADDON_DEFS: [
-    { key:'cleaning',   name:'Cleaning, Laundry & Towel', price:500, desc:'Cleaning, laundry, and fresh towel service handled on a rhythm.' },
-    { key:'chef',       name:'Chef',                      price:500, desc:'Fresh meals and meal prep, sourced clean. You just say what you like.' },
-    { key:'management', name:'House Management',          price:500, desc:'Completing orders (food, items), fixing anything that goes wrong in the unit, receiving and opening your packages.' },
+  // All-inclusive monthly rate by commitment term.
+  // Every membership includes: cleaning, laundry, receiving orders, meal prep.
+  BASE_BY_TERM: { '12': 4000, '6': 4500, 'mtm': 5500 },
+  INCLUDED_SERVICES: [
+    { name:'Cleaning',         desc:'Your suite and shared spaces kept immaculate on a rhythm.' },
+    { name:'Laundry',          desc:'Washed, folded, and returned. Fresh linens and towels.' },
+    { name:'Receiving orders', desc:'Packages and deliveries received, opened if you like, and put away.' },
+    { name:'Meal prep',        desc:'Fresh meals prepared from Whole Foods, Trader Joe\'s, Publix, Costco, and local farms.' },
   ],
-  ALL_THREE_FLAT: 4000,        // flat total when all 3 add-ons are selected (any term)
   TIME_VALUE_PER_HR: 50,       // used by the savings calculator
-  // Discount codes: CODE -> percent off. Share a code with a member to apply it.
-  DISCOUNT_CODES: { 'JAMES16': 16 },
   // Standard tenant screening (credit + criminal + eviction). ~$35, applicant-paid, same-day PDF.
   BG_CHECK_URL: 'https://www.mysmartmove.com/',
   // PAYMENT_MODE: 'mercury' = member picks ACH/Wire, you get an email, you send a Mercury invoice.
@@ -924,26 +922,15 @@ const CONFIG = {
   }
 };
 
-/* ---------- pricing engine (shared by page + onboarding) ----------
+/* ---------- pricing engine (all-inclusive) ----------
    Rules:
-   - base by term: 12mo 2500, 6mo 2750, month-to-month 3000
-   - each add-on +500; all three flat 4000 (any term)
+   - one all-inclusive rate by term: 12mo 4000, 6mo 4500, month-to-month 5500
+   - cleaning, laundry, receiving orders, and meal prep are included in every plan
    - deposit equals one month's membership
-   - last month collected in advance on 6- and 12-month terms (not month-to-month)
-   - discount code applies a percent off the monthly (and therefore deposit + last month) */
-let selectedPlan = { term: '6', addons: [], discountCode: '' };
+   - last month collected in advance on 6- and 12-month terms (not month-to-month) */
+let selectedPlan = { term: '12' };
 
-function planBaseMonthly(plan = selectedPlan){
-  if(plan.addons.length === 3) return CONFIG.ALL_THREE_FLAT;
-  return CONFIG.BASE_BY_TERM[plan.term] + plan.addons.length * 500;
-}
-function discountPct(plan = selectedPlan){
-  const code = (plan.discountCode || '').trim().toUpperCase();
-  return CONFIG.DISCOUNT_CODES[code] || 0;
-}
-function planMonthly(plan = selectedPlan){
-  return Math.round(planBaseMonthly(plan) * (1 - discountPct(plan)/100));
-}
+function planMonthly(plan = selectedPlan){ return CONFIG.BASE_BY_TERM[plan.term]; }
 function planDeposit(plan = selectedPlan){ return planMonthly(plan); }      // deposit = one month
 function planHasLastMonth(plan = selectedPlan){ return plan.term !== 'mtm'; } // 6 & 12 mo only
 function planDueAtMoveIn(plan = selectedPlan){
@@ -973,7 +960,6 @@ document.getElementById('yr').textContent = new Date().getFullYear();
    SAVINGS CALCULATOR (now lives inside the application flow)
    ============================================================ */
 const calcState = { food:null, time:null, laundry:null, cleaning:null };
-let recsApplied = false;
 
 function calcAllAnswered(){ const {food,time,laundry,cleaning}=calcState; return food!=null&&time!=null&&laundry!=null&&cleaning!=null; }
 function calcSummary(){ const {food,time,laundry,cleaning}=calcState;
@@ -981,11 +967,6 @@ function calcSummary(){ const {food,time,laundry,cleaning}=calcState;
   const hrsMonth=Math.round((time||0)*4.33);
   const timeVal=hrsMonth*CONFIG.TIME_VALUE_PER_HR;
   return { cash, hrsMonth, timeVal }; }
-function calcRecommendations(){ const {food,time,laundry,cleaning}=calcState; const rec=[];
-  if(food>=700||time>=6) rec.push('chef');
-  if(laundry>=100||cleaning>=200) rec.push('cleaning');
-  if(cleaning>=200||food>=1100||time>=10) rec.push('management');
-  return [...new Set(rec)]; }
 function calcGridHTML(){
   const Q=[
     {q:'food', label:'Monthly food spend', sub:'groceries and dining out', opts:[['$400',400],['$700',700],['$1,100',1100],['$1,600+',1600]]},
@@ -999,16 +980,12 @@ function calcGridHTML(){
   </div>`).join('');
 }
 
-/* ---- plan builder (used on the page and inside the flow) ---- */
+/* ---- plan builder (all-inclusive, used inside the flow) ---- */
 const TERM_ORDER = ['12','6','mtm'];   // display order: 12 → 6 → month-to-month
 function renderPlanBuilder(elId, inFlow){
   const el = document.getElementById(elId);
   if(!el) return;
-  const base = planBaseMonthly();
   const net = planMonthly();
-  const pct = discountPct();
-  const stacked = CONFIG.BASE_BY_TERM[selectedPlan.term] + selectedPlan.addons.length * 500;
-  const saved = selectedPlan.addons.length === 3 ? stacked - CONFIG.ALL_THREE_FLAT : 0;
   const dep = planDeposit();
   const last = planHasLastMonth();
   const due = planDueAtMoveIn();
@@ -1024,49 +1001,24 @@ function renderPlanBuilder(elId, inFlow){
     </div>`;
   }).join('');
 
-  const addons = CONFIG.ADDON_DEFS.map(a=>{
-    const on = selectedPlan.addons.includes(a.key);
-    return `<div class="addon ${on?'sel':''}" data-addon="${a.key}">
+  const included = CONFIG.INCLUDED_SERVICES.map(a=>`
+    <div class="addon sel inc">
       <div class="box"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-      <div class="meta"><div class="nm"><span>${a.name}</span><span class="p">+${fmt(a.price)}</span></div>
-      <div class="d">${a.desc}</div></div></div>`;
-  }).join('');
+      <div class="meta"><div class="nm"><span>${a.name}</span><span class="p">Included</span></div>
+      <div class="d">${a.desc}</div></div></div>`).join('');
 
-  // discount code only appears inside the application flow, hidden behind a link
-  const codeOpen = !!(selectedPlan.discountCode || pct);
-  const codeBlock = inFlow ? `
-      <button type="button" class="code-link" id="codeLink_${elId}" ${codeOpen?'style="display:none"':''}>Have a discount code?</button>
-      <div class="code-wrap" id="codeWrap_${elId}" style="display:${codeOpen?'block':'none'}">
-        <div class="pb-label" style="margin-top:14px;">Discount code</div>
-        <div class="code-row">
-          <input id="codeInput_${elId}" class="code-in" placeholder="Enter code" value="${esc(selectedPlan.discountCode||'')}" />
-          <button class="code-btn" data-apply="${elId}">Apply</button>
-        </div>
-        <div class="code-msg" id="codeMsg_${elId}">${pct?`Code applied: ${pct}% off`:''}</div>
-      </div>` : '';
-
-  // ---- live value comparison (flow only): show spend + time today vs with LiveWork ----
+  // ---- live value comparison (flow only): what life costs today vs all-inclusive ----
   let valueBlock = '';
   if(inFlow){
     const sum = calcSummary();
-    const termBaseNet = CONFIG.BASE_BY_TERM[selectedPlan.term] * (1 - pct/100);
-    const servicesCost = Math.max(0, Math.round(net - termBaseNet));
-    const names = selectedPlan.addons.map(k=>{ const d=CONFIG.ADDON_DEFS.find(x=>x.key===k); return d?d.name:k; });
     const answered = calcAllAnswered();
-    let line;
-    if(!answered){
-      line = `Pick the services you want below. Each one hands real hours back to your week.`;
-    } else if(servicesCost===0){
-      line = `Today you spend about ${fmt(sum.cash)} and roughly ${sum.hrsMonth} hours a month on food, laundry, and cleaning. Add a service below and we handle it, and you keep those hours.`;
-    } else if(sum.timeVal > servicesCost){
-      line = `Your services cost ${fmt(servicesCost)} a month and hand back about ${sum.hrsMonth} hours, worth roughly ${fmt(sum.timeVal)} of your time. You come out ahead, before counting the errands you simply never run again.`;
-    } else {
-      line = `Everything cooked, cleaned, and handled for ${fmt(servicesCost)} a month, with about ${sum.hrsMonth} hours given back to you.`;
-    }
+    const line = answered
+      ? `Today you spend about ${fmt(sum.cash)} a month on food, laundry, and cleaning, plus roughly ${sum.hrsMonth} hours of your own time (worth about ${fmt(sum.timeVal)}). With LiveWork, all of it is included and handled, and you keep the hours.`
+      : `Cleaning, laundry, receiving orders, and meal prep are included in every membership. Nothing is handled by you.`;
     valueBlock = `<div class="value-compare ${answered?'':'dim'}">
       <div class="vc-col today">
         <div class="vc-h">Today, on your own</div>
-        <div class="vc-big">${fmt(sum.cash)}<small>/mo</small></div>
+        <div class="vc-big">${answered?fmt(sum.cash):'$—'}<small>/mo</small></div>
         <div class="vc-sub">food, laundry &amp; cleaning</div>
         <div class="vc-time">${answered?`+ ~${sum.hrsMonth} hrs/mo of your time`:'+ your time, every week'}</div>
         <div class="vc-foot">you plan, shop, cook, and clean</div>
@@ -1074,8 +1026,8 @@ function renderPlanBuilder(elId, inFlow){
       <div class="vc-arrow">→</div>
       <div class="vc-col live">
         <div class="vc-h">With LiveWork</div>
-        <div class="vc-big">${fmt(servicesCost)}<small>/mo</small></div>
-        <div class="vc-sub">${names.length?names.join(', '):'add a service below'}</div>
+        <div class="vc-big">Included</div>
+        <div class="vc-sub">cleaning, laundry, orders &amp; meal prep</div>
         <div class="vc-time">${answered?`${sum.hrsMonth} hrs/mo back`:'your hours, back'}</div>
         <div class="vc-foot">cooked, cleaned, handled</div>
       </div>
@@ -1087,15 +1039,13 @@ function renderPlanBuilder(elId, inFlow){
     <div class="pb-l">
       <div class="pb-label">Commitment</div>
       <div class="terms">${terms}</div>
-      <div class="pb-label">Add-on services</div>
-      ${addons}
-      ${codeBlock}
+      <div class="pb-label">Included in every membership</div>
+      ${included}
     </div>
     <div class="pb-r">
       <span class="lab">Your membership</span>
-      <div class="total">${pct?`<s>${fmt(base)}</s> `:''}${fmt(net)}<small>/mo</small></div>
-      <div class="brk">${termLabel(selectedPlan.term)} base${selectedPlan.addons.length?` + ${selectedPlan.addons.length} service${selectedPlan.addons.length>1?'s':''}`:''}${pct?` · ${pct}% off`:''}</div>
-      ${saved>0?`<span class="save">All-three bundle saves ${fmt(saved)}</span>`:''}
+      <div class="total">${fmt(net)}<small>/mo</small></div>
+      <div class="brk">${termLabel(selectedPlan.term)} · all-inclusive</div>
       <div class="move-in">
         <div class="mi"><span>First month</span><span>${fmt(net)}</span></div>
         ${last?`<div class="mi"><span>Last month (held)</span><span>${fmt(net)}</span></div>`:''}
@@ -1108,30 +1058,12 @@ function renderPlanBuilder(elId, inFlow){
   </div>`;
 
   el.querySelectorAll('.term').forEach(t=> t.addEventListener('click', ()=>{ selectedPlan.term = t.dataset.term; renderPlanBuilder(elId, inFlow); }));
-  el.querySelectorAll('.addon').forEach(a=> a.addEventListener('click', ()=>{
-    const k = a.dataset.addon;
-    selectedPlan.addons = selectedPlan.addons.includes(k) ? selectedPlan.addons.filter(x=>x!==k) : [...selectedPlan.addons, k];
-    renderPlanBuilder(elId, inFlow);
-  }));
-  const applyCode = ()=>{
-    const v = document.getElementById('codeInput_'+elId).value.trim();
-    selectedPlan.discountCode = v;
-    const ok = discountPct({...selectedPlan, discountCode:v}) > 0;
-    if(v && !ok){ const mEl=document.getElementById('codeMsg_'+elId); mEl.textContent='Code not recognized'; mEl.classList.add('bad'); return; }
-    renderPlanBuilder(elId, inFlow);
-  };
-  const cb = el.querySelector('.code-btn'); if(cb) cb.addEventListener('click', applyCode);
-  const ci = el.querySelector('.code-in'); if(ci) ci.addEventListener('keydown', e=>{ if(e.key==='Enter') applyCode(); });
-  const cl = document.getElementById('codeLink_'+elId);
-  if(cl) cl.addEventListener('click', ()=>{ const w=document.getElementById('codeWrap_'+elId); if(w){ w.style.display='block'; cl.style.display='none'; const i=document.getElementById('codeInput_'+elId); if(i) i.focus(); } });
 }
 function applyWithPlan(){ application.plan = planSnapshot(); openOnboarding(); }
 function planSnapshot(){ return {
   term:selectedPlan.term, termLabel:termLabel(selectedPlan.term),
-  addons:[...selectedPlan.addons],
-  discountCode:(selectedPlan.discountCode||'').trim().toUpperCase(),
-  discountPct:discountPct(),
-  baseMonthly:planBaseMonthly(),
+  included:CONFIG.INCLUDED_SERVICES.map(a=>a.name),
+  addons:[],
   monthlyTotal:planMonthly(),
   deposit:planDeposit(),
   hasLastMonth:planHasLastMonth(),
@@ -1324,7 +1256,7 @@ const TPL = {
     <label class="chk"><input type="checkbox" id="f_agreePay" ${application.agreePay?'checked':''} /><span>I understand the deposit, first month, and any last month due prior to move-in, and that membership is a revocable license, not a lease.</span></label>
     <label class="chk"><input type="checkbox" id="f_agreeSign" ${application.agreeSign?'checked':''} /><span>Typing my name above is my legal electronic signature on this Agreement.</span></label>`,
 
-  9: ()=>{ const p = application.plan || planSnapshot(); const m = p.monthlyTotal; const due = p.dueAtMoveIn; return `
+  9: ()=>{ const p = planSnapshot(); application.plan = p; const m = p.monthlyTotal; const due = p.dueAtMoveIn; return `
     <h3>Payment</h3>
     <p class="desc">Securely pay with ACH or wire to secure your membership.</p>
     <div class="charge">
@@ -1399,7 +1331,6 @@ function collectStep(){
   if(step===1) ['moveIn','lengthOfStay','inMiami'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===2) ['occupation','schedule','wfh','guests','cleanliness'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===3) ['occupation','instagram','linkedin','website','anythingElse'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
-  if(step===4){ if(!recsApplied && calcAllAnswered()){ selectedPlan.addons = calcRecommendations(); recsApplied=true; } }
   if(step===5){ application.plan = planSnapshot(); }
   if(step===6){ const c=document.getElementById('f_bgAuthorize'); if(c) application.bgAuthorize=c.checked; }
   if(step===7){ const s=document.getElementById('f_idType'); if(s) application.idType=s.value; }
@@ -1537,8 +1468,7 @@ async function sendApplicantEmail(){
   const E = CONFIG.EMAILJS;
   if(!window.emailjs || !E || !E.serviceId) return;
   try{ emailjs.init({ publicKey:E.publicKey }); }catch(_){}
-  const p = application.plan || planSnapshot();
-  const addonNames = (p.addons||[]).map(k=>{ const d=CONFIG.ADDON_DEFS.find(x=>x.key===k); return d?d.name:k; });
+  const p = planSnapshot(); application.plan = p;
   const params = {
     to_email:      application.email || '',
     to_name:       (application.fullName||'').split(' ')[0] || 'there',
@@ -1560,8 +1490,7 @@ async function sendApplicantEmail(){
     mailing_address: application.mailingAddress || application.currentAddress || '',
     plan_label:    p.termLabel || '',
     monthly:       fmt(p.monthlyTotal),
-    addons:        addonNames.length ? addonNames.join(', ') : 'None',
-    discount:      p.discountPct ? (p.discountPct + '% (' + (p.discountCode||'') + ')') : 'None',
+    addons:        'Cleaning, laundry, receiving orders, meal prep (included)',
     deposit:       fmt(p.deposit),
     last_month:    p.hasLastMonth ? fmt(p.monthlyTotal) : 'Not applicable',
     due_at_movein: fmt(p.dueAtMoveIn),
