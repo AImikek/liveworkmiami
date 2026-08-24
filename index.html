@@ -1113,9 +1113,9 @@ if(!reduce){
                opened by sending an approved applicant to liveworkmiami.com/?onboard=1 */
 const FLOWS = {
   apply:   { seq:[0,1,3,10], labels:['Contact','Timing','About you','Done'] },
-  onboard: { seq:[0,4,5,6,7,8,9,10], labels:['Contact','Your time','Your plan','Background check','Photo ID','Agreement','Payment','Welcome'] }
+  onboard: { seq:[0,5,6,7,8,9,10], labels:['Contact','Your plan','Background check','Photo ID','Agreement','Payment','Welcome'] }
 };
-let MODE = /[?&]onboard/.test(location.search) ? 'onboard' : 'apply';
+let MODE = (/[?&]onboard/.test(location.search) || /^\/welcome\/?$/.test(location.pathname)) ? 'onboard' : 'apply';
 let pos = 0; let step = FLOWS[MODE].seq[0];
 const application = { fullName:'',email:'',phone:'',
   moveIn:'',lengthOfStay:'',inMiami:'',
@@ -1495,7 +1495,7 @@ async function sendApplicantEmail(){
     last_month:    p.hasLastMonth ? fmt(p.monthlyTotal) : 'Not applicable',
     due_at_movein: fmt(p.dueAtMoveIn),
     pay_method:    'ACH or wire (selected in Mercury)',
-    application_stage: MODE==='apply' ? 'Initial request (short form)' : 'Full onboarding',
+    application_stage: MODE==='apply' ? 'Initial request (short form)' : 'Onboarding complete (signed, ready to invoice)',
     reply_to:      application.email || ''
   };
   await emailjs.send(E.serviceId, E.templateId, params);
@@ -1509,11 +1509,11 @@ function esc(s){ return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','
 function today(){ return new Date().toISOString().slice(0,10); }
 
 function AGREEMENT(){ return `
-  <h4>Membership Agreement &mdash; 1300 S Miami Ave, Apt 3506</h4>
-  <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: LiveWork Miami, operated by mikek.ai LLC, a Florida limited liability company. Premises: 1300 S Miami Ave, Apt 3506, Miami, FL 33130. Effective date: on signature.</p>
+  <h4>Membership Agreement &mdash; 1300 S Miami Ave, PH 4910</h4>
+  <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: LiveWork Miami, operated by mikek.ai LLC, a Florida limited liability company. Premises: 1300 S Miami Ave, PH 4910, Miami, FL 33130. Effective date: on signature.</p>
 
   <h4>1. Parties and premises</h4>
-  <p>This Membership Agreement (the "Agreement") is entered into on the date of electronic signature (the "Effective Date") by and between mikek.ai LLC, a Florida limited liability company doing business as LiveWork Miami, by its authorized representative Michael Krilivsky (the "Operator"), and the individual signing below (the "Member"). The premises are located at 1300 S Miami Ave, Apt 3506, Miami, Florida 33130 (the "Premises").</p>
+  <p>This Membership Agreement (the "Agreement") is entered into on the date of electronic signature (the "Effective Date") by and between mikek.ai LLC, a Florida limited liability company doing business as LiveWork Miami, by its authorized representative Michael Krilivsky (the "Operator"), and the individual signing below (the "Member"). The premises are located at 1300 S Miami Ave, PH 4910, Miami, Florida 33130 (the "Premises").</p>
 
   <h4>2. Nature of agreement; no tenancy created</h4>
   <p>This Agreement grants the Member a revocable license to use the Premises and the included services. It is a membership, not a lease, sublease, or rental. Nothing in this Agreement creates a tenancy, leasehold, subtenancy, or any landlord-tenant relationship, and the Member does not receive the possessory rights of a tenant. The Member's assigned bedroom and bathroom are reserved for the Member's own private use during the membership term.</p>
