@@ -570,7 +570,8 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   <a href="#top" class="wordmark">LiveWork <i>Miami</i></a>
   <div class="nav-links" id="navLinks">
     <a href="#scene" onclick="closeMenu()">The Residence</a>
-    <a href="#outside" onclick="closeMenu()">The Neighborhood</a>
+    <a href="#outside" onclick="closeMenu()">Amenities</a>
+    <a href="#neighborhood" onclick="closeMenu()">The Neighborhood</a>
     <a href="#membership" onclick="closeMenu()">Membership</a>
     <button class="btn nav-apply" onclick="openOnboarding();closeMenu()">Request membership</button>
   </div>
@@ -721,13 +722,13 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   </div>
 </section>
 
-<!-- ===================== EVERYTHING OUTSIDE YOUR DOOR ===================== -->
+<!-- ===================== EXCLUSIVE AMENITIES (in the building) ===================== -->
 <section class="pad" id="outside">
   <div class="wrap">
     <div class="lede" data-reveal style="margin-bottom:44px;">
-      <span class="eyebrow">Everything outside your door</span>
-      <h2>Step out, and the city <em>is already yours.</em></h2>
-      <p>Wellness in the building. The best of Brickell on foot. And a quiet, walkable life most of Miami drives across town for.</p>
+      <span class="eyebrow">Exclusive amenities</span>
+      <h2>Downstairs is <em>a resort.</em></h2>
+      <p>All of this is inside your building, part of the residence. Take the elevator, not the car.</p>
     </div>
 
     <div class="amen" data-reveal>
@@ -738,7 +739,18 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
       <div class="a"><span class="ai">🎬</span><h4>Theater</h4><p>Private screening room and billiards</p></div>
       <div class="a"><span class="ai">🏋️</span><h4>Fitness</h4><p>Building gym, steps to Equinox</p></div>
       <div class="a"><span class="ai">🎤</span><h4>Resident events</h4><p>Comedy, networking, evenings out</p></div>
-      <div class="a"><span class="ai">🚶</span><h4>Walkable</h4><p>The most walkable corner of Miami</p></div>
+      <div class="a"><span class="ai">🥤</span><h4>Hydrogen water</h4><p>In the residence, always on</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== THE NEIGHBORHOOD ===================== -->
+<section class="pad" id="neighborhood" style="padding-top:0;">
+  <div class="wrap">
+    <div class="lede" data-reveal style="margin-bottom:36px;">
+      <span class="eyebrow">The neighborhood</span>
+      <h2>Step out, and the city <em>is already yours.</em></h2>
+      <p>The best of Brickell on foot. A quiet, walkable life most of Miami drives across town for.</p>
     </div>
 
     <!-- neighborhood: walking times -->
@@ -904,6 +916,7 @@ const CONFIG = {
     { name:'Meal prep',        desc:'Fresh meals prepared from Whole Foods, Trader Joe\'s, Publix, Costco, and local farms.' },
   ],
   TIME_VALUE_PER_HR: 50,       // used by the savings calculator
+  AVAILABLE_FROM: '2026-09-28', // PH 4910 lease start; earliest possible move-in
   // Standard tenant screening (credit + criminal + eviction). ~$35, applicant-paid, same-day PDF.
   BG_CHECK_URL: 'https://www.mysmartmove.com/',
   // PAYMENT_MODE: 'mercury' = member picks ACH/Wire, you get an email, you send a Mercury invoice.
@@ -951,8 +964,8 @@ document.getElementById('yr').textContent = new Date().getFullYear();
 /* ---- next available membership (1st of next month) ---- */
 (function(){
   const el = document.getElementById('nextAvail'); if(!el) return;
-  const d = new Date(); d.setMonth(d.getMonth()+1, 1);
-  el.textContent = 'Next residence available ' + d.toLocaleDateString('en-US',{month:'long', year:'numeric'}) + ' · reviewed in the order received';
+  const d = new Date(CONFIG.AVAILABLE_FROM + 'T12:00:00');
+  el.textContent = 'Next residence available ' + d.toLocaleDateString('en-US',{month:'long', day:'numeric', year:'numeric'}) + ' · reviewed in the order received';
 })();
 
 /* ============================================================
@@ -1193,7 +1206,8 @@ const TPL = {
   1: ()=>`
     <h3>Timing</h3>
     <p class="desc">When you are hoping to move in, and for how long.</p>
-    <div class="field"><label>Desired move-in date <span class="rq">*</span></label><input id="f_moveIn" type="date" value="${esc(application.moveIn)}" /></div>
+    <div class="field"><label>Desired move-in date <span class="rq">*</span></label><input id="f_moveIn" type="date" min="${CONFIG.AVAILABLE_FROM}" value="${esc(application.moveIn)}" />
+      <div style="font-size:.8rem;color:var(--ink-soft);margin-top:6px;">The residence is available from September 28, 2026.</div></div>
     <div class="field"><label>Desired length of stay <span class="rq">*</span></label>
       ${sel('lengthOfStay',application.lengthOfStay,['Not sure yet','A few months','6 months','12 months','A year or more'])}</div>
     <div class="field"><label>Are you currently in Miami? <span class="rq">*</span></label>
@@ -1370,6 +1384,7 @@ function validateStep(){ collectStep();
     if(!/^\S+@\S+\.\S+$/.test(application.email)) return 'Please enter a valid email address.';
     if(!application.phone) return 'Please enter your phone number.'; }
   if(step===1){ if(!application.moveIn) return 'Please choose a desired move-in date.';
+    if(application.moveIn < CONFIG.AVAILABLE_FROM) return 'The residence is available from September 28, 2026. Please choose that date or later.';
     if(!application.lengthOfStay) return 'Please choose a desired length of stay.';
     if(!application.inMiami) return 'Please let us know if you are currently in Miami.'; }
   if(step===2){ if(!application.occupation) return 'Please tell us your occupation.';
@@ -1540,7 +1555,7 @@ function today(){ return new Date().toISOString().slice(0,10); }
 
 function AGREEMENT(){ return `
   <h4>Membership Agreement &mdash; 1300 S Miami Ave, PH 4910</h4>
-  <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: LiveWork Miami, operated by mikek.ai LLC, a Florida limited liability company. Premises: 1300 S Miami Ave, PH 4910, Miami, FL 33130. Effective date: on signature.</p>
+  <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: LiveWork Miami, operated by mikek.ai LLC, a Florida limited liability company. Premises: 1300 S Miami Ave, PH 4910, Miami, FL 33130. Effective date: on signature. Membership begins on the move-in date agreed with the Operator; the residence is available beginning September 28, 2026.</p>
 
   <h4>1. Parties and premises</h4>
   <p>This Membership Agreement (the "Agreement") is entered into on the date of electronic signature (the "Effective Date") by and between mikek.ai LLC, a Florida limited liability company doing business as LiveWork Miami, by its authorized representative Michael Krilivsky (the "Operator"), and the individual signing below (the "Member"). The premises are located at 1300 S Miami Ave, PH 4910, Miami, Florida 33130 (the "Premises").</p>
