@@ -342,19 +342,29 @@ section{ position:relative; }
 .pb{ display:grid; grid-template-columns:1.32fr .68fr; gap:0; border:1px solid var(--hair); border-radius:8px; overflow:hidden; }
 .pb-l{ padding:40px; }
 .pb-label{ font-size:.7rem; letter-spacing:.24em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; margin-bottom:14px; }
-.terms{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:34px; }
-.term{ position:relative; cursor:pointer; border:1px solid var(--hair); border-radius:6px; padding:20px 12px; text-align:center; background:transparent;
-  transition:border-color .3s var(--ease), background .3s, box-shadow .3s; }
-.term:hover{ border-color:var(--ink); }
-.term.sel{ border-color:var(--ink); background:var(--ink); }
-.term.sel .t{ color:rgba(255,255,255,.7); }
-.term.sel .pr{ color:#fff; }
-.term.sel .pr small{ color:rgba(255,255,255,.6); }
-.term .t{ font-weight:500; font-size:.82rem; letter-spacing:.02em; color:var(--ink-soft); }
-.term .pr{ font-family:var(--f-disp); font-weight:300; font-size:1.5rem; margin-top:6px; letter-spacing:-.01em; }
+.terms{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:26px; }
+.term{ position:relative; cursor:pointer; border:2px solid var(--hair); border-radius:10px; padding:26px 12px 18px; text-align:center; background:var(--paper);
+  transition:border-color .25s var(--ease), background .25s, box-shadow .25s, transform .15s; }
+.term:hover{ border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 24px rgba(28,26,22,.08); }
+.term.sel{ border-color:var(--accent); background:linear-gradient(180deg, rgba(166,128,62,.10), rgba(166,128,62,.03)); box-shadow:0 10px 28px rgba(166,128,62,.16); }
+.term .radio{ position:absolute; top:10px; right:10px; width:22px; height:22px; border:2px solid var(--hair); border-radius:50%;
+  display:grid; place-items:center; transition:background .25s, border-color .25s; background:#fff; }
+.term .radio svg{ width:12px; height:12px; stroke:#fff; fill:none; stroke-width:3.5; opacity:0; transition:opacity .15s; }
+.term.sel .radio{ background:var(--accent); border-color:var(--accent); }
+.term.sel .radio svg{ opacity:1; }
+.term .t{ font-weight:600; font-size:.86rem; letter-spacing:.02em; color:var(--ink); }
+.term .pr{ font-family:var(--f-disp); font-weight:300; font-size:1.6rem; margin-top:6px; letter-spacing:-.01em; color:var(--ink); }
 .term .pr small{ font-family:var(--f-body); font-size:.7rem; color:var(--ink-soft); }
-.term .best{ position:absolute; top:-9px; left:50%; transform:translateX(-50%); font-size:.6rem; font-weight:700;
+.term .pick{ margin-top:10px; font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); }
+.term.sel .pick{ color:var(--accent); }
+.term .best{ position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-size:.6rem; font-weight:700;
   letter-spacing:.16em; text-transform:uppercase; color:#fff; background:var(--accent); padding:3px 10px; border-radius:100px; white-space:nowrap; }
+.inc-chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
+.inc-chip{ display:inline-flex; align-items:center; gap:7px; font-size:.85rem; font-weight:500; color:var(--ink);
+  background:var(--sand); border-radius:100px; padding:8px 14px; }
+.inc-chip svg{ width:12px; height:12px; stroke:var(--accent); fill:none; stroke-width:3; }
+@media (max-width:560px){ .terms{ grid-template-columns:1fr; } .term{ padding:20px 14px 16px; text-align:left; }
+  .term .radio{ top:50%; transform:translateY(-50%); right:14px; } .term .best{ left:14px; transform:none; } }
 .addon{ display:flex; gap:16px; align-items:flex-start; border:1px solid var(--hair); border-radius:6px;
   padding:18px 20px; margin-bottom:11px; cursor:pointer; transition:border-color .3s var(--ease), background .3s; }
 .addon:hover{ border-color:var(--ink); }
@@ -951,12 +961,13 @@ const CONFIG = {
    - one all-inclusive rate by term: 12mo 4000, 6mo 4500, month-to-month 5500
    - cleaning, laundry, receiving orders, and meal prep are included in every plan
    - deposit equals one month's membership
-   - last month collected in advance on 6- and 12-month terms (not month-to-month) */
+   - first month, last month, and deposit are collected on every term
+   - month-to-month has a two-month minimum */
 let selectedPlan = { term: '12' };
 
 function planMonthly(plan = selectedPlan){ return CONFIG.BASE_BY_TERM[plan.term]; }
 function planDeposit(plan = selectedPlan){ return planMonthly(plan); }      // deposit = one month
-function planHasLastMonth(plan = selectedPlan){ return plan.term !== 'mtm'; } // 6 & 12 mo only
+function planHasLastMonth(plan = selectedPlan){ return true; } // first + last + deposit on every term
 function planDueAtMoveIn(plan = selectedPlan){
   const m = planMonthly(plan);
   return m /*first*/ + planDeposit(plan) + (planHasLastMonth(plan) ? m : 0);
@@ -1016,67 +1027,41 @@ function renderPlanBuilder(elId, inFlow){
 
   const mtmBase = CONFIG.BASE_BY_TERM['mtm'];
   const terms = TERM_ORDER.map(k=>{
+    const on = selectedPlan.term===k;
     const saveVsMtm = mtmBase - CONFIG.BASE_BY_TERM[k];
     return `
-    <div class="term ${selectedPlan.term===k?'sel':''}" data-term="${k}">
+    <div class="term ${on?'sel':''}" data-term="${k}" role="button" aria-pressed="${on}">
       ${k==='12'?'<span class="best">Best value</span>':''}
+      <span class="radio"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
       <div class="t">${termLabel(k)}</div><div class="pr">${fmt(CONFIG.BASE_BY_TERM[k])}<small>/mo</small></div>
-      ${saveVsMtm>0?`<div class="tsave">Save ${fmt(saveVsMtm)}/mo</div>`:`<div class="tsave flex">Most flexible</div>`}
+      ${saveVsMtm>0?`<div class="tsave">Save ${fmt(saveVsMtm)}/mo</div>`:`<div class="tsave flex">Flexible · 2-mo minimum</div>`}
+      <div class="pick">${on?'✓ Selected':'Tap to select'}</div>
     </div>`;
   }).join('');
 
-  const included = CONFIG.INCLUDED_SERVICES.map(a=>`
-    <div class="addon sel inc">
-      <div class="box"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
-      <div class="meta"><div class="nm"><span>${a.name}</span><span class="p">Included</span></div>
-      <div class="d">${a.desc}</div></div></div>`).join('');
+  const included = `<div class="inc-chips">${CONFIG.INCLUDED_SERVICES.map(a=>
+    `<span class="inc-chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>${a.name}</span>`).join('')}</div>`;
 
-  // ---- live value comparison (flow only): what life costs today vs all-inclusive ----
-  let valueBlock = '';
-  if(inFlow){
-    const sum = calcSummary();
-    const answered = calcAllAnswered();
-    const line = answered
-      ? `Today you spend about ${fmt(sum.cash)} a month on food, laundry, and cleaning, plus roughly ${sum.hrsMonth} hours of your own time (worth about ${fmt(sum.timeVal)}). With LiveWork, all of it is included and handled, and you keep the hours.`
-      : `Cleaning, laundry, receiving orders, and meal prep are included in every membership. Nothing is handled by you.`;
-    valueBlock = `<div class="value-compare ${answered?'':'dim'}">
-      <div class="vc-col today">
-        <div class="vc-h">Today, on your own</div>
-        <div class="vc-big">${answered?fmt(sum.cash):'$—'}<small>/mo</small></div>
-        <div class="vc-sub">food, laundry &amp; cleaning</div>
-        <div class="vc-time">${answered?`+ ~${sum.hrsMonth} hrs/mo of your time`:'+ your time, every week'}</div>
-        <div class="vc-foot">you plan, shop, cook, and clean</div>
-      </div>
-      <div class="vc-arrow">→</div>
-      <div class="vc-col live">
-        <div class="vc-h">With LiveWork</div>
-        <div class="vc-big">Included</div>
-        <div class="vc-sub">cleaning, laundry, orders &amp; meal prep</div>
-        <div class="vc-time">${answered?`${sum.hrsMonth} hrs/mo back`:'your hours, back'}</div>
-        <div class="vc-foot">cooked, cleaned, handled</div>
-      </div>
-    </div>
-    <p class="value-line">${line}</p>`;
-  }
+  const valueBlock = '';
 
   el.innerHTML = valueBlock + `<div class="pb${inFlow?' flow':''}">
     <div class="pb-l">
-      <div class="pb-label">Commitment</div>
+      <div class="pb-label">Step 1 · Select your plan (tap one)</div>
       <div class="terms">${terms}</div>
-      <div class="pb-label">Included in every membership</div>
+      <div class="pb-label">Included in every plan</div>
       ${included}
     </div>
     <div class="pb-r">
       <span class="lab">Your membership</span>
       <div class="total">${fmt(net)}<small>/mo</small></div>
-      <div class="brk">${termLabel(selectedPlan.term)} · all-inclusive</div>
+      <div class="brk">${termLabel(selectedPlan.term)} · all-inclusive${selectedPlan.term==='mtm'?' · 2-month minimum':''}</div>
       <div class="move-in">
         <div class="mi"><span>First month</span><span>${fmt(net)}</span></div>
         ${last?`<div class="mi"><span>Last month (held)</span><span>${fmt(net)}</span></div>`:''}
         <div class="mi"><span>Deposit</span><span>${fmt(dep)}</span></div>
         <div class="mi tot"><span>Due prior to move-in</span><span>${fmt(due)}</span></div>
       </div>
-      ${inFlow ? `<p style="font-size:.82rem;color:rgba(255,255,255,.6);margin-top:6px;">Continue below to keep this plan. You can change it before signing.</p>`
+      ${inFlow ? `<p style="font-size:.82rem;color:rgba(255,255,255,.6);margin-top:6px;">This updates as you tap a plan. Press Continue to keep it.</p>`
                : `<button class="btn btn-light" onclick="applyWithPlan()" style="margin-top:6px;">Apply with this plan</button>`}
     </div>
   </div>`;
@@ -1255,8 +1240,8 @@ const TPL = {
     <div class="calc-grid flow" id="flowCalcGrid">${calcGridHTML()}</div>`,
 
   5: ()=>`
-    <h3>Your plan, and what it saves you</h3>
-    <p class="desc">Here is your current life next to LiveWork. Deselect anything you do not want, and watch the numbers move.</p>
+    <h3>Select your plan</h3>
+    <p class="desc">Tap the commitment that fits you. Everything is included in every plan, and you can change your selection any time before signing.</p>
     <div id="flowPlan"></div>`,
 
   6: ()=>`
@@ -1575,7 +1560,7 @@ function today(){ return new Date().toISOString().slice(0,10); }
 
 function AGREEMENT(){ return `
   <h4>Membership Agreement &mdash; 1300 S Miami Ave, PH 4910</h4>
-  <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: LiveWork Miami, operated by mikek.ai LLC, a Florida limited liability company. Premises: 1300 S Miami Ave, PH 4910, Miami, FL 33130. Effective date: on signature. Membership begins on the move-in date agreed with the Operator; the residence is available beginning September 28, 2026.</p>
+  <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: LiveWork Miami, operated by mikek.ai LLC, a Florida limited liability company. Premises: 1300 S Miami Ave, PH 4910, Miami, FL 33130. Effective date: on signature. Membership begins on the move-in date agreed with the Operator; the residence is available beginning September 28, 2026. Month-to-month memberships have a minimum term of two months.</p>
 
   <h4>1. Parties and premises</h4>
   <p>This Membership Agreement (the "Agreement") is entered into on the date of electronic signature (the "Effective Date") by and between mikek.ai LLC, a Florida limited liability company doing business as LiveWork Miami, by its authorized representative Michael Krilivsky (the "Operator"), and the individual signing below (the "Member"). The premises are located at 1300 S Miami Ave, PH 4910, Miami, Florida 33130 (the "Premises").</p>
