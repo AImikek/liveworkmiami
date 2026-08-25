@@ -1174,6 +1174,7 @@ try{
       if(k==='plan' && v && typeof v==='object'){ application.plan=v; if(v.term) selectedPlan.term=v.term; }
       else if(typeof v==='string' || typeof v==='boolean'){ application[k]=v; }
     }
+    syncTermFromStay();
   }
 }catch(_){}
 
@@ -1377,9 +1378,15 @@ function bindDrop(key,onFile){ const d=document.getElementById('drop_'+key), inp
   ['dragleave','drop'].forEach(ev=> d.addEventListener(ev, e=>{ e.preventDefault(); d.style.borderColor=''; }));
   d.addEventListener('drop', e=>{ if(e.dataTransfer.files[0]) show(e.dataTransfer.files[0]); }); }
 
+/* Keep the plan term in sync with the applicant's stated length of stay. */
+function syncTermFromStay(){
+  const m={'6 months':'6','12 months':'12','A year or more':'12','A few months':'mtm'};
+  const t=m[application.lengthOfStay];
+  if(t) selectedPlan.term=t;
+}
 function collectStep(){
   if(step===0) ['fullName','email','phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
-  if(step===1) ['moveIn','lengthOfStay','inMiami'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+  if(step===1){ ['moveIn','lengthOfStay','inMiami'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); }); syncTermFromStay(); }
   if(step===2) ['occupation','schedule','wfh','guests','cleanliness'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===3) ['occupation','instagram','linkedin','website','anythingElse'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===5){ application.plan = planSnapshot(); }
