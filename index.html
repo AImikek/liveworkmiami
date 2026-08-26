@@ -1163,6 +1163,30 @@ const application = { fullName:'',email:'',phone:'',
   paymentMethod:'ach', paymentAck:false,
   bankConnected:false, stripeCustomerId:null, paymentMethodId:null };
 
+/* Personalized completion link: the short form's answers travel inside the
+   link itself (URL fragment), so /welcome prefills on any device. */
+const LINK_FIELDS=['fullName','email','phone','moveIn','lengthOfStay','inMiami','occupation','schedule','wfh','guests','cleanliness','instagram','linkedin','website','anythingElse'];
+function packApplicant(){
+  const o={}; LINK_FIELDS.forEach(k=>{ if(application[k]) o[k]=application[k]; });
+  o._t=selectedPlan.term;
+  try{ return btoa(encodeURIComponent(JSON.stringify(o))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }catch(_){ return ''; }
+}
+function welcomeLink(){
+  const base = /^https?:/.test(location.origin) ? location.origin : 'https://www.liveworkmiami.com';
+  const tok = packApplicant();
+  return base + '/welcome' + (tok ? ('#a='+tok) : '');
+}
+function unpackApplicant(){
+  try{
+    const m = location.hash.match(/[#&]a=([^&]+)/); if(!m) return;
+    let b64 = m[1].replace(/-/g,'+').replace(/_/g,'/'); while(b64.length%4) b64+='=';
+    const o = JSON.parse(decodeURIComponent(atob(b64)));
+    LINK_FIELDS.forEach(k=>{ if(typeof o[k]==='string' && o[k]) application[k]=o[k]; });
+    if(o._t && CONFIG.BASE_BY_TERM[o._t]) selectedPlan.term=o._t;
+    syncTermFromStay();
+    persistLocal();
+  }catch(_){}
+}
 /* Prefill from a previous session on this device (short form -> /welcome). */
 try{
   const saved = JSON.parse(localStorage.getItem('lwm_app')||'null');
@@ -1176,6 +1200,7 @@ try{
     syncTermFromStay();
   }
 }catch(_){}
+unpackApplicant();
 
 function openOnboarding(){ const o=document.getElementById('overlay'); o.classList.add('open'); o.setAttribute('aria-hidden','false');
   document.body.style.overflow='hidden';
@@ -1572,7 +1597,8 @@ async function sendApplicantEmail(){
     due_at_movein: fmt(p.dueAtMoveIn),
     pay_method:    'ACH or wire (selected in Mercury)',
     application_stage: MODE==='apply' ? 'Initial request (short form)' : 'Onboarding complete (signed, ready to invoice)',
-    reply_to:      application.email || ''
+    reply_to:      application.email || '',
+    welcome_link:  welcomeLink()
   };
   await emailjs.send(E.serviceId, E.templateId, params);
 }
