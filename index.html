@@ -1169,6 +1169,7 @@ const LINK_FIELDS=['fullName','email','phone','moveIn','lengthOfStay','inMiami',
 function packApplicant(){
   const o={}; LINK_FIELDS.forEach(k=>{ if(application[k]) o[k]=application[k]; });
   o._t=selectedPlan.term;
+  if(APP_ID) o._id=APP_ID;
   try{ return btoa(encodeURIComponent(JSON.stringify(o))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }catch(_){ return ''; }
 }
 function welcomeLink(){
@@ -1183,6 +1184,7 @@ function unpackApplicant(){
     const o = JSON.parse(decodeURIComponent(atob(b64)));
     LINK_FIELDS.forEach(k=>{ if(typeof o[k]==='string' && o[k]) application[k]=o[k]; });
     if(o._t && CONFIG.BASE_BY_TERM[o._t]) selectedPlan.term=o._t;
+    if(o._id) APP_ID=o._id;
     syncTermFromStay();
     persistLocal();
   }catch(_){}
@@ -1546,6 +1548,7 @@ function markBankConnected(demo){
 }
 
 async function submitApplication(){
+  application.plan = planSnapshot();   // record the plan (term synced from their stated stay)
   try{
     const [bg, id] = await Promise.all([
       application.bgCheckFile ? fileToBase64(application.bgCheckFile) : null,
