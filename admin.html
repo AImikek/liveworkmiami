@@ -125,10 +125,11 @@ async function api(body){
   return r.json();
 }
 
-async function login(){
-  PW = document.getElementById('pw').value;
+async function login(pwOverride){
+  PW = pwOverride || document.getElementById('pw').value;
   try{
     await load();
+    try{ localStorage.setItem('lwm_admin', PW); }catch(_){}
     document.getElementById('gate').style.display='none';
     document.getElementById('hdr').style.display='block';
     document.getElementById('main').style.display='block';
@@ -136,7 +137,9 @@ async function login(){
     document.getElementById('loginErr').textContent = e.message==='Unauthorized' ? 'Incorrect password.' : (e.message + ' — is the backend deployed with ADMIN_PASSWORD set?');
   }
 }
-function logout(){ PW=''; APPS=[]; location.reload(); }
+function logout(){ PW=''; APPS=[]; try{ localStorage.removeItem('lwm_admin'); }catch(_){} location.reload(); }
+/* auto-login with the remembered password */
+addEventListener('DOMContentLoaded', ()=>{ try{ const saved=localStorage.getItem('lwm_admin'); if(saved) login(saved); }catch(_){} });
 
 async function load(){
   const { apps } = await api({ action:'list' });
@@ -200,6 +203,7 @@ function render(){
       </div>
       ${a.anythingElse?`<div class="f" style="margin-bottom:14px;"><label>Anything else</label><div style="font-size:.9rem;color:var(--soft);">${esc(a.anythingElse)}</div></div>`:''}
       <div class="actions">
+        ${a.signature?`<button class="btn sm" onclick="viewAgreement('${a.id}')">View signed agreement</button>`:''}
         <button class="btn sm ok" onclick="setStatus('${a.id}','approved')">Approve</button>
         <button class="btn sm no" onclick="setStatus('${a.id}','declined')">Decline</button>
         <button class="btn sm" onclick="charge('${a.id}','movein')" ${a.bankConnected?'':'disabled style=opacity:.4'}>Charge move-in</button>
@@ -209,6 +213,97 @@ function render(){
   }).join('');
 }
 
+
+const AGREEMENT_HTML = `
+  <h4>Membership Agreement &mdash; 1300 S Miami Ave, PH 4910</h4>
+  <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: LiveWork Miami, operated by mikek.ai LLC, a Florida limited liability company. Premises: 1300 S Miami Ave, PH 4910, Miami, FL 33130. Effective date: on signature. Membership begins on the move-in date agreed with the Operator; the residence is available beginning September 28, 2026. Month-to-month memberships have a minimum term of two months.</p>
+
+  <h4>1. Parties and premises</h4>
+  <p>This Membership Agreement (the "Agreement") is entered into on the date of electronic signature (the "Effective Date") by and between mikek.ai LLC, a Florida limited liability company doing business as LiveWork Miami, by its authorized representative Michael Krilivsky (the "Operator"), and the individual signing below (the "Member"). The premises are located at 1300 S Miami Ave, PH 4910, Miami, Florida 33130 (the "Premises").</p>
+
+  <h4>2. Nature of agreement; no tenancy created</h4>
+  <p>This Agreement grants the Member a revocable license to use the Premises and the included services. It is a membership, not a lease, sublease, or rental. Nothing in this Agreement creates a tenancy, leasehold, subtenancy, or any landlord-tenant relationship, and the Member does not receive the possessory rights of a tenant. The Member's assigned bedroom is reserved for the Member's own private use during the membership term.</p>
+
+  <h4>3. Building access requires a separate lease</h4>
+  <p>Membership does not include access to the building, a fob, a key, a parking spot, or the residence entry systems. To receive any of these, the Member must be added to and sign the building lease, a completely separate agreement between the Member and the landlord and/or building management. The Member is solely responsible for all fees associated with building access, including parking, fob, key, building or association deposits, application or processing fees, and any recurring charges. These are separate from and in addition to the membership fee. If the Member is not approved on the lease, fails to maintain it, or is removed from it, building access will not be available and this may affect continued membership.</p>
+
+  <h4>4. Term and termination</h4>
+  <p>This Agreement begins on the Effective Date and continues on a month-to-month basis. Either party may terminate with thirty (30) days or more written notice. The Operator may terminate immediately for material breach, including non-payment, misconduct, unauthorized guests, property damage, conduct that harms the household or community, or breach of the confidentiality, non-solicitation, or other protective provisions.</p>
+
+  <h4>5. Membership fee, payment, and deposit</h4>
+  <p>Membership fee: at the rate confirmed during the application and payment process on this site. All payments are made exclusively through that process, in advance of each membership period. Payment is deemed received only when cleared funds are received. Partial payments are not accepted unless approved in writing. Any past-due balance accrues interest at the maximum rate permitted under Florida law (currently 18% per year), and a $150 administrative late fee may apply. Non-payment more than five (5) days past due is a material breach. A membership deposit equal to one month's membership is held and may be applied toward property damage beyond normal wear, breaches, costs related to food, water, utilities, or services, and unpaid fees, interest, penalties, or administrative costs. For six (6) and twelve (12) month terms, the last month's membership is collected in advance at move-in; month-to-month memberships do not include a last month but do include the deposit. If no damages or breaches occur, the deposit is refunded within fifteen (15) days of the Operator receiving the corresponding deposit back from the landlord. If deductions apply, an itemized notice is provided within thirty (30) days.</p>
+
+  <h4>6. Fees that are the Member's responsibility</h4>
+  <p>Separate from the membership fee, the Member is responsible for all of their own costs, including parking (if needed), fob, key, and replacement or activation fees, building/HOA/landlord deposits, application fees and recurring charges, and the Member's own insurance, personal belongings, and personal services.</p>
+
+  <h4>7. Services and access included</h4>
+  <p>An assigned, primary-use bedroom for the Member's own regular use. The Member's room is reserved for the Member and is not assigned to or used by anyone else during the membership term. Access to shared living spaces and building amenities per building rules. Hydrogen water.</p>
+
+  <h4>8. Member responsibilities and conduct</h4>
+  <p>Assist with basic cleanliness and organization when the house manager is unavailable. Maintain respectful conduct and avoid disruption to the household or the Operator's business operations. Guests require prior written approval and remain the Member's full responsibility. Comply with the house standards provided at move-in and with all building and HOA rules.</p>
+
+  <h4>9. Pets (if applicable)</h4>
+  <p>Pets require prior written approval. Any pet deposit covers pet-related damage only and does not replace the Member's direct responsibility. The Member is responsible for replacing or repairing any pet-caused damage in full.</p>
+
+  <h4>10. Damages and condition of premises</h4>
+  <p>Any damage caused during occupancy, including by the Member's guests or pets, must be one hundred percent (100%) repaired or replaced prior to move-out. Failure to do so may result in loss of deposit and further action.</p>
+
+  <h4>11. Confidentiality</h4>
+  <p>The Member may access confidential information, including business operations, event and partnership details, internal processes, and personal information regarding the Operator and the household. The Member agrees to maintain strict confidentiality and not to disclose or use such information for personal gain. These obligations survive termination indefinitely.</p>
+
+  <h4>12. Non-solicitation</h4>
+  <p>During membership and for twelve (12) months after termination, the Member shall not solicit or attempt to recruit the Operator's staff, contractors, vendors, partners, or sponsors. The Operator may pursue all available legal remedies, including injunctive relief and damages.</p>
+
+  <h4>13. Insurance and personal property</h4>
+  <p>The Operator is not responsible for loss of, theft of, or damage to the Member's personal property for any reason. The Member is encouraged to carry their own renter's or personal property insurance and assumes full responsibility for their belongings at all times.</p>
+
+  <h4>14. Assumption of risk, release, indemnification, hold harmless</h4>
+  <p>The Member assumes all risk associated with occupancy and participation, for themselves and their guests. To the fullest extent permitted by law, the Member releases, indemnifies, and holds harmless the Operator from any and all claims, injuries, damages, liabilities, losses, costs, and expenses (including attorney's fees) arising from or related to the membership, occupancy, conduct, guests, or pets, except to the extent caused by the Operator's gross negligence or willful misconduct.</p>
+
+  <h4>15. Limitation of liability</h4>
+  <p>To the fullest extent permitted by law, the Operator's total liability shall not exceed the total membership fees paid by the Member in the three (3) months preceding the event giving rise to the claim. The Operator shall not be liable for indirect, incidental, consequential, or punitive damages.</p>
+
+  <h4>16. Compliance with law</h4>
+  <p>The Member shall not use the Premises for any unlawful purpose and shall comply with all applicable laws, building rules, and HOA requirements.</p>
+
+  <h4>17. Governing law, venue, attorney's fees</h4>
+  <p>This Agreement is governed by the laws of the State of Florida. Exclusive venue for any dispute shall be Miami-Dade County, Florida. The prevailing party shall be entitled to reasonable attorney's fees and costs.</p>
+
+  <h4>18. Electronic signature and consent</h4>
+  <p>The Member consents to sign electronically under the federal E-SIGN Act and the Florida Uniform Electronic Transaction Act. Typing the full legal name and submitting this Agreement constitutes the Member's legal signature, has the same effect as a handwritten signature, and reflects intent to be bound. The date, time, and submission details are recorded as part of the signed record.</p>
+
+  <h4>19. Entire agreement; amendments; severability</h4>
+  <p>This Agreement is the entire agreement between the parties regarding membership and supersedes all prior agreements on that subject. The building lease is a separate agreement and is not merged into or superseded by this Agreement. Any amendment must be in writing and agreed to by both parties. If any provision is found unenforceable, the remaining provisions stay in full effect.</p>`;
+function viewAgreement(id){
+  const a = APPS.find(x=>x.id===id); if(!a) return;
+  const p = a.plan||{};
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Signed Membership Agreement — ${esc(a.fullName||'')}</title>
+  <style>
+    body{ font-family: Georgia, 'Times New Roman', serif; color:#1C1A16; max-width:760px; margin:40px auto; padding:0 24px; line-height:1.6; }
+    h4{ margin:22px 0 8px; } .sig-block{ margin-top:34px; border-top:2px solid #1C1A16; padding-top:18px; }
+    .row{ margin:6px 0; } .row b{ display:inline-block; min-width:210px; }
+    .stamp{ margin-top:22px; font-size:.85rem; color:#6B6457; border:1px solid #E4DCCB; padding:12px 14px; border-radius:6px; }
+    .noprint{ margin:26px 0; } @media print{ .noprint{ display:none; } body{ margin:0.5in auto; } }
+  </style></head><body>
+  ${AGREEMENT_HTML}
+  <div class="sig-block">
+    <h4>Executed by the Member</h4>
+    <div class="row"><b>Signature (typed):</b> ${esc(a.signature||'')}</div>
+    <div class="row"><b>Printed name:</b> ${esc(a.printedName||a.fullName||'')}</div>
+    <div class="row"><b>Date signed:</b> ${esc(a.signedAt||'')}</div>
+    <div class="row"><b>Email:</b> ${esc(a.email||'')} &nbsp; <b style="min-width:0">Phone:</b> ${esc(a.phone||'')}</div>
+    <div class="row"><b>Mailing address:</b> ${esc(a.mailingAddress||'')}</div>
+    <div class="row"><b>Emergency contact 1:</b> ${esc(a.ec1Name||'')} · ${esc(a.ec1Phone||'')}</div>
+    ${a.ec2Name?`<div class="row"><b>Emergency contact 2:</b> ${esc(a.ec2Name)} · ${esc(a.ec2Phone||'')}</div>`:''}
+    <div class="row"><b>Plan at signing:</b> ${esc(p.termLabel||'')} at ${fmt(p.monthlyTotal)}/mo · due prior to move-in ${fmt(p.dueAtMoveIn)}</div>
+    <div class="row"><b>Consents:</b> Agreement read and accepted ${a.agreeAll?'✓':'✗'} · Building access terms ${a.agreeAccess?'✓':'✗'} · Payment terms ${a.agreePay?'✓':'✗'} · Electronic signature ${a.agreeSign?'✓':'✗'}</div>
+  </div>
+  <div class="stamp">Signed electronically at liveworkmiami.com. This record, including the typed signature, date, and consent checkboxes above, constitutes the Member's electronic signature under E-SIGN and Florida UETA.</div>
+  <div class="noprint"><button onclick="window.print()" style="padding:10px 22px;font-size:1rem;cursor:pointer;">Print or save as PDF</button></div>
+  </body></html>`);
+  w.document.close();
+}
 async function setStatus(id, status){
   if(status==='declined' && !confirm('Decline this application?')) return;
   try{ await api({ action:'setStatus', id, status }); await load(); }
