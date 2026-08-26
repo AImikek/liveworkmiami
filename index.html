@@ -570,6 +570,20 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
   .hero-media img{ height:100%; }
   [data-reveal], .ph img{ opacity:1 !important; transform:none !important; }
 }
+
+/* ---- /welcome: dedicated full-screen signing page ---- */
+.welcome-page body{ overflow:auto !important; background:var(--paper); }
+.welcome-page body > *:not(#overlay){ display:none !important; }
+.welcome-page .overlay{ position:static; display:block; z-index:auto; }
+.welcome-page .ov-bg{ display:none; }
+.welcome-page .ov-modal{ position:static; inset:auto; padding:34px 18px 60px; overflow:visible; min-height:100svh; align-items:flex-start; }
+.welcome-page .sheet{ max-width:760px; box-shadow:0 24px 70px rgba(28,26,22,.10); }
+.welcome-page .sbody{ max-height:none; overflow:visible; }
+.welcome-page .x{ display:none; }
+@media (max-width:640px){ .welcome-page .ov-modal{ padding:0; } .welcome-page .sheet{ border-radius:0; min-height:100svh; } }
+
+.addr3{ display:grid; grid-template-columns:2fr .8fr 1fr; gap:14px; }
+@media (max-width:560px){ .addr3{ grid-template-columns:1fr; gap:0; } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
@@ -1141,7 +1155,7 @@ const application = { fullName:'',email:'',phone:'',
   moveIn:'',lengthOfStay:'',inMiami:'',
   occupation:'',schedule:'',wfh:'',guests:'',cleanliness:'',
   instagram:'',linkedin:'',website:'',anythingElse:'',
-  currentAddress:'', plan:null,
+  currentAddress:'', addr1:'', addr2:'', city:'', state:'', zip:'', plan:null,
   bgAuthorize:false, bgCheckFile:null, idType:'passport', idFile:null,
   signature:'', printedName:'', signedAt:'', mailingAddress:'',
   ec1Name:'', ec1Phone:'', ec2Name:'', ec2Phone:'',
@@ -1167,10 +1181,12 @@ function openOnboarding(){ const o=document.getElementById('overlay'); o.classLi
   document.body.style.overflow='hidden';
   if(MODE==='onboard'){ FLOWS.onboard.seq=buildOnboardSeq(); FLOWS.onboard.labels=FLOWS.onboard.seq.map(id=>STEP_LABELS[id]); }
   pos=0; step=FLOWS[MODE].seq[0]; renderStep(); }
-function closeOnboarding(){ const o=document.getElementById('overlay'); o.classList.remove('open'); o.setAttribute('aria-hidden','true');
+function closeOnboarding(){
+  if(document.documentElement.classList.contains('welcome-page')){ location.href='/'; return; }
+  const o=document.getElementById('overlay'); o.classList.remove('open'); o.setAttribute('aria-hidden','true');
   document.body.style.overflow=''; }
 addEventListener('keydown', e=>{ if(e.key==='Escape') closeOnboarding(); });
-if(MODE==='onboard') addEventListener('load', ()=> openOnboarding());
+if(MODE==='onboard'){ document.documentElement.classList.add('welcome-page'); }
 
 function setErr(m){ const el=document.getElementById('err'); if(m){ el.textContent=m; el.classList.add('show'); } else el.classList.remove('show'); }
 function updateBar(){
@@ -1191,6 +1207,7 @@ function renderStep(){ setErr(''); const b=document.getElementById('sbody'); b.i
   requestAnimationFrame(()=>{ b.scrollTop=0;
     const sh=document.querySelector('.sheet'); if(sh) sh.scrollTop=0;
     const m=document.querySelector('.ov-modal'); if(m) m.scrollTop=0;
+    window.scrollTo(0,0);
   });
 }
 
@@ -1273,9 +1290,14 @@ const TPL = {
       <div class="field" style="margin-bottom:0;"><label>Type your full legal name to sign <span class="rq">*</span></label><input id="f_signature" class="sign-in" value="${esc(application.signature)}" placeholder="Your full name" /></div>
       <div class="field" style="margin-bottom:0;"><label>Date</label><input id="f_signedAt" type="date" value="${application.signedAt||today()}" /></div>
     </div>
-    <div class="two" style="margin-top:14px;">
-      <div class="field"><label>Printed name <span class="rq">*</span></label><input id="f_printedName" value="${esc(application.printedName||application.fullName)}" placeholder="Full name" /></div>
-      <div class="field"><label>Current mailing address <span class="rq">*</span></label><input id="f_mailingAddress" value="${esc(application.mailingAddress||application.currentAddress)}" placeholder="Street, city, state, ZIP" /></div>
+    <div class="field" style="margin-top:14px;"><label>Printed name <span class="rq">*</span></label><input id="f_printedName" value="${esc(application.printedName||application.fullName)}" placeholder="Full name" /></div>
+    <div class="pb-label" style="margin:10px 0 8px;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;">Current mailing address</div>
+    <div class="field"><label>Address line 1 <span class="rq">*</span></label><input id="f_addr1" value="${esc(application.addr1)}" placeholder="Street address" /></div>
+    <div class="field"><label>Address line 2 (unit, apt, suite) — optional</label><input id="f_addr2" value="${esc(application.addr2)}" placeholder="Unit or apartment number" /></div>
+    <div class="addr3">
+      <div class="field"><label>City <span class="rq">*</span></label><input id="f_city" value="${esc(application.city)}" placeholder="City" /></div>
+      <div class="field"><label>State <span class="rq">*</span></label><input id="f_state" value="${esc(application.state)}" placeholder="FL" /></div>
+      <div class="field"><label>ZIP <span class="rq">*</span></label><input id="f_zip" value="${esc(application.zip)}" inputmode="numeric" placeholder="33130" /></div>
     </div>
 
     <div class="pb-label" style="margin:10px 0 8px;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;">Emergency contacts</div>
@@ -1378,7 +1400,8 @@ function collectStep(){
   if(step===6){ const c=document.getElementById('f_bgAuthorize'); if(c) application.bgAuthorize=c.checked; }
   if(step===7){ const s=document.getElementById('f_idType'); if(s) application.idType=s.value; }
   if(step===8){
-    ['signature','printedName','mailingAddress','ec1Name','ec1Phone','ec2Name','ec2Phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+    ['signature','printedName','addr1','addr2','city','state','zip','ec1Name','ec1Phone','ec2Name','ec2Phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+    application.mailingAddress=[application.addr1, application.addr2, [application.city, application.state].filter(Boolean).join(', '), application.zip].filter(Boolean).join(', ');
     application.signedAt=(document.getElementById('f_signedAt')||{}).value||today();
     ['agreeAll','agreeAccess','agreePay','agreeSign'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.checked; });
   }
@@ -1408,7 +1431,10 @@ function validateStep(){ collectStep();
     if(!application.signature) return 'Please type your full name to sign.';
     if(application.signature.toLowerCase()!==application.fullName.toLowerCase()) return 'Your signature should match the name from the first step.';
     if(!application.printedName) return 'Please enter your printed name.';
-    if(!application.mailingAddress) return 'Please enter your mailing address.';
+    if(!application.addr1) return 'Please enter your street address.';
+    if(!application.city) return 'Please enter your city.';
+    if(!application.state) return 'Please enter your state.';
+    if(!application.zip) return 'Please enter your ZIP code.';
     if(!application.ec1Name || !application.ec1Phone) return 'Please add at least one emergency contact (name and phone).';
     if(!(application.agreeAll && application.agreeAccess && application.agreePay && application.agreeSign)) return 'Please check all four boxes to agree and sign.';
   }
@@ -1618,6 +1644,7 @@ function AGREEMENT(){ return `
 
   <h4>19. Entire agreement; amendments; severability</h4>
   <p>This Agreement is the entire agreement between the parties regarding membership and supersedes all prior agreements on that subject. The building lease is a separate agreement and is not merged into or superseded by this Agreement. Any amendment must be in writing and agreed to by both parties. If any provision is found unenforceable, the remaining provisions stay in full effect.</p>`; }
+if(MODE==='onboard'){ openOnboarding(); }
 </script>
 </body>
 </html>
