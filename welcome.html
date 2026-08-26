@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Welcome — LiveWork Miami</title>
-<meta http-equiv="refresh" content="0; url=/?onboard=1" />
-<script>location.replace('/?onboard=1');</script>
+
+<script>location.replace('/?onboard=1' + location.hash);</script>
 <style>
   body{ font-family:'Manrope',-apple-system,sans-serif; background:#FCFAF5; color:#1C1A16;
     display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
@@ -17,7 +17,7 @@
 <body>
   <div class="c">
     <p>Opening your membership completion...</p>
-    <p><a href="/?onboard=1">Tap here if it does not open automatically</a></p>
+    <p><a href="#" onclick="location.replace('/?onboard=1'+location.hash);return false;">Tap here if it does not open automatically</a></p>
   </div>
 </body>
 </html>

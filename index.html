@@ -1179,7 +1179,7 @@ function welcomeLink(){
 }
 function unpackApplicant(){
   try{
-    const m = location.hash.match(/[#&]a=([^&]+)/); if(!m) return;
+    const m = (location.hash+location.search).match(/[#&?]a=([^&]+)/); if(!m) return;
     let b64 = m[1].replace(/-/g,'+').replace(/_/g,'/'); while(b64.length%4) b64+='=';
     const o = JSON.parse(decodeURIComponent(atob(b64)));
     LINK_FIELDS.forEach(k=>{ if(typeof o[k]==='string' && o[k]) application[k]=o[k]; });
