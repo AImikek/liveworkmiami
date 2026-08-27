@@ -4,13 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>LiveWork Miami · Admin</title>
-<!-- build: v3 · full field display + submission times + stored documents (Aug 26, 2026) -->
+<!-- build: v4 · clickable summary filters, delete, document links, signature certificate (Aug 26, 2026) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Manrope:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
 <style>
 :root{ --paper:#FBFAF7; --sand:#F0EADF; --ink:#17191E; --soft:#5A5C63; --hair:rgba(23,25,30,.14);
-  --accent:#0D7368; --f-d:'Fraunces',serif; --f-b:'Manrope',sans-serif; }
+  --accent:#0D7368; --f-d:'Fraunces',serif; --f-b:'Manrope',sans-serif;
+  --f-sig:'Great Vibes','Snell Roundhand','Segoe Script',cursive; }
 *{ box-sizing:border-box; margin:0; padding:0; }
 body{ font-family:var(--f-b); background:var(--paper); color:var(--ink); line-height:1.5; -webkit-font-smoothing:antialiased; }
 .wrap{ max-width:1100px; margin:0 auto; padding:0 24px; }
@@ -27,6 +28,7 @@ header .wrap{ display:flex; align-items:center; justify-content:space-between; }
 .btn.sm{ padding:7px 12px; font-size:.8rem; }
 .btn.ok{ color:var(--accent); border-color:var(--accent); }
 .btn.no{ color:#C0392B; border-color:rgba(192,57,43,.4); }
+.btn.no:hover{ border-color:#C0392B; background:rgba(192,57,43,.05); }
 
 /* login */
 .gate{ max-width:380px; margin:18vh auto; text-align:center; padding:0 24px; }
@@ -41,8 +43,12 @@ header .wrap{ display:flex; align-items:center; justify-content:space-between; }
 main{ padding:34px 0 80px; display:none; }
 .head{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:8px; }
 .head h1{ font-size:2.2rem; font-weight:300; }
-.summary{ display:flex; gap:26px; margin:18px 0 28px; flex-wrap:wrap; }
+.summary{ display:flex; gap:14px; margin:18px 0 28px; flex-wrap:wrap; }
+.summary .s{ cursor:pointer; padding:8px 14px; border-radius:8px; border:1px solid transparent; transition:.2s; }
+.summary .s:hover{ background:var(--sand); }
+.summary .s.active{ border-color:var(--accent); background:rgba(13,115,104,.06); }
 .summary .s b{ font-family:var(--f-d); font-weight:300; font-size:1.7rem; display:block; }
+.summary .s.active b{ color:var(--accent); }
 .summary .s span{ font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--soft); }
 .toolbar{ display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
 .toolbar input{ flex:1; min-width:200px; font-family:var(--f-b); font-size:.92rem; padding:11px 13px; border:1px solid var(--hair); border-radius:4px; }
@@ -66,34 +72,16 @@ main{ padding:34px 0 80px; display:none; }
 .tags{ display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
 .tag{ font-size:.72rem; background:var(--sand); border-radius:100px; padding:3px 10px; }
 .chk{ font-size:.85rem; } .chk.y{ color:var(--accent); } .chk.n{ color:var(--soft); }
-.actions{ display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid var(--hair); padding-top:16px; margin-top:4px; }
+.sig-script{ font-family:var(--f-sig); font-size:1.45rem; line-height:1.2; }
+.actions{ display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid var(--hair); padding-top:16px; margin-top:4px; align-items:center; }
+.actions .spacer{ flex:1; }
 .empty{ text-align:center; color:var(--soft); padding:60px 0; }
 .loading{ text-align:center; color:var(--soft); padding:50px 0; }
 .note{ font-size:.8rem; color:var(--soft); margin-top:14px; }
 .blk{ margin:0 0 14px; }
 .blk label{ font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--soft); display:block; margin-bottom:3px; }
 .blk div{ font-size:.9rem; color:var(--soft); }
-
-/* stored documents */
-.docs{ display:flex; gap:10px; flex-wrap:wrap; }
-.doc{ margin:0; cursor:pointer; text-align:center; }
-.doc img{ width:88px; height:64px; object-fit:cover; border-radius:4px; border:1px solid var(--hair); display:block; transition:.2s; background:var(--sand); }
-.doc:hover img{ border-color:var(--accent); transform:translateY(-1px); box-shadow:0 6px 16px rgba(23,25,30,.12); }
-.doc-generic{ width:88px; height:64px; border:1px solid var(--hair); border-radius:4px; display:grid; place-items:center;
-  font-size:.68rem; font-weight:700; letter-spacing:.1em; color:var(--soft); background:var(--sand); transition:.2s; }
-.doc:hover .doc-generic{ border-color:var(--accent); color:var(--accent); }
-.doc figcaption{ font-size:.64rem; color:var(--soft); margin-top:4px; max-width:96px; line-height:1.3; }
-
-/* document viewer */
-.lb{ position:fixed; inset:0; z-index:60; background:rgba(12,14,18,.72); display:none; align-items:center; justify-content:center; padding:20px; }
-.lb.open{ display:flex; }
-.lb-card{ background:#fff; border-radius:8px; max-width:min(940px,94vw); max-height:92vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 40px 100px -20px rgba(0,0,0,.5); }
-.lb-body{ overflow:auto; display:grid; place-items:center; background:#15171b; min-height:180px; min-width:280px; }
-.lb-body img{ max-width:90vw; max-height:72vh; display:block; }
-.lb-body .lb-msg{ color:#cfd2d8; font-size:.9rem; padding:40px 30px; text-align:center; }
-.lb-foot{ display:flex; gap:10px; align-items:center; justify-content:space-between; padding:12px 16px; flex-wrap:wrap; }
-.lb-foot .nm{ font-size:.83rem; color:var(--soft); word-break:break-all; }
-.lb-foot .bs{ display:flex; gap:8px; }
+.doclinks div{ padding:2px 0; }
 </style>
 </head>
 <body>
@@ -125,7 +113,7 @@ main{ padding:34px 0 80px; display:none; }
     <div class="summary" id="summary"></div>
     <div class="toolbar">
       <input id="search" placeholder="Search name, email, phone, social…" oninput="render()" />
-      <select id="filter" onchange="render()">
+      <select id="filter" onchange="renderSummary();render()">
         <option value="all">All statuses</option>
         <option value="submitted">Submitted</option>
         <option value="approved">Approved</option>
@@ -134,30 +122,14 @@ main{ padding:34px 0 80px; display:none; }
       </select>
     </div>
     <div id="list"><div class="loading">Loading…</div></div>
-    <p class="note">Click a document thumbnail to view it full size. Send invoices from Mercury; members pay by ACH or wire inside Mercury.</p>
+    <p class="note">Click a document link to open it in a new tab (PDFs open right in the browser). Send invoices from Mercury; members pay by ACH or wire inside Mercury.</p>
   </div>
 </main>
-
-<!-- DOCUMENT VIEWER -->
-<div class="lb" id="lb" onclick="if(event.target===this)closeLb()">
-  <div class="lb-card">
-    <div class="lb-body" id="lbBody"><div class="lb-msg">Loading…</div></div>
-    <div class="lb-foot">
-      <span class="nm" id="lbName"></span>
-      <span class="bs">
-        <button class="btn sm" id="lbOpen" onclick="lbOpenTab()">Open in new tab</button>
-        <button class="btn sm" id="lbDl" onclick="lbDownload()">Download</button>
-        <button class="btn sm" onclick="closeLb()">Close</button>
-      </span>
-    </div>
-  </div>
-</div>
 
 <script>
 let PW = '';
 let APPS = [];
 const FILE_CACHE = {};   // fileId -> { name, type, size, dataUrl }
-let LB_CURRENT = null;   // file currently shown in the viewer
 const fmt = n => '$' + Number(n||0).toLocaleString('en-US');
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const dt = iso => { if(!iso) return ''; const d = new Date(iso); if(isNaN(d)) return esc(iso);
@@ -195,16 +167,18 @@ async function load(){
   APPS = apps || [];
   renderSummary(); render();
 }
+/* Summary numbers are clickable filters. */
 function renderSummary(){
-  const sub = APPS.filter(a=>a.status==='submitted').length;
-  const appr = APPS.filter(a=>a.status==='approved').length;
-  const paid = APPS.filter(a=>a.moveInCharge).length;
-  document.getElementById('summary').innerHTML = `
-    <div class="s"><b>${APPS.length}</b><span>Total</span></div>
-    <div class="s"><b>${sub}</b><span>Awaiting review</span></div>
-    <div class="s"><b>${appr}</b><span>Approved</span></div>
-    <div class="s"><b>${paid}</b><span>Move-in charged</span></div>`;
+  const cnt = s => APPS.filter(a=>a.status===s).length;
+  const f = document.getElementById('filter').value;
+  const tile = (val,n,label)=>`<div class="s ${f===val?'active':''}" onclick="setFilter('${val}')" title="Show: ${label}"><b>${n}</b><span>${label}</span></div>`;
+  document.getElementById('summary').innerHTML =
+    tile('all', APPS.length, 'Total') +
+    tile('submitted', cnt('submitted'), 'Awaiting review') +
+    tile('approved', cnt('approved'), 'Approved') +
+    tile('in_progress', cnt('in_progress'), 'In progress');
 }
+function setFilter(v){ document.getElementById('filter').value = v; renderSummary(); render(); }
 
 function planSummary(p){
   if(!p) return '<span class="chk n">No plan</span>';
@@ -229,7 +203,8 @@ function linkify(kind, v){
   return url ? `${lbl}: <a href="${esc(url)}" target="_blank" rel="noopener">${esc(t)}</a>` : `${lbl}: ${esc(t)}`;
 }
 
-/* Stored documents render as thumbnails; click opens the full file. */
+/* Stored documents render as plain links; clicking opens the file in a new tab
+   (PDFs open natively in the browser). */
 function docCell(a){
   const docs = a.documents || {};
   const kinds = Object.keys(docs);
@@ -240,17 +215,42 @@ function docCell(a){
       : '<span class="chk n">None</span>';
   }
   const idTypeLabel = a.idType==='drivers_license' ? "driver's license" : a.idType==='passport' ? 'passport' : '';
-  return '<div class="docs">' + kinds.map(k=>{
+  return '<div class="doclinks">' + kinds.map(k=>{
     const v = docs[k]||{};
     const label = k==='id' ? ('Photo ID' + (idTypeLabel?' · '+idTypeLabel:'')) : k==='backgroundCheck' ? 'Screening report' : esc(k);
-    const size = v.size ? fmtSize(v.size) : '';
-    const isPdf = ((v.type||'').includes('pdf')) || /\.pdf$/i.test(v.name||'');
-    const inner = v.thumb ? `<img src="${v.thumb}" alt="${esc(label)}" loading="lazy" />`
-                          : `<div class="doc-generic">${isPdf?'PDF':'FILE'}</div>`;
-    const click = v.fileId ? `onclick="viewDoc('${esc(a.id)}','${esc(k)}')"`
-                : v.url ? `onclick="window.open('${esc(v.url)}','_blank')"` : '';
-    return `<figure class="doc" ${click} title="${esc(v.name||label)}">${inner}<figcaption>${label}${size?`<br>${size}`:''}</figcaption></figure>`;
+    const size = v.size ? ` <span style="color:var(--soft);font-size:.78rem;">(${fmtSize(v.size)})</span>` : '';
+    if(v.fileId) return `<div><a href="#" onclick="return openDocFile('${esc(a.id)}','${esc(k)}',this)">${label} ↗</a>${size}</div>`;
+    if(v.url)    return `<div><a href="${esc(v.url)}" target="_blank" rel="noopener">${label} ↗</a></div>`;
+    return `<div><span class="chk n">${label}${v.name?' · '+esc(v.name):''} (not stored)</span></div>`;
   }).join('') + '</div>';
+}
+function dataUrlToBlob(u){
+  const [h,b] = String(u).split(',');
+  const mime = (h.match(/data:(.*?)(;|$)/)||[])[1] || 'application/octet-stream';
+  const bin = atob(b||''); const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr], {type:mime});
+}
+async function openDocFile(appId, kind, el){
+  const a = APPS.find(x=>x.id===appId); const meta = a && (a.documents||{})[kind];
+  if(!meta || !meta.fileId) return false;
+  const w = window.open('', '_blank'); // open synchronously so popup blockers allow it
+  try{
+    if(w){ w.document.write('<title>Loading…</title><p style="font-family:sans-serif;color:#555;padding:20px;">Loading document…</p>'); }
+    let f = FILE_CACHE[meta.fileId];
+    if(!f){
+      const prev = el ? el.textContent : '';
+      if(el) el.textContent = 'Opening…';
+      try{ f = await api({ action:'getFile', fileId: meta.fileId }); FILE_CACHE[meta.fileId] = f; }
+      finally{ if(el) el.textContent = prev; }
+    }
+    const u = URL.createObjectURL(dataUrlToBlob(f.dataUrl));
+    if(w) w.location = u; else window.open(u, '_blank');
+  }catch(e){
+    if(w) w.close();
+    alert('Could not open document: ' + e.message);
+  }
+  return false;
 }
 
 /* Everything on the record that the named cells above don't already show.
@@ -259,6 +259,7 @@ const SHOWN_KEYS = ['id','fullName','email','phone','occupation','company','plan
   'moveIn','lengthOfStay','inMiami','schedule','wfh','guests','cleanliness',
   'instagram','linkedin','website','anythingElse','currentAddress','addr1','addr2','city','state','zip','mailingAddress',
   'signature','printedName','signedAt','agreeAll','agreeAccess','agreePay','agreeSign',
+  'signedAtISO','signatureUA','signatureTz','signatureCertId','signatureIP','agreementSha256','agreementVersion',
   'ec1Name','ec1Phone','ec2Name','ec2Phone','idType','bgAuthorize','bgCheckFileName','idFileName',
   'paymentMethod','paymentAck','paymentSent','bankConnected','stripeCustomerId','paymentMethodId',
   'documents','moveInCharge','createdAt','updatedAt','decidedAt'];
@@ -304,6 +305,9 @@ function render(){
     ].filter(Boolean).join('<br>');
     const stopped = a.status==='in_progress' && (a.lastStep||a.lastStep===0)
       ? `<div style="font-size:.76rem;color:var(--soft);margin-top:2px;">Stopped at: ${esc(STEP_NAMES[a.lastStep]||String(a.lastStep))}</div>` : '';
+    const signed = a.signature
+      ? `<div class="sig-script">${esc(a.signature)}</div><div style="font-size:.8rem;color:var(--soft);">${a.signedAtISO?dt(a.signedAtISO):esc(fdate(a.signedAt))}</div>`
+      : '<span class="chk n">Not signed</span>';
     const cell = (label, html) => html ? `<div class="f"><label>${label}</label><div>${html}</div></div>` : '';
     return `<div class="card">
       <div class="card-top">
@@ -316,7 +320,7 @@ function render(){
         ${cell('Timing', timing || '<span class="chk n">—</span>')}
         ${cell('Social', social || '<span class="chk n">—</span>')}
         ${lifestyle ? cell('Lifestyle', `<span style="font-size:.85rem;">${lifestyle}</span>`) : ''}
-        ${cell('Signed', a.signature ? esc(a.signature)+'<br>'+esc(fdate(a.signedAt)) : '<span class="chk n">Not signed</span>')}
+        ${cell('Signed', signed)}
         ${address ? cell('Mailing address', `<span style="font-size:.85rem;">${esc(address)}</span>`) : ''}
         ${cell('Checks', `
           <span class="chk ${a.bgAuthorize?'y':'n'}">${a.bgAuthorize?'✓':'·'} Background authorized</span><br>
@@ -334,47 +338,12 @@ function render(){
         ${a.signature?`<button class="btn sm" onclick="viewAgreement('${esc(a.id)}')">View signed agreement</button>`:''}
         <button class="btn sm ok" onclick="setStatus('${esc(a.id)}','approved')">Approve</button>
         <button class="btn sm no" onclick="setStatus('${esc(a.id)}','declined')">Decline</button>
-        <button class="btn sm" onclick="charge('${esc(a.id)}','movein')" ${a.bankConnected?'':'disabled style=opacity:.4'}>Charge move-in</button>
-        <button class="btn sm" onclick="charge('${esc(a.id)}','monthly')" ${a.bankConnected?'':'disabled style=opacity:.4'}>Charge one month</button>
+        <span class="spacer"></span>
+        <button class="btn sm no" onclick="deleteApp('${esc(a.id)}')" title="Permanently delete this application and its documents">Delete</button>
       </div>
     </div>`;
   }).join('');
 }
-
-/* ===== document viewer ===== */
-function dataUrlToBlob(u){
-  const [h,b] = String(u).split(',');
-  const mime = (h.match(/data:(.*?)(;|$)/)||[])[1] || 'application/octet-stream';
-  const bin = atob(b||''); const arr = new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
-  return new Blob([arr], {type:mime});
-}
-async function viewDoc(appId, kind){
-  const a = APPS.find(x=>x.id===appId); if(!a) return;
-  const meta = (a.documents||{})[kind]; if(!meta || !meta.fileId) return;
-  const lb = document.getElementById('lb'); const body = document.getElementById('lbBody');
-  document.getElementById('lbName').textContent = (meta.name||'document') + (meta.size?' · '+fmtSize(meta.size):'');
-  body.innerHTML = '<div class="lb-msg">Loading…</div>';
-  LB_CURRENT = null;
-  lb.classList.add('open');
-  try{
-    let file = FILE_CACHE[meta.fileId];
-    if(!file){ file = await api({ action:'getFile', fileId: meta.fileId }); FILE_CACHE[meta.fileId] = file; }
-    LB_CURRENT = file;
-    if((file.type||'').startsWith('image/')){
-      body.innerHTML = `<img src="${file.dataUrl}" alt="${esc(file.name||'document')}" />`;
-    } else {
-      body.innerHTML = `<div class="lb-msg">${esc(file.name||'document')}<br><br>This file type does not preview here.<br>Use Open in new tab or Download below.</div>`;
-    }
-  }catch(e){
-    body.innerHTML = `<div class="lb-msg">Could not load this document.<br>${esc(e.message||'')}</div>`;
-  }
-}
-function lbOpenTab(){ if(!LB_CURRENT) return; const u = URL.createObjectURL(dataUrlToBlob(LB_CURRENT.dataUrl)); window.open(u,'_blank'); }
-function lbDownload(){ if(!LB_CURRENT) return; const u = URL.createObjectURL(dataUrlToBlob(LB_CURRENT.dataUrl));
-  const el = document.createElement('a'); el.href = u; el.download = LB_CURRENT.name || 'document'; document.body.appendChild(el); el.click(); el.remove(); }
-function closeLb(){ document.getElementById('lb').classList.remove('open'); }
-addEventListener('keydown', e=>{ if(e.key==='Escape') closeLb(); });
 
 
 const AGREEMENT_HTML = `
@@ -440,30 +409,59 @@ const AGREEMENT_HTML = `
 function viewAgreement(id){
   const a = APPS.find(x=>x.id===id); if(!a) return;
   const p = a.plan||{};
+  const consentRow = (label, ok) => `<tr><td style="padding:3px 14px 3px 0;color:#6B6457;">${label}</td><td>${ok?'✓ Agreed':'✗ Not agreed'}</td></tr>`;
+  const certRow = (label, val) => val ? `<tr><td style="padding:3px 14px 3px 0;color:#6B6457;white-space:nowrap;vertical-align:top;">${label}</td><td style="word-break:break-all;">${val}</td></tr>` : '';
   const w = window.open('', '_blank');
   w.document.write(`<!DOCTYPE html><html><head><title>Signed Membership Agreement — ${esc(a.fullName||'')}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet" />
   <style>
     body{ font-family: Georgia, 'Times New Roman', serif; color:#1C1A16; max-width:760px; margin:40px auto; padding:0 24px; line-height:1.6; }
     h4{ margin:22px 0 8px; } .sig-block{ margin-top:34px; border-top:2px solid #1C1A16; padding-top:18px; }
     .row{ margin:6px 0; } .row b{ display:inline-block; min-width:210px; }
+    .script{ font-family:'Great Vibes','Snell Roundhand','Segoe Script',cursive; font-size:2.1rem; line-height:1.2; }
+    .cert{ margin-top:26px; border:1.5px solid #1C1A16; border-radius:8px; padding:18px 22px; page-break-inside:avoid; }
+    .cert h4{ margin:0 0 4px; letter-spacing:.04em; }
+    .cert .sub{ font-size:.82rem; color:#6B6457; margin-bottom:12px; }
+    .cert table{ border-collapse:collapse; font-size:.9rem; width:100%; }
     .stamp{ margin-top:22px; font-size:.85rem; color:#6B6457; border:1px solid #E4DCCB; padding:12px 14px; border-radius:6px; }
     .noprint{ margin:26px 0; } @media print{ .noprint{ display:none; } body{ margin:0.5in auto; } }
   </style></head><body>
   ${AGREEMENT_HTML}
   <div class="sig-block">
     <h4>Executed by the Member</h4>
-    <div class="row"><b>Signature (typed):</b> ${esc(a.signature||'')}</div>
+    <div class="script" style="border-bottom:1.5px solid #1C1A16; display:inline-block; padding:0 30px 2px 4px; min-width:320px;">${esc(a.signature||'')}</div>
+    <div style="font-size:.8rem;color:#6B6457;margin:4px 0 14px;">Adopted electronic signature · /s/ ${esc(a.signature||'')}</div>
     <div class="row"><b>Printed name:</b> ${esc(a.printedName||a.fullName||'')}</div>
-    <div class="row"><b>Date signed:</b> ${esc(a.signedAt||'')}</div>
-    ${a.updatedAt?`<div class="row"><b>Recorded:</b> ${dt(a.updatedAt)}</div>`:''}
+    <div class="row"><b>Signature date (stated):</b> ${esc(a.signedAt||'')}</div>
+    ${a.signedAtISO?`<div class="row"><b>Signed at (recorded):</b> ${dt(a.signedAtISO)} local · ${esc(a.signedAtISO)}</div>`:(a.updatedAt?`<div class="row"><b>Recorded:</b> ${dt(a.updatedAt)}</div>`:'')}
     <div class="row"><b>Email:</b> ${esc(a.email||'')} &nbsp; <b style="min-width:0">Phone:</b> ${esc(a.phone||'')}</div>
     <div class="row"><b>Mailing address:</b> ${esc(a.mailingAddress||'')}</div>
     <div class="row"><b>Emergency contact 1:</b> ${esc(a.ec1Name||'')} · ${esc(a.ec1Phone||'')}</div>
     ${a.ec2Name?`<div class="row"><b>Emergency contact 2:</b> ${esc(a.ec2Name)} · ${esc(a.ec2Phone||'')}</div>`:''}
     <div class="row"><b>Plan at signing:</b> ${esc(p.termLabel||'')} at ${fmt(p.monthlyTotal)}/mo · due prior to move-in ${fmt(p.dueAtMoveIn)}</div>
-    <div class="row"><b>Consents:</b> Agreement read and accepted ${a.agreeAll?'✓':'✗'} · Building access terms ${a.agreeAccess?'✓':'✗'} · Payment terms ${a.agreePay?'✓':'✗'} · Electronic signature ${a.agreeSign?'✓':'✗'}</div>
   </div>
-  <div class="stamp">Signed electronically at liveworkmiami.com. This record, including the typed signature, date, and consent checkboxes above, constitutes the Member's electronic signature under E-SIGN and Florida UETA.</div>
+  <div class="cert">
+    <h4>SIGNATURE CERTIFICATE</h4>
+    <div class="sub">Electronic record and signature evidence, retained by mikek.ai LLC dba LiveWork Miami.</div>
+    <table>
+      ${certRow('Certificate ID', esc(a.signatureCertId||''))}
+      ${certRow('Record ID', esc(a.id||''))}
+      ${certRow('Signer', esc((a.printedName||a.fullName||'')) + ' &lt;' + esc(a.email||'') + '&gt;')}
+      ${certRow('Signed at (UTC)', esc(a.signedAtISO||''))}
+      ${certRow('Signer time zone', esc(a.signatureTz||''))}
+      ${certRow('IP address', esc(a.signatureIP||''))}
+      ${certRow('Device', esc(a.signatureUA||''))}
+      ${certRow('Agreement version', esc(a.agreementVersion||''))}
+      ${certRow('Document hash (SHA-256)', esc(a.agreementSha256||''))}
+    </table>
+    <table style="margin-top:12px;">
+      ${consentRow('Read and accepted the Agreement in full', a.agreeAll)}
+      ${consentRow("Building access requires a separate lease; related fees are the Member's", a.agreeAccess)}
+      ${consentRow('Deposit, first month, and last month due prior to move-in; revocable license, not a lease', a.agreePay)}
+      ${consentRow('Consent to electronic signature (E-SIGN Act and Florida UETA)', a.agreeSign)}
+    </table>
+  </div>
+  <div class="stamp">Signed electronically at liveworkmiami.com. The typed name above was adopted by the Member as their electronic signature. This record, including the certificate details and consents above, constitutes the Member's electronic signature under the federal E-SIGN Act and the Florida Uniform Electronic Transaction Act (Fla. Stat. § 668.50), and is associated with and retained as part of the signed record.</div>
   <div class="noprint"><button onclick="window.print()" style="padding:10px 22px;font-size:1rem;cursor:pointer;">Print or save as PDF</button></div>
   </body></html>`);
   w.document.close();
@@ -473,11 +471,12 @@ async function setStatus(id, status){
   try{ await api({ action:'setStatus', id, status }); await load(); }
   catch(e){ alert('Error: '+e.message); }
 }
-async function charge(id, chargeType){
-  const label = chargeType==='movein' ? 'move-in (first + last/deposit)' : 'one month';
-  if(!confirm(`Charge ${label} by ACH for this member?`)) return;
-  try{ const r = await api({ action:'charge', id, chargeType }); alert('Charge started. '+(r.amount?fmt(r.amount):'')); await load(); }
-  catch(e){ alert('Charge error: '+e.message); }
+async function deleteApp(id){
+  const a = APPS.find(x=>x.id===id);
+  const who = a && a.fullName ? a.fullName : 'this application';
+  if(!confirm(`Delete ${who} permanently? Stored documents are deleted too. This cannot be undone.`)) return;
+  try{ await api({ action:'delete', id }); await load(); }
+  catch(e){ alert('Error: '+e.message); }
 }
 document.getElementById('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') login(); });
 </script>

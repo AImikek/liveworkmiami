@@ -4,12 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>LiveWork Miami · A members residence in Brickell</title>
-<!-- build: v3 · in-browser image compression + stored documents (Aug 26, 2026) -->
+<!-- build: v4 · e-sign evidence package + stored documents (Aug 26, 2026) -->
 <meta name="description" content="A members-only penthouse residence atop Brickell's DUA luxury tower. Meals, cleaning, and laundry handled daily. Your network, multiplied." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
 <script src="https://js.stripe.com/v3/"></script>
 
 <style>
@@ -490,8 +490,14 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
 .agree h4:first-child{ margin-top:0; }
 .agree p{ margin-bottom:8px; }
 .signrow{ display:grid; grid-template-columns:1.4fr .8fr; gap:14px; margin-top:18px; }
-.sign-in{ font-family:var(--f-disp); font-style:italic; font-size:1.5rem; color:var(--accent); }
-.sign-in::placeholder{ font-family:var(--f-body); font-style:normal; font-size:.92rem; color:var(--ink-soft); }
+.field input.sign-in{ font-family:'Great Vibes','Snell Roundhand','Segoe Script',cursive; font-size:1.8rem; color:var(--ink); padding:8px 14px; }
+.field input.sign-in::placeholder{ font-family:var(--f-body); font-style:normal; font-size:.92rem; color:var(--ink-soft); }
+/* adopted electronic signature preview (standard e-sign look) */
+.adopt{ margin-top:16px; border:1px solid var(--hair); background:#fff; border-radius:6px; padding:16px 20px 12px; }
+.adopt-line{ font-family:'Great Vibes','Snell Roundhand','Segoe Script',cursive; font-size:2.3rem; line-height:1.25; min-height:1.3em;
+  color:var(--ink); border-bottom:1.5px solid var(--ink); padding-bottom:2px; overflow-wrap:anywhere; }
+.adopt-cap{ font-size:.66rem; font-weight:700; color:var(--ink-soft); letter-spacing:.14em; margin-top:8px; text-transform:uppercase; }
+.adopt-meta{ font-size:.78rem; color:var(--ink-soft); margin-top:5px; line-height:1.45; }
 .chk{ display:flex; gap:11px; align-items:flex-start; margin-top:16px; cursor:pointer; }
 .chk input{ width:19px; height:19px; flex:0 0 auto; margin-top:2px; accent-color:var(--accent); cursor:pointer; }
 .chk span{ font-size:.87rem; }
@@ -1315,12 +1321,17 @@ const TPL = {
 
   8: ()=>`
     <h3>Membership agreement</h3>
-    <p class="desc">Please read in full, complete the details, then type your full legal name to sign.</p>
+    <p class="desc">Please read in full, complete the details, then type your full legal name to sign. Typing your name adopts it as your legal electronic signature under the E-SIGN Act and Florida UETA.</p>
     <div class="agree">${AGREEMENT()}</div>
 
     <div class="signrow" style="margin-top:20px;">
-      <div class="field" style="margin-bottom:0;"><label>Type your full legal name to sign <span class="rq">*</span></label><input id="f_signature" class="sign-in" value="${esc(application.signature)}" placeholder="Your full name" /></div>
+      <div class="field" style="margin-bottom:0;"><label>Type your full legal name to sign <span class="rq">*</span></label><input id="f_signature" class="sign-in" value="${esc(application.signature)}" placeholder="Your full name" autocomplete="off" /></div>
       <div class="field" style="margin-bottom:0;"><label>Date</label><input id="f_signedAt" type="date" value="${application.signedAt||today()}" /></div>
+    </div>
+    <div class="adopt">
+      <div class="adopt-line" id="adoptPrev">&nbsp;</div>
+      <div class="adopt-cap">Adopted electronic signature</div>
+      <div class="adopt-meta" id="adoptMeta">Type your full legal name above to adopt your signature.</div>
     </div>
     <div class="field" style="margin-top:14px;"><label>Printed name <span class="rq">*</span></label><input id="f_printedName" value="${esc(application.printedName||application.fullName)}" placeholder="Full name" /></div>
     <div class="pb-label" style="margin:10px 0 8px;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;">Current mailing address</div>
@@ -1406,6 +1417,15 @@ function bindStep(){
   if(step===6){ const c=document.getElementById('f_bgAuthorize'); if(c) c.addEventListener('change', e=> application.bgAuthorize=e.target.checked); bindDrop('bg', f=> application.bgCheckFile=f); }
   if(step===7){ bindDrop('id', f=> application.idFile=f);
     document.getElementById('f_idType').addEventListener('change', e=> application.idType=e.target.value); }
+  if(step===8){
+    const si=document.getElementById('f_signature');
+    const upd=()=>{ const v=si.value.trim();
+      document.getElementById('adoptPrev').textContent = v || ' ';
+      document.getElementById('adoptMeta').textContent = v
+        ? '/s/ ' + v + ' · your signature will be recorded with the exact date and time, IP address, and device details.'
+        : 'Type your full legal name above to adopt your signature.'; };
+    si.addEventListener('input', upd); upd();
+  }
   if(step===9){
     const cs=document.getElementById('f_paymentAck'); if(cs) cs.addEventListener('change', e=> application.paymentAck=e.target.checked);
   }
@@ -1501,6 +1521,19 @@ async function nextStep(){ const F=FLOWS[MODE];
       ? 'That file is too large. Please upload a photo of your ID instead.'
       : 'That file could not be read. Please upload a clear photo of your ID.'); return; }
   }
+  // Signature evidence package: recorded the moment the agreement step is
+  // completed successfully (certificate id, exact time, device, agreement hash).
+  if(step===8){
+    if(!application.signatureCertId) application.signatureCertId =
+      'LWM-ES-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+    application.signedAtISO = new Date().toISOString();
+    application.signatureUA = navigator.userAgent || '';
+    try{ application.signatureTz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; }catch(_){ application.signatureTz=''; }
+    application.agreementVersion = AGREEMENT_VERSION;
+    try{ application.agreementSha256 = await sha256Hex(
+      AGREEMENT() + '\n/s/ ' + application.signature + '\n' + application.printedName + '\n' + application.email + '\n' + application.signedAtISO
+    ); }catch(_){ /* non-secure context; hash simply omitted */ }
+  }
   await saveProgress();
   if(F.seq[pos+1]===10){ await submitApplication(); }
   pos++; step=F.seq[pos]; renderStep(); }
@@ -1556,12 +1589,11 @@ async function processUpload(file){
     try{
       const img = await loadImage(dataUrl);
       const main = toFit(img, 1600, 0.82, 900000);   // stored copy, <= ~675 KB
-      const thumb = toFit(img, 320, 0.6, 40000);     // small preview for the admin card
-      if(main.length > 120) return { name:file.name, type:'image/jpeg', base64:(main.split(',')[1]||''), thumb };
+      if(main.length > 120) return { name:file.name, type:'image/jpeg', base64:(main.split(',')[1]||'') };
     }catch(_){ /* some formats cannot be decoded here; fall through to raw upload */ }
   }
   if(rawB64.length > MAX_RAW_B64) return { error:'too-large', name:file.name };
-  return { name:file.name, type:file.type||'application/octet-stream', base64:rawB64, thumb:null };
+  return { name:file.name, type:file.type||'application/octet-stream', base64:rawB64 };
 }
 
 async function saveProgress(){
@@ -1631,8 +1663,8 @@ async function submitApplication(){
     await api(CONFIG.API.saveApplication, {
       id: APP_ID, step: 'submit', data: serializable(application),
       files: {
-        backgroundCheck: (bg && !bg.error && bg.base64) ? { name:bg.name, type:bg.type, base64:bg.base64, thumb:bg.thumb||null } : null,
-        id:              (idf && !idf.error && idf.base64) ? { name:idf.name, type:idf.type, base64:idf.base64, thumb:idf.thumb||null } : null
+        backgroundCheck: (bg && !bg.error && bg.base64) ? { name:bg.name, type:bg.type, base64:bg.base64 } : null,
+        id:              (idf && !idf.error && idf.base64) ? { name:idf.name, type:idf.type, base64:idf.base64 } : null
       },
       // member pays via Mercury invoice after submit; no automatic charge unless in Stripe mode
       chargeMoveIn: CONFIG.PAYMENT_MODE === 'stripe'
@@ -1686,6 +1718,11 @@ function serializable(a){ const c={...a};
 /* ===== utils ===== */
 function esc(s){ return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function today(){ return new Date().toISOString().slice(0,10); }
+const AGREEMENT_VERSION = '2026-08-26';
+async function sha256Hex(s){
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
 
 function AGREEMENT(){ return `
   <h4>Membership Agreement &mdash; 1300 S Miami Ave, PH 4910</h4>
