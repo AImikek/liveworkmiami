@@ -8,13 +8,22 @@
 //   'getFile'   -> { fileId } reassembles a stored document (ID photo, screening
 //                  report) from its Firestore chunks and returns it as a data URL
 //   'setStatus' -> { id, status }  approve / decline / etc.
-//   'charge'    -> { id, chargeType }  trigger move-in or monthly charge
+//   'delete'    -> { id }  permanently removes the application AND its stored documents
+//   'charge'    -> { id, chargeType }  trigger move-in or monthly charge (Stripe mode only)
 
 import { db } from '../lib/firebase.js';
 import { cors } from '../lib/util.js';
 
 const tsToISO = (t) => (t && typeof t.toDate === 'function') ? t.toDate().toISOString()
   : (typeof t === 'string' ? t : null);
+
+async function deleteStoredFile(fileId) {
+  const ref = db.collection('applicationFiles').doc(fileId);
+  const snap = await ref.get();
+  const n = (snap.exists && snap.data().chunkCount) || 0;
+  for (let i = 0; i < n; i++) await ref.collection('chunks').doc(String(i)).delete();
+  await ref.delete();
+}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -55,6 +64,18 @@ export default async function handler(req, res) {
         size: meta.size || 0,
         dataUrl: `data:${meta.type || 'application/octet-stream'};base64,${b64}`,
       });
+    }
+
+    if (action === 'delete') {
+      if (!id) return res.status(400).json({ error: 'id required' });
+      const ref = db.collection('memberApplications').doc(id);
+      const snap = await ref.get();
+      const docs = (snap.exists && snap.data().documents) || {};
+      for (const v of Object.values(docs)) {
+        if (v && v.fileId) { try { await deleteStoredFile(v.fileId); } catch (e) { console.warn('file delete failed:', e.message); } }
+      }
+      await ref.delete();
+      return res.status(200).json({ ok: true });
     }
 
     if (action === 'setStatus') {

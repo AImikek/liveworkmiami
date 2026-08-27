@@ -105,6 +105,12 @@ export default async function handler(req, res) {
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
     if (!id) payload.createdAt = admin.firestore.FieldValue.serverTimestamp();
+    // Signature evidence: record the signer's IP server-side whenever a save
+    // carries a completed signature (part of the e-sign audit trail).
+    if (data && data.signature && data.signedAtISO) {
+      payload.signatureIP = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()
+        || (req.socket && req.socket.remoteAddress) || '';
+    }
 
     await ref.set(payload, { merge: true });
 
