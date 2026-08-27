@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>LiveWork Miami · Admin</title>
-<!-- build: v4 · clickable summary filters, delete, document links, signature certificate (Aug 26, 2026) -->
+<!-- build: v5 · full-term commitment agreement + summary filters, delete, document links, signature certificate (Aug 27, 2026) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Manrope:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
@@ -346,24 +346,43 @@ function render(){
 }
 
 
+/* Personalized commitment schedule, KEEP IDENTICAL to the copy in index.html
+   so this reconstruction matches what the member signed. */
+function AGREEMENT_SCHEDULE(p){
+  if(!p || !p.monthlyTotal) return '';
+  const m = Number(p.monthlyTotal)||0, dep = Number(p.deposit)||m, due = Number(p.dueAtMoveIn)||0;
+  const isMtm = p.term === 'mtm';
+  const months = p.term === '12' ? 12 : p.term === '6' ? 6 : 2;
+  const feesTotal = m * months;
+  const grand = feesTotal + dep;
+  return `<div class="commit-box">
+  <h4>Your membership commitment</h4>
+  <p><b>Selected term:</b> ${esc(p.termLabel||'')}${isMtm?' (two-month minimum)':''} &nbsp;·&nbsp; <b>Monthly membership fee:</b> ${fmt(m)}<br>
+  <b>${isMtm?'Minimum membership fees (two months)':'Membership fees for the full term'}:</b> ${fmt(feesTotal)} (${months} × ${fmt(m)})<br>
+  <b>Membership deposit:</b> ${fmt(dep)}<br>
+  <b>Total ${isMtm?'minimum ':''}membership commitment:</b> ${fmt(grand)}${isMtm?', continuing at '+fmt(m)+' per month after the minimum until ended with 30 days written notice':''}<br>
+  <b>Due prior to move-in:</b> ${fmt(due)} (first month, last month, and deposit); remaining monthly fees are due monthly in advance.</p>
+  </div>`;
+}
 const AGREEMENT_HTML = `
   <h4>Membership Agreement &mdash; 1300 S Miami Ave, PH 4910</h4>
   <p>This is a private, revocable license to the residence and its included services. It is not a lease. Operator: LiveWork Miami, operated by mikek.ai LLC, a Florida limited liability company. Premises: 1300 S Miami Ave, PH 4910, Miami, FL 33130. Effective date: on signature. Membership begins on the move-in date agreed with the Operator; the residence is available beginning September 28, 2026. Month-to-month memberships have a minimum term of two months.</p>
-
+  <!--SCHEDULE-->
   <h4>1. Parties and premises</h4>
   <p>This Membership Agreement (the "Agreement") is entered into on the date of electronic signature (the "Effective Date") by and between mikek.ai LLC, a Florida limited liability company doing business as LiveWork Miami, by its authorized representative Michael Krilivsky (the "Operator"), and the individual signing below (the "Member"). The premises are located at 1300 S Miami Ave, PH 4910, Miami, Florida 33130 (the "Premises").</p>
 
-  <h4>2. Nature of agreement; no tenancy created</h4>
-  <p>This Agreement grants the Member a revocable license to use the Premises and the included services. It is a membership, not a lease, sublease, or rental. Nothing in this Agreement creates a tenancy, leasehold, subtenancy, or any landlord-tenant relationship, and the Member does not receive the possessory rights of a tenant. The Member's assigned bedroom is reserved for the Member's own private use during the membership term.</p>
+  <h4>2. Nature of agreement; no tenancy created; personal to the Member</h4>
+  <p>This Agreement grants the Member a revocable license to use the Premises and the included services. It is a membership, not a lease, sublease, or rental. Nothing in this Agreement creates a tenancy, leasehold, subtenancy, or any landlord-tenant relationship, and the Member does not receive the possessory rights of a tenant. The Member's assigned bedroom is reserved for the Member's own private use during the membership term. This membership is personal to the Member. The Member may not assign or transfer this Agreement, may not sublease, sublicense, rent out, or share the room or any part of the Premises, may not list the room or the Premises on any rental or hospitality platform, and may not permit any other person to stay in or occupy the room, in each case whether or not money changes hands. Any attempted assignment, sublease, sublicense, or substitute occupancy is void and is a material breach of this Agreement.</p>
 
   <h4>3. Building access requires a separate lease</h4>
   <p>Membership does not include access to the building, a fob, a key, a parking spot, or the residence entry systems. To receive any of these, the Member must be added to and sign the building lease, a completely separate agreement between the Member and the landlord and/or building management. The Member is solely responsible for all fees associated with building access, including parking, fob, key, building or association deposits, application or processing fees, and any recurring charges. These are separate from and in addition to the membership fee. If the Member is not approved on the lease, fails to maintain it, or is removed from it, building access will not be available and this may affect continued membership.</p>
 
-  <h4>4. Term and termination</h4>
-  <p>This Agreement begins on the Effective Date and continues on a month-to-month basis. Either party may terminate with thirty (30) days or more written notice. The Operator may terminate immediately for material breach, including non-payment, misconduct, unauthorized guests, property damage, conduct that harms the household or community, or breach of the confidentiality, non-solicitation, or other protective provisions.</p>
+  <h4>4. Term, total membership commitment, and termination</h4>
+  <p>The membership term is the term the Member selected during the application and confirmed at signing: twelve (12) months, six (6) months, or month-to-month with a two-month minimum, beginning on the move-in date agreed with the Operator. By signing, the Member commits to the entire selected term and is responsible for the total membership commitment: the monthly membership fee for every month of the selected term, plus the membership deposit (for month-to-month, a minimum of two months of fees plus the deposit, continuing month to month thereafter). The total membership commitment is owed in full even if the Member moves out early, stops using the Premises or its services, or is removed for material breach; leaving early does not reduce it. If the Member departs or is removed before the end of the term, the unpaid balance of the total membership commitment becomes immediately due and payable, provided that the Operator will credit against that balance any membership fees the Operator actually receives from a replacement member for the same room for the remainder of the term.</p>
+  <p>Month-to-month memberships continue after the two-month minimum until either party gives thirty (30) days written notice. Six and twelve month memberships end at the end of the selected term; membership continues past the term, month to month at the Operator's then-current month-to-month rate, only with the Operator's prior written approval. If the Member remains in the Premises after termination or expiration without written approval, the Member owes a holdover fee of one and one-half (1.5) times the pro-rated daily membership fee for each day of holdover, and the Operator may pursue every lawful remedy. The Operator may terminate immediately for material breach, including non-payment, misconduct, unauthorized guests or occupants, property damage, conduct that harms the household or community, or breach of the confidentiality, non-solicitation, or other protective provisions; termination for the Member's breach does not release the Member from the total membership commitment. The Member's occupancy depends on the Operator's own underlying rights to the Premises; if those rights end or the Premises become unavailable, the Operator may terminate this Agreement early, in which case the Operator will refund prepaid, unused membership fees and the refundable portion of the deposit, the remaining commitment is cancelled, and that refund is the Member's sole remedy.</p>
 
   <h4>5. Membership fee, payment, and deposit</h4>
-  <p>Membership fee: at the rate confirmed during the application and payment process on this site. All payments are made exclusively through that process, in advance of each membership period. Payment is deemed received only when cleared funds are received. Partial payments are not accepted unless approved in writing. Any past-due balance accrues interest at the maximum rate permitted under Florida law (currently 18% per year), and a $150 administrative late fee may apply. Non-payment more than five (5) days past due is a material breach. A membership deposit equal to one month's membership is held and may be applied toward property damage beyond normal wear, breaches, costs related to food, water, utilities, or services, and unpaid fees, interest, penalties, or administrative costs. For six (6) and twelve (12) month terms, the last month's membership is collected in advance at move-in; month-to-month memberships do not include a last month but do include the deposit. If no damages or breaches occur, the deposit is refunded within fifteen (15) days of the Operator receiving the corresponding deposit back from the landlord. If deductions apply, an itemized notice is provided within thirty (30) days.</p>
+  <p>Membership fee: at the rate confirmed during the application and payment process on this site. All payments are made exclusively through that process, in advance of each membership period. Payment is deemed received only when cleared funds are received. Partial payments are not accepted unless approved in writing. Any past-due balance accrues interest at the maximum rate permitted under Florida law (currently 18% per year), and a $150 administrative late fee may apply. Non-payment more than five (5) days past due is a material breach. A membership deposit equal to one month's membership is held and may be applied toward property damage beyond normal wear, breaches, costs related to food, water, utilities, or services, and unpaid fees, interest, penalties, or administrative costs. The first month, the last month, and the membership deposit are collected prior to move-in on every term, including month-to-month. After move-in, each remaining monthly fee is due in advance on or before the monthly anniversary of the move-in date, unless otherwise agreed in writing. The deposit is not a substitute for any month's fee and does not cap the Member's responsibility for damages or for the total membership commitment. If no damages or breaches occur, the deposit is refunded within fifteen (15) days of the Operator receiving the corresponding deposit back from the landlord. If deductions apply, an itemized notice is provided within thirty (30) days.</p>
 
   <h4>6. Fees that are the Member's responsibility</h4>
   <p>Separate from the membership fee, the Member is responsible for all of their own costs, including parking (if needed), fob, key, and replacement or activation fees, building/HOA/landlord deposits, application fees and recurring charges, and the Member's own insurance, personal belongings, and personal services.</p>
@@ -372,7 +391,7 @@ const AGREEMENT_HTML = `
   <p>An assigned, primary-use bedroom for the Member's own regular use. The Member's room is reserved for the Member and is not assigned to or used by anyone else during the membership term. Access to shared living spaces and building amenities per building rules. Hydrogen water.</p>
 
   <h4>8. Member responsibilities and conduct</h4>
-  <p>Assist with basic cleanliness and organization when the house manager is unavailable. Maintain respectful conduct and avoid disruption to the household or the Operator's business operations. Guests require prior written approval and remain the Member's full responsibility. Comply with the house standards provided at move-in and with all building and HOA rules.</p>
+  <p>Assist with basic cleanliness and organization when the house manager is unavailable. Maintain respectful conduct and avoid disruption to the household or the Operator's business operations. Guests require prior written approval and remain the Member's full responsibility; overnight guests do not become occupants and gain no rights under this Agreement. No smoking or vaping anywhere in the Premises. Comply with the house standards provided at move-in and with all building and HOA rules.</p>
 
   <h4>9. Pets (if applicable)</h4>
   <p>Pets require prior written approval. Any pet deposit covers pet-related damage only and does not replace the Member's direct responsibility. The Member is responsible for replacing or repairing any pet-caused damage in full.</p>
@@ -405,7 +424,7 @@ const AGREEMENT_HTML = `
   <p>The Member consents to sign electronically under the federal E-SIGN Act and the Florida Uniform Electronic Transaction Act. Typing the full legal name and submitting this Agreement constitutes the Member's legal signature, has the same effect as a handwritten signature, and reflects intent to be bound. The date, time, and submission details are recorded as part of the signed record.</p>
 
   <h4>19. Entire agreement; amendments; severability</h4>
-  <p>This Agreement is the entire agreement between the parties regarding membership and supersedes all prior agreements on that subject. The building lease is a separate agreement and is not merged into or superseded by this Agreement. Any amendment must be in writing and agreed to by both parties. If any provision is found unenforceable, the remaining provisions stay in full effect.</p>`;
+  <p>This Agreement is the entire agreement between the parties regarding membership and supersedes all prior agreements on that subject. The building lease is a separate agreement and is not merged into or superseded by this Agreement. Any amendment must be in writing and agreed to by both parties. If any provision is found unenforceable, the remaining provisions stay in full effect. Notices under this Agreement must be in writing and may be given by email to the other party's email address on record; email notice is effective on the day it is sent.</p>`;
 function viewAgreement(id){
   const a = APPS.find(x=>x.id===id); if(!a) return;
   const p = a.plan||{};
@@ -419,6 +438,9 @@ function viewAgreement(id){
     h4{ margin:22px 0 8px; } .sig-block{ margin-top:34px; border-top:2px solid #1C1A16; padding-top:18px; }
     .row{ margin:6px 0; } .row b{ display:inline-block; min-width:210px; }
     .script{ font-family:'Great Vibes','Snell Roundhand','Segoe Script',cursive; font-size:2.1rem; line-height:1.2; }
+    .commit-box{ background:#FBF6EA; border:1px solid #D8C28C; border-radius:6px; padding:12px 16px; margin:14px 0; }
+    .commit-box h4{ margin:0 0 6px; }
+    .commit-box p{ margin:0; }
     .cert{ margin-top:26px; border:1.5px solid #1C1A16; border-radius:8px; padding:18px 22px; page-break-inside:avoid; }
     .cert h4{ margin:0 0 4px; letter-spacing:.04em; }
     .cert .sub{ font-size:.82rem; color:#6B6457; margin-bottom:12px; }
@@ -426,7 +448,7 @@ function viewAgreement(id){
     .stamp{ margin-top:22px; font-size:.85rem; color:#6B6457; border:1px solid #E4DCCB; padding:12px 14px; border-radius:6px; }
     .noprint{ margin:26px 0; } @media print{ .noprint{ display:none; } body{ margin:0.5in auto; } }
   </style></head><body>
-  ${AGREEMENT_HTML}
+  ${AGREEMENT_HTML.replace('<!--SCHEDULE-->', AGREEMENT_SCHEDULE(p))}
   <div class="sig-block">
     <h4>Executed by the Member</h4>
     <div class="script" style="border-bottom:1.5px solid #1C1A16; display:inline-block; padding:0 30px 2px 4px; min-width:320px;">${esc(a.signature||'')}</div>
@@ -438,7 +460,7 @@ function viewAgreement(id){
     <div class="row"><b>Mailing address:</b> ${esc(a.mailingAddress||'')}</div>
     <div class="row"><b>Emergency contact 1:</b> ${esc(a.ec1Name||'')} · ${esc(a.ec1Phone||'')}</div>
     ${a.ec2Name?`<div class="row"><b>Emergency contact 2:</b> ${esc(a.ec2Name)} · ${esc(a.ec2Phone||'')}</div>`:''}
-    <div class="row"><b>Plan at signing:</b> ${esc(p.termLabel||'')} at ${fmt(p.monthlyTotal)}/mo · due prior to move-in ${fmt(p.dueAtMoveIn)}</div>
+    <div class="row"><b>Plan at signing:</b> ${esc(p.termLabel||'')} at ${fmt(p.monthlyTotal)}/mo · total ${p.term==='mtm'?'minimum ':''}commitment ${fmt((Number(p.monthlyTotal)||0)*(p.term==='12'?12:p.term==='6'?6:2)+(Number(p.deposit)||0))} · due prior to move-in ${fmt(p.dueAtMoveIn)}</div>
   </div>
   <div class="cert">
     <h4>SIGNATURE CERTIFICATE</h4>
@@ -457,7 +479,7 @@ function viewAgreement(id){
     <table style="margin-top:12px;">
       ${consentRow('Read and accepted the Agreement in full', a.agreeAll)}
       ${consentRow("Building access requires a separate lease; related fees are the Member's", a.agreeAccess)}
-      ${consentRow('Deposit, first month, and last month due prior to move-in; revocable license, not a lease', a.agreePay)}
+      ${consentRow('Full membership commitment for the selected term (every monthly fee plus deposit); revocable license, not a lease', a.agreePay)}
       ${consentRow('Consent to electronic signature (E-SIGN Act and Florida UETA)', a.agreeSign)}
     </table>
   </div>
