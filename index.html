@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>LiveWork Miami · A members residence in Brickell</title>
-<!-- build: v6.4 · building-credentials checkbox reframed as protection (refund guarantee lives in the agreement) (Aug 27, 2026) -->
+<!-- build: v6.5 · plan step redesigned: options are the hero, compact summary strip, sticky Continue on the welcome flow (Aug 27, 2026) -->
 <meta name="description" content="A members-only penthouse residence atop Brickell's DUA luxury tower. Meals, cleaning, and laundry handled daily. Your network, multiplied." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -409,6 +409,14 @@ section{ position:relative; }
 .pb.flow{ grid-template-columns:1fr; border-radius:6px; }
 .pb.flow .pb-l{ padding:24px; }
 .pb.flow .pb-r{ padding:24px 22px; }
+/* compact in-flow plan summary (replaces the big dark panel in the flow) */
+.flow-sum{ margin-top:14px; background:var(--sand); border-radius:8px; padding:14px 18px; }
+.flow-sum .fs-row{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; }
+.flow-sum .fs-row span{ font-size:.88rem; color:var(--ink-soft); }
+.flow-sum .fs-row b{ font-family:var(--f-disp); font-weight:400; font-size:1.4rem; letter-spacing:-.01em; white-space:nowrap; }
+.flow-sum .fs-row b small{ font-family:var(--f-body); font-size:.78rem; color:var(--ink-soft); }
+.flow-sum .fs-row.sub{ margin-top:7px; padding-top:9px; border-top:1px solid var(--hair); }
+.flow-sum .fs-row.sub b{ font-size:1.1rem; color:var(--accent); }
 
 /* ============================================================
    CLOSING
@@ -590,6 +598,10 @@ footer{ background:var(--paper); border-top:1px solid var(--hair); padding:54px 
 .welcome-page .sheet{ max-width:760px; box-shadow:0 24px 70px rgba(28,26,22,.10); }
 .welcome-page .sbody{ max-height:none; overflow:visible; }
 .welcome-page .x{ display:none; }
+/* keep Continue always in reach on the full-page flow (long steps like the agreement) */
+.welcome-page .sheet{ overflow:visible; }
+.welcome-page .sfoot{ position:sticky; bottom:0; z-index:6; background:rgba(252,250,245,.94);
+  backdrop-filter:blur(10px); padding-bottom:calc(24px + env(safe-area-inset-bottom)); }
 @media (max-width:640px){ .welcome-page .ov-modal{ padding:0; } .welcome-page .sheet{ border-radius:0; min-height:100svh; } }
 
 .addr3{ display:grid; grid-template-columns:2fr .8fr 1fr; gap:14px; }
@@ -1072,7 +1084,20 @@ function renderPlanBuilder(elId, inFlow){
 
   const valueBlock = '';
 
-  el.innerHTML = valueBlock + `<div class="pb${inFlow?' flow':''}">
+  /* In the application flow the plan cards are the hero: the summary is a
+     compact light strip (the big dark panel stays homepage-only) so the
+     Continue button is right there instead of buried below the fold. */
+  el.innerHTML = valueBlock + (inFlow ? `<div class="pb flow">
+    <div class="pb-l">
+      <div class="terms">${terms}</div>
+      <div class="pb-label">Included in every plan</div>
+      ${included}
+    </div>
+  </div>
+  <div class="flow-sum">
+    <div class="fs-row"><span>${termLabel(selectedPlan.term)} · all inclusive${selectedPlan.term==='mtm'?' · 2-month minimum':''}</span><b>${fmt(net)}<small>/mo</small></b></div>
+    <div class="fs-row sub"><span>Due prior to move-in · first month + last month + deposit</span><b>${fmt(due)}</b></div>
+  </div>` : `<div class="pb">
     <div class="pb-l">
       <div class="pb-label">Step 1 · Select your plan (tap one)</div>
       <div class="terms">${terms}</div>
@@ -1089,10 +1114,9 @@ function renderPlanBuilder(elId, inFlow){
         <div class="mi"><span>Deposit</span><span>${fmt(dep)}</span></div>
         <div class="mi tot"><span>Due prior to move-in</span><span>${fmt(due)}</span></div>
       </div>
-      ${inFlow ? `<p style="font-size:.82rem;color:rgba(255,255,255,.6);margin-top:6px;">This updates as you tap a plan. Press Continue to keep it.</p>`
-               : `<button class="btn btn-light" onclick="applyWithPlan()" style="margin-top:6px;">Apply with this plan</button>`}
+      <button class="btn btn-light" onclick="applyWithPlan()" style="margin-top:6px;">Apply with this plan</button>
     </div>
-  </div>`;
+  </div>`);
 
   el.querySelectorAll('.term').forEach(t=> t.addEventListener('click', ()=>{ selectedPlan.term = t.dataset.term; renderPlanBuilder(elId, inFlow); }));
 }
