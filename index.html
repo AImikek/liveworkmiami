@@ -970,7 +970,11 @@ const CONFIG = {
   PAYMENT_MODE: 'mercury',
   PAYMENT: { email: 'michaelkrilivsky@gmail.com' },
   // EmailJS — sends the confirmation email from the page (to applicant, BCC you).
-  EMAILJS: { serviceId:'service_pj51ko3', templateId:'template_iy2zyl8', publicKey:'X2dC3mFeqOruG4n4S' },
+  // templateId is used for the short-form request. templateIdComplete is the
+  // dedicated "membership signed" confirmation sent when onboarding finishes;
+  // paste its id here after creating it in EmailJS (see EMAILJS-SIGNED-TEMPLATE
+  // setup file). While it is empty, completions fall back to templateId.
+  EMAILJS: { serviceId:'service_pj51ko3', templateId:'template_iy2zyl8', templateIdComplete:'', publicKey:'X2dC3mFeqOruG4n4S' },
   // Your Stripe publishable key (only used when PAYMENT_MODE is 'stripe')
   STRIPE_PUBLISHABLE_KEY: 'pk_test_REPLACE_ME',
   API: {
@@ -1703,6 +1707,12 @@ async function sendApplicantEmail(){
   if(!window.emailjs || !E || !E.serviceId) return;
   try{ emailjs.init({ publicKey:E.publicKey }); }catch(_){}
   const p = planSnapshot(); application.plan = p;
+  // Commitment figures and signature record, prebuilt as display-ready strings
+  // for the "membership signed" confirmation template.
+  const months = p.term==='12' ? 12 : p.term==='6' ? 6 : 2;
+  const isMtm = p.term==='mtm';
+  const feesTotal = (p.monthlyTotal||0) * months;
+  const grand = feesTotal + (p.deposit||0);
   const params = {
     to_email:      application.email || '',
     to_name:       (application.fullName||'').split(' ')[0] || 'there',
@@ -1731,9 +1741,31 @@ async function sendApplicantEmail(){
     pay_method:    'ACH or wire (selected in Mercury)',
     application_stage: MODE==='apply' ? 'Initial request (short form)' : 'Onboarding complete (signed, ready to invoice)',
     reply_to:      application.email || '',
-    welcome_link:  welcomeLink()
+    welcome_link:  welcomeLink(),
+    /* extra fields for the dedicated "membership signed" confirmation */
+    move_in_pretty: application.moveIn ? new Date(application.moveIn+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '',
+    term_months:   String(months),
+    total_fees:    fmt(feesTotal),
+    total_commitment: fmt(grand),
+    plan_summary:  `${p.termLabel||''} at ${fmt(p.monthlyTotal)}/mo, all inclusive${isMtm?' (two-month minimum)':''}`,
+    commitment_line: isMtm
+      ? `Total minimum membership commitment: ${fmt(grand)} (2 × ${fmt(p.monthlyTotal)} + ${fmt(p.deposit)} deposit), continuing monthly until ended with 30 days written notice`
+      : `Total membership commitment: ${fmt(grand)} (${months} × ${fmt(p.monthlyTotal)} + ${fmt(p.deposit)} deposit)`,
+    commitment_label: isMtm ? 'Total minimum membership commitment' : 'Total membership commitment',
+    commitment_value: isMtm
+      ? `${fmt(grand)} (2 × ${fmt(p.monthlyTotal)} + ${fmt(p.deposit)} deposit), continuing monthly until ended with 30 days written notice`
+      : `${fmt(grand)} (${months} × ${fmt(p.monthlyTotal)} + ${fmt(p.deposit)} deposit)`,
+    signed_line: application.signature
+      ? `Signed electronically by ${application.signature}`
+        + (application.signedAtISO ? ` on ${new Date(application.signedAtISO).toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}` : '')
+        + (application.signatureCertId ? `. Signature certificate ${application.signatureCertId}.` : '.')
+      : '',
+    signature_cert_id: application.signatureCertId || ''
   };
-  await emailjs.send(E.serviceId, E.templateId, params);
+  // Completed onboarding gets the dedicated confirmation template when it is
+  // configured; everything else (and the fallback) uses the standard template.
+  const tpl = (MODE==='onboard' && E.templateIdComplete) ? E.templateIdComplete : E.templateId;
+  await emailjs.send(E.serviceId, tpl, params);
 }
 function serializable(a){ const c={...a};
   c.bgCheckFileName=a.bgCheckFile?a.bgCheckFile.name:null; c.idFileName=a.idFile?a.idFile.name:null;
