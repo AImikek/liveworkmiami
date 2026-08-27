@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>LiveWork Miami · A members residence in Brickell</title>
+<!-- build: v3 · in-browser image compression + stored documents (Aug 26, 2026) -->
 <meta name="description" content="A members-only penthouse residence atop Brickell's DUA luxury tower. Meals, cleaning, and laundry handled daily. Your network, multiplied." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1165,6 +1166,10 @@ const application = { fullName:'',email:'',phone:'',
 
 /* Personalized completion link: the short form's answers travel inside the
    link itself (URL fragment), so /welcome prefills on any device. */
+/* NOTE: APP_ID must be declared BEFORE unpackApplicant() runs below, otherwise
+   reading it throws and the record id from the link is silently lost, which
+   created duplicate applications in admin. Do not move this back down. */
+let APP_ID = null; // server-assigned application id
 const LINK_FIELDS=['fullName','email','phone','moveIn','lengthOfStay','inMiami','occupation','schedule','wfh','guests','cleanliness','instagram','linkedin','website','anythingElse'];
 function packApplicant(){
   const o={}; LINK_FIELDS.forEach(k=>{ if(application[k]) o[k]=application[k]; });
@@ -1406,7 +1411,15 @@ function bindStep(){
   }
 }
 function bindDrop(key,onFile){ const d=document.getElementById('drop_'+key), inp=document.getElementById('file_'+key);
-  const show=f=>{ onFile(f); d.classList.add('has'); document.getElementById('fn_'+key).textContent=f.name; };
+  const show=f=>{ onFile(f); d.classList.add('has');
+    const fn=document.getElementById('fn_'+key); fn.textContent=f.name+' · preparing…';
+    UPLOADS[key]=processUpload(f).then(r=>{
+      if(r.error==='too-large'){ fn.textContent=f.name+' · too large. Please pick a file under 2 MB, or a photo.'; }
+      else if(r.error){ fn.textContent=f.name+' · could not read this file. Please try another.'; }
+      else{ fn.textContent=f.name+' ✓'; }
+      return r;
+    }).catch(()=>{ fn.textContent=f.name+' · could not read this file. Please try another.'; return { error:'failed', name:f.name }; });
+  };
   inp.addEventListener('change', e=>{ if(e.target.files[0]) show(e.target.files[0]); });
   ['dragover','dragenter'].forEach(ev=> d.addEventListener(ev, e=>{ e.preventDefault(); d.style.borderColor='var(--accent)'; }));
   ['dragleave','drop'].forEach(ev=> d.addEventListener(ev, e=>{ e.preventDefault(); d.style.borderColor=''; }));
@@ -1474,6 +1487,20 @@ function validateStep(){ collectStep();
 async function nextStep(){ const F=FLOWS[MODE];
   if(pos===F.seq.length-1){ closeOnboarding(); return; }
   const e=validateStep(); if(e){ setErr(e); return; } setErr('');
+  // If a file was just picked, wait for the in-browser preparation to finish
+  // and surface a clear message if it could not be used.
+  if(step===6 && application.bgCheckFile && UPLOADS.bg){
+    const r=await UPLOADS.bg;
+    if(r && r.error){ setErr(r.error==='too-large'
+      ? 'That report file is too large. Please upload a file under 2 MB, or photos of the pages instead.'
+      : 'That file could not be read. Please try a different file.'); return; }
+  }
+  if(step===7){
+    const r=UPLOADS.id ? await UPLOADS.id : null;
+    if(!r || r.error){ setErr(!r ? 'Please upload a photo of your ID.' : r.error==='too-large'
+      ? 'That file is too large. Please upload a photo of your ID instead.'
+      : 'That file could not be read. Please upload a clear photo of your ID.'); return; }
+  }
   await saveProgress();
   if(F.seq[pos+1]===10){ await submitApplication(); }
   pos++; step=F.seq[pos]; renderStep(); }
@@ -1484,7 +1511,7 @@ function prevStep(){ if(pos>0){ collectStep(); pos--; step=FLOWS[MODE].seq[pos];
    Each one falls back to a local demo if the backend isn't
    reachable (so this file also previews standalone).
    ============================================================ */
-let APP_ID = null; // server-assigned application id
+/* (APP_ID is declared near the top of this script, before unpackApplicant runs.) */
 
 async function api(path, body){
   const r = await fetch(path, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
@@ -1493,6 +1520,49 @@ async function api(path, body){
 }
 function fileToBase64(file){ return new Promise((res,rej)=>{ const fr=new FileReader();
   fr.onload=()=>res(fr.result.split(',')[1]); fr.onerror=rej; fr.readAsDataURL(file); }); }
+
+/* ---- upload preparation (runs the moment a file is picked) ----
+   Phone photos are 3 to 10 MB, which is too big to send or store reliably.
+   Images are resized and recompressed in the browser to well under 1 MB
+   (still sharp enough to read an ID), plus a small thumbnail for the admin
+   card. PDFs and other non-image files upload as-is up to about 2 MB. */
+const UPLOADS = { bg:null, id:null };   // key -> Promise of {name,type,base64,thumb} or {error,name}
+const MAX_RAW_B64 = 2800000;            // ~2.1 MB for non-image files
+
+function readAsDataURL(file){ return new Promise((res,rej)=>{ const fr=new FileReader();
+  fr.onload=()=>res(fr.result); fr.onerror=rej; fr.readAsDataURL(file); }); }
+function loadImage(src){ return new Promise((res,rej)=>{ const im=new Image();
+  im.onload=()=>res(im); im.onerror=rej; im.src=src; }); }
+function drawScaled(img, maxDim, quality){
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  const scale = Math.min(1, maxDim / Math.max(iw, ih));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(iw * scale)); c.height = Math.max(1, Math.round(ih * scale));
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', quality);
+}
+function toFit(img, startDim, startQ, maxChars){
+  let dim = startDim, q = startQ, out = drawScaled(img, dim, q);
+  for(let i=0; i<7 && out.length>maxChars; i++){
+    if(q > 0.55) q -= 0.1; else dim = Math.round(dim * 0.78);
+    out = drawScaled(img, dim, q);
+  }
+  return out;
+}
+async function processUpload(file){
+  const dataUrl = await readAsDataURL(file);
+  const rawB64 = String(dataUrl).split(',')[1] || '';
+  if(/^image\//.test(file.type||'')){
+    try{
+      const img = await loadImage(dataUrl);
+      const main = toFit(img, 1600, 0.82, 900000);   // stored copy, <= ~675 KB
+      const thumb = toFit(img, 320, 0.6, 40000);     // small preview for the admin card
+      if(main.length > 120) return { name:file.name, type:'image/jpeg', base64:(main.split(',')[1]||''), thumb };
+    }catch(_){ /* some formats cannot be decoded here; fall through to raw upload */ }
+  }
+  if(rawB64.length > MAX_RAW_B64) return { error:'too-large', name:file.name };
+  return { name:file.name, type:file.type||'application/octet-stream', base64:rawB64, thumb:null };
+}
 
 async function saveProgress(){
   persistLocal();
@@ -1550,15 +1620,19 @@ function markBankConnected(demo){
 async function submitApplication(){
   application.plan = planSnapshot();   // record the plan (term synced from their stated stay)
   try{
-    const [bg, id] = await Promise.all([
-      application.bgCheckFile ? fileToBase64(application.bgCheckFile) : null,
-      application.idFile ? fileToBase64(application.idFile) : null
+    // Use the browser-prepared (compressed) files; fall back to a raw read if
+    // preparation never ran for some reason.
+    let [bg, idf] = await Promise.all([
+      UPLOADS.bg ? UPLOADS.bg.catch(()=>null) : null,
+      UPLOADS.id ? UPLOADS.id.catch(()=>null) : null
     ]);
+    if(!idf && application.idFile){ try{ idf = await processUpload(application.idFile); }catch(_){} }
+    if(!bg && application.bgCheckFile){ try{ bg = await processUpload(application.bgCheckFile); }catch(_){} }
     await api(CONFIG.API.saveApplication, {
       id: APP_ID, step: 'submit', data: serializable(application),
       files: {
-        backgroundCheck: bg && { name:application.bgCheckFile.name, type:application.bgCheckFile.type, base64:bg },
-        id:              id && { name:application.idFile.name, type:application.idFile.type, base64:id }
+        backgroundCheck: (bg && !bg.error && bg.base64) ? { name:bg.name, type:bg.type, base64:bg.base64, thumb:bg.thumb||null } : null,
+        id:              (idf && !idf.error && idf.base64) ? { name:idf.name, type:idf.type, base64:idf.base64, thumb:idf.thumb||null } : null
       },
       // member pays via Mercury invoice after submit; no automatic charge unless in Stripe mode
       chargeMoveIn: CONFIG.PAYMENT_MODE === 'stripe'

@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>LiveWork Miami · Admin</title>
+<!-- build: v3 · full field display + submission times + stored documents (Aug 26, 2026) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -69,6 +70,30 @@ main{ padding:34px 0 80px; display:none; }
 .empty{ text-align:center; color:var(--soft); padding:60px 0; }
 .loading{ text-align:center; color:var(--soft); padding:50px 0; }
 .note{ font-size:.8rem; color:var(--soft); margin-top:14px; }
+.blk{ margin:0 0 14px; }
+.blk label{ font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--soft); display:block; margin-bottom:3px; }
+.blk div{ font-size:.9rem; color:var(--soft); }
+
+/* stored documents */
+.docs{ display:flex; gap:10px; flex-wrap:wrap; }
+.doc{ margin:0; cursor:pointer; text-align:center; }
+.doc img{ width:88px; height:64px; object-fit:cover; border-radius:4px; border:1px solid var(--hair); display:block; transition:.2s; background:var(--sand); }
+.doc:hover img{ border-color:var(--accent); transform:translateY(-1px); box-shadow:0 6px 16px rgba(23,25,30,.12); }
+.doc-generic{ width:88px; height:64px; border:1px solid var(--hair); border-radius:4px; display:grid; place-items:center;
+  font-size:.68rem; font-weight:700; letter-spacing:.1em; color:var(--soft); background:var(--sand); transition:.2s; }
+.doc:hover .doc-generic{ border-color:var(--accent); color:var(--accent); }
+.doc figcaption{ font-size:.64rem; color:var(--soft); margin-top:4px; max-width:96px; line-height:1.3; }
+
+/* document viewer */
+.lb{ position:fixed; inset:0; z-index:60; background:rgba(12,14,18,.72); display:none; align-items:center; justify-content:center; padding:20px; }
+.lb.open{ display:flex; }
+.lb-card{ background:#fff; border-radius:8px; max-width:min(940px,94vw); max-height:92vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 40px 100px -20px rgba(0,0,0,.5); }
+.lb-body{ overflow:auto; display:grid; place-items:center; background:#15171b; min-height:180px; min-width:280px; }
+.lb-body img{ max-width:90vw; max-height:72vh; display:block; }
+.lb-body .lb-msg{ color:#cfd2d8; font-size:.9rem; padding:40px 30px; text-align:center; }
+.lb-foot{ display:flex; gap:10px; align-items:center; justify-content:space-between; padding:12px 16px; flex-wrap:wrap; }
+.lb-foot .nm{ font-size:.83rem; color:var(--soft); word-break:break-all; }
+.lb-foot .bs{ display:flex; gap:8px; }
 </style>
 </head>
 <body>
@@ -99,7 +124,7 @@ main{ padding:34px 0 80px; display:none; }
     <div class="head"><h1>Applications</h1></div>
     <div class="summary" id="summary"></div>
     <div class="toolbar">
-      <input id="search" placeholder="Search name, email, company…" oninput="render()" />
+      <input id="search" placeholder="Search name, email, phone, social…" oninput="render()" />
       <select id="filter" onchange="render()">
         <option value="all">All statuses</option>
         <option value="submitted">Submitted</option>
@@ -109,15 +134,39 @@ main{ padding:34px 0 80px; display:none; }
       </select>
     </div>
     <div id="list"><div class="loading">Loading…</div></div>
-    <p class="note">Documents open as secure links that expire after one hour. Charges pull by ACH and settle in 1–4 business days.</p>
+    <p class="note">Click a document thumbnail to view it full size. Send invoices from Mercury; members pay by ACH or wire inside Mercury.</p>
   </div>
 </main>
+
+<!-- DOCUMENT VIEWER -->
+<div class="lb" id="lb" onclick="if(event.target===this)closeLb()">
+  <div class="lb-card">
+    <div class="lb-body" id="lbBody"><div class="lb-msg">Loading…</div></div>
+    <div class="lb-foot">
+      <span class="nm" id="lbName"></span>
+      <span class="bs">
+        <button class="btn sm" id="lbOpen" onclick="lbOpenTab()">Open in new tab</button>
+        <button class="btn sm" id="lbDl" onclick="lbDownload()">Download</button>
+        <button class="btn sm" onclick="closeLb()">Close</button>
+      </span>
+    </div>
+  </div>
+</div>
 
 <script>
 let PW = '';
 let APPS = [];
+const FILE_CACHE = {};   // fileId -> { name, type, size, dataUrl }
+let LB_CURRENT = null;   // file currently shown in the viewer
 const fmt = n => '$' + Number(n||0).toLocaleString('en-US');
-const esc = s => (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const dt = iso => { if(!iso) return ''; const d = new Date(iso); if(isNaN(d)) return esc(iso);
+  return d.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'}) + ' · ' +
+         d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); };
+const fdate = s => { if(!/^\d{4}-\d{2}-\d{2}$/.test(s||'')) return s||''; const d = new Date(s+'T12:00:00');
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+const fmtSize = b => { b = Number(b||0); if(!b) return ''; if(b < 1024*1024) return Math.max(1,Math.round(b/1024)) + ' KB';
+  return (b/1024/1024).toFixed(1) + ' MB'; };
 
 async function api(body){
   const r = await fetch('/api/admin', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ password:PW, ...body }) });
@@ -134,7 +183,7 @@ async function login(pwOverride){
     document.getElementById('hdr').style.display='block';
     document.getElementById('main').style.display='block';
   }catch(e){
-    document.getElementById('loginErr').textContent = e.message==='Unauthorized' ? 'Incorrect password.' : (e.message + ' — is the backend deployed with ADMIN_PASSWORD set?');
+    document.getElementById('loginErr').textContent = e.message==='Unauthorized' ? 'Incorrect password.' : (e.message + ' · is the backend deployed with ADMIN_PASSWORD set?');
   }
 }
 function logout(){ PW=''; APPS=[]; try{ localStorage.removeItem('lwm_admin'); }catch(_){} location.reload(); }
@@ -166,52 +215,166 @@ function planSummary(p){
     <div style="font-size:.8rem;color:var(--soft);margin-top:4px;">Due prior to move-in: ${fmt(p.dueAtMoveIn)}</div>`;
 }
 
+/* Social values become clickable links where possible; "NA" stays plain. */
+function linkify(kind, v){
+  if(!v) return '';
+  const t = String(v).trim(); const low = t.toLowerCase();
+  const lbl = { ig:'IG', li:'LI', web:'Web' }[kind];
+  if(low==='na'||low==='n/a'||low==='none'||low==='-') return `${lbl}: <span class="chk n">${esc(t)}</span>`;
+  let url = '';
+  if(/^https?:\/\//i.test(t)) url = t;
+  else if(kind==='ig') url = 'https://instagram.com/' + t.replace(/^@/,'').replace(/^instagram\.com\//i,'');
+  else if(kind==='li' && low.includes('linkedin.com')) url = 'https://' + t.replace(/^\/+/,'');
+  else if(kind==='web' && t.includes('.') && !t.includes(' ')) url = 'https://' + t;
+  return url ? `${lbl}: <a href="${esc(url)}" target="_blank" rel="noopener">${esc(t)}</a>` : `${lbl}: ${esc(t)}`;
+}
+
+/* Stored documents render as thumbnails; click opens the full file. */
+function docCell(a){
+  const docs = a.documents || {};
+  const kinds = Object.keys(docs);
+  if(!kinds.length){
+    const legacy = [a.idFileName?'ID: '+a.idFileName:'', a.bgCheckFileName?'Report: '+a.bgCheckFileName:''].filter(Boolean);
+    return legacy.length
+      ? `<span class="chk n">Not stored</span><div style="font-size:.76rem;color:var(--soft);margin-top:2px;">${legacy.map(esc).join('<br>')}<br>(submitted before document storage was added)</div>`
+      : '<span class="chk n">None</span>';
+  }
+  const idTypeLabel = a.idType==='drivers_license' ? "driver's license" : a.idType==='passport' ? 'passport' : '';
+  return '<div class="docs">' + kinds.map(k=>{
+    const v = docs[k]||{};
+    const label = k==='id' ? ('Photo ID' + (idTypeLabel?' · '+idTypeLabel:'')) : k==='backgroundCheck' ? 'Screening report' : esc(k);
+    const size = v.size ? fmtSize(v.size) : '';
+    const isPdf = ((v.type||'').includes('pdf')) || /\.pdf$/i.test(v.name||'');
+    const inner = v.thumb ? `<img src="${v.thumb}" alt="${esc(label)}" loading="lazy" />`
+                          : `<div class="doc-generic">${isPdf?'PDF':'FILE'}</div>`;
+    const click = v.fileId ? `onclick="viewDoc('${esc(a.id)}','${esc(k)}')"`
+                : v.url ? `onclick="window.open('${esc(v.url)}','_blank')"` : '';
+    return `<figure class="doc" ${click} title="${esc(v.name||label)}">${inner}<figcaption>${label}${size?`<br>${size}`:''}</figcaption></figure>`;
+  }).join('') + '</div>';
+}
+
+/* Everything on the record that the named cells above don't already show.
+   Any new form field added later appears here automatically. */
+const SHOWN_KEYS = ['id','fullName','email','phone','occupation','company','plan','status','lastStep',
+  'moveIn','lengthOfStay','inMiami','schedule','wfh','guests','cleanliness',
+  'instagram','linkedin','website','anythingElse','currentAddress','addr1','addr2','city','state','zip','mailingAddress',
+  'signature','printedName','signedAt','agreeAll','agreeAccess','agreePay','agreeSign',
+  'ec1Name','ec1Phone','ec2Name','ec2Phone','idType','bgAuthorize','bgCheckFileName','idFileName',
+  'paymentMethod','paymentAck','paymentSent','bankConnected','stripeCustomerId','paymentMethodId',
+  'documents','moveInCharge','createdAt','updatedAt','decidedAt'];
+function extraDetails(a){
+  const rows = [];
+  for(const [k,v] of Object.entries(a)){
+    if(SHOWN_KEYS.includes(k)) continue;
+    if(v==null || v==='' || v===false) continue;
+    if(typeof v==='object') continue;
+    const label = k.replace(/([A-Z])/g,' $1').replace(/^./,c=>c.toUpperCase());
+    rows.push(`<b>${esc(label)}:</b> ${v===true?'✓':esc(String(v))}`);
+  }
+  return rows.length ? `<div class="blk"><label>Other details</label><div>${rows.join(' &nbsp;·&nbsp; ')}</div></div>` : '';
+}
+
+const STEP_NAMES = {0:'Contact',1:'Timing',2:'Lifestyle',3:'About',4:'Time questions',5:'Plan',6:'Background check',7:'Photo ID',8:'Agreement',9:'Payment',10:'Done'};
+
 function render(){
   const q = (document.getElementById('search').value||'').toLowerCase();
   const f = document.getElementById('filter').value;
   let rows = APPS.filter(a=>{
     if(f!=='all' && a.status!==f) return false;
-    if(q){ const hay = (a.fullName+' '+a.email+' '+a.company+' '+a.occupation).toLowerCase(); if(!hay.includes(q)) return false; }
+    if(q){ const hay = [a.fullName,a.email,a.phone,a.company,a.occupation,a.instagram,a.linkedin,a.website]
+      .filter(Boolean).join(' ').toLowerCase(); if(!hay.includes(q)) return false; }
     return true;
   });
   const list = document.getElementById('list');
   if(!rows.length){ list.innerHTML = '<div class="empty">No applications match.</div>'; return; }
   list.innerHTML = rows.map(a=>{
-    const docs = Object.entries(a.documents||{}).map(([k,v])=>{ const lbl = k==='id'?'ID':k==='payment'?'Payment proof':'Screening';
-      return v.url ? `<a href="${v.url}" target="_blank" rel="noopener">${lbl} ↗</a>` : `<span class="chk n">${lbl} (n/a)</span>`; }).join(' &nbsp; ') || '<span class="chk n">None</span>';
-    const payLabel = { ach:'ACH', wire:'Wire', applepay:'Apple Pay', venmo:'Venmo', paypal:'PayPal F&F' }[a.paymentMethod] || '—';
-    const when = a.updatedAt ? new Date(a.updatedAt).toLocaleDateString() : '';
+    const payLabel = { ach:'ACH', wire:'Wire', applepay:'Apple Pay', venmo:'Venmo', paypal:'PayPal F&F' }[a.paymentMethod] || 'ACH or wire';
+    const timing = [
+      a.moveIn ? 'Move-in: ' + esc(fdate(a.moveIn)) : '',
+      a.lengthOfStay ? 'Stay: ' + esc(a.lengthOfStay) : '',
+      a.inMiami ? esc(a.inMiami) : ''
+    ].filter(Boolean).join('<br>');
+    const social = [ linkify('ig',a.instagram), linkify('li',a.linkedin), linkify('web',a.website) ].filter(Boolean).join('<br>');
+    const lifestyle = [a.schedule, a.wfh?'WFH: '+a.wfh:'', a.guests?'Guests: '+a.guests:'', a.cleanliness?'Clean: '+a.cleanliness:'']
+      .filter(Boolean).map(esc).join('<br>');
+    const address = a.mailingAddress || a.currentAddress || '';
+    const emergency = [
+      a.ec1Name ? esc(a.ec1Name)+'<br>'+esc(a.ec1Phone||'') : '',
+      a.ec2Name ? esc(a.ec2Name)+'<br>'+esc(a.ec2Phone||'') : ''
+    ].filter(Boolean).join('<br>');
+    const stopped = a.status==='in_progress' && (a.lastStep||a.lastStep===0)
+      ? `<div style="font-size:.76rem;color:var(--soft);margin-top:2px;">Stopped at: ${esc(STEP_NAMES[a.lastStep]||String(a.lastStep))}</div>` : '';
+    const cell = (label, html) => html ? `<div class="f"><label>${label}</label><div>${html}</div></div>` : '';
     return `<div class="card">
       <div class="card-top">
         <div class="who"><h3>${esc(a.fullName||'(no name)')}</h3>
-          <div class="meta">${esc(a.occupation||'')}${a.company?` · ${esc(a.company)}`:''} · ${esc(a.email)} · ${esc(a.phone)}</div></div>
-        <span class="pill ${a.status}">${(a.status||'').replace('_',' ')}</span>
+          <div class="meta">${[esc(a.occupation||''), a.company?esc(a.company):'', esc(a.email||''), esc(a.phone||'')].filter(Boolean).join(' · ')}</div></div>
+        <span class="pill ${esc(a.status||'in_progress')}">${esc((a.status||'').replace('_',' '))}</span>
       </div>
       <div class="grid">
-        <div class="f"><label>Plan</label>${planSummary(a.plan)}</div>
-        <div class="f"><label>Timing</label><div>${esc(a.moveIn||'—')}${a.lengthOfStay?'<br>'+esc(a.lengthOfStay):''}${a.inMiami?'<br>'+esc(a.inMiami):''}</div></div>
-        <div class="f"><label>Lifestyle</label><div style="font-size:.85rem;">${[a.schedule,a.wfh?'WFH: '+a.wfh:'',a.guests?'Guests: '+a.guests:'',a.cleanliness?'Clean: '+a.cleanliness:''].filter(Boolean).map(esc).join('<br>')||'—'}</div></div>
-        <div class="f"><label>Social</label><div style="font-size:.85rem;">${[a.instagram?'IG: '+a.instagram:'',a.linkedin?'LI: '+a.linkedin:'',a.website?'Web: '+a.website:''].filter(Boolean).map(esc).join('<br>')||'—'}</div></div>
-        <div class="f"><label>Signed</label><div>${a.signature?esc(a.signature)+'<br>'+esc(a.signedAt):'<span class="chk n">Not signed</span>'}</div></div>
-        <div class="f"><label>Checks</label><div>
-          <span class="chk ${a.bgAuthorize?'y':'n'}">${a.bgAuthorize?'✓':'·'} Background</span><br>
+        ${cell('Plan', planSummary(a.plan))}
+        ${cell('Timing', timing || '<span class="chk n">—</span>')}
+        ${cell('Social', social || '<span class="chk n">—</span>')}
+        ${lifestyle ? cell('Lifestyle', `<span style="font-size:.85rem;">${lifestyle}</span>`) : ''}
+        ${cell('Signed', a.signature ? esc(a.signature)+'<br>'+esc(fdate(a.signedAt)) : '<span class="chk n">Not signed</span>')}
+        ${address ? cell('Mailing address', `<span style="font-size:.85rem;">${esc(address)}</span>`) : ''}
+        ${cell('Checks', `
+          <span class="chk ${a.bgAuthorize?'y':'n'}">${a.bgAuthorize?'✓':'·'} Background authorized</span><br>
+          ${a.paymentAck?'<span class="chk y">✓ Mercury process acknowledged</span><br>':''}
           <span class="chk y">Invoice via ${payLabel}</span><br>
-          <span class="chk ${a.moveInCharge?'y':'n'}">${a.moveInCharge?'✓ Charged '+fmt(a.moveInCharge.amount):'· Send Mercury invoice, confirm payment'}</span></div></div>
-        <div class="f"><label>Documents</label><div>${docs}</div></div>
-        <div class="f"><label>Emergency</label><div>${a.ec1Name?esc(a.ec1Name)+'<br>'+esc(a.ec1Phone):'—'}${a.ec2Name?'<br>'+esc(a.ec2Name)+'<br>'+esc(a.ec2Phone||''):''}</div></div>
-        <div class="f"><label>Updated</label><div>${when}</div></div>
+          <span class="chk ${a.moveInCharge?'y':'n'}">${a.moveInCharge?'✓ Charged '+fmt(a.moveInCharge.amount):'· Send Mercury invoice, confirm payment'}</span>`)}
+        ${cell('Documents', docCell(a))}
+        ${emergency ? cell('Emergency', emergency) : ''}
+        ${cell('Received', a.createdAt ? dt(a.createdAt) : '')}
+        ${cell('Updated', (a.updatedAt ? dt(a.updatedAt) : '') + stopped)}
       </div>
-      ${a.anythingElse?`<div class="f" style="margin-bottom:14px;"><label>Anything else</label><div style="font-size:.9rem;color:var(--soft);">${esc(a.anythingElse)}</div></div>`:''}
+      ${a.anythingElse?`<div class="blk"><label>Notes from applicant</label><div style="font-size:.9rem;">${esc(a.anythingElse)}</div></div>`:''}
+      ${extraDetails(a)}
       <div class="actions">
-        ${a.signature?`<button class="btn sm" onclick="viewAgreement('${a.id}')">View signed agreement</button>`:''}
-        <button class="btn sm ok" onclick="setStatus('${a.id}','approved')">Approve</button>
-        <button class="btn sm no" onclick="setStatus('${a.id}','declined')">Decline</button>
-        <button class="btn sm" onclick="charge('${a.id}','movein')" ${a.bankConnected?'':'disabled style=opacity:.4'}>Charge move-in</button>
-        <button class="btn sm" onclick="charge('${a.id}','monthly')" ${a.bankConnected?'':'disabled style=opacity:.4'}>Charge one month</button>
+        ${a.signature?`<button class="btn sm" onclick="viewAgreement('${esc(a.id)}')">View signed agreement</button>`:''}
+        <button class="btn sm ok" onclick="setStatus('${esc(a.id)}','approved')">Approve</button>
+        <button class="btn sm no" onclick="setStatus('${esc(a.id)}','declined')">Decline</button>
+        <button class="btn sm" onclick="charge('${esc(a.id)}','movein')" ${a.bankConnected?'':'disabled style=opacity:.4'}>Charge move-in</button>
+        <button class="btn sm" onclick="charge('${esc(a.id)}','monthly')" ${a.bankConnected?'':'disabled style=opacity:.4'}>Charge one month</button>
       </div>
     </div>`;
   }).join('');
 }
+
+/* ===== document viewer ===== */
+function dataUrlToBlob(u){
+  const [h,b] = String(u).split(',');
+  const mime = (h.match(/data:(.*?)(;|$)/)||[])[1] || 'application/octet-stream';
+  const bin = atob(b||''); const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr], {type:mime});
+}
+async function viewDoc(appId, kind){
+  const a = APPS.find(x=>x.id===appId); if(!a) return;
+  const meta = (a.documents||{})[kind]; if(!meta || !meta.fileId) return;
+  const lb = document.getElementById('lb'); const body = document.getElementById('lbBody');
+  document.getElementById('lbName').textContent = (meta.name||'document') + (meta.size?' · '+fmtSize(meta.size):'');
+  body.innerHTML = '<div class="lb-msg">Loading…</div>';
+  LB_CURRENT = null;
+  lb.classList.add('open');
+  try{
+    let file = FILE_CACHE[meta.fileId];
+    if(!file){ file = await api({ action:'getFile', fileId: meta.fileId }); FILE_CACHE[meta.fileId] = file; }
+    LB_CURRENT = file;
+    if((file.type||'').startsWith('image/')){
+      body.innerHTML = `<img src="${file.dataUrl}" alt="${esc(file.name||'document')}" />`;
+    } else {
+      body.innerHTML = `<div class="lb-msg">${esc(file.name||'document')}<br><br>This file type does not preview here.<br>Use Open in new tab or Download below.</div>`;
+    }
+  }catch(e){
+    body.innerHTML = `<div class="lb-msg">Could not load this document.<br>${esc(e.message||'')}</div>`;
+  }
+}
+function lbOpenTab(){ if(!LB_CURRENT) return; const u = URL.createObjectURL(dataUrlToBlob(LB_CURRENT.dataUrl)); window.open(u,'_blank'); }
+function lbDownload(){ if(!LB_CURRENT) return; const u = URL.createObjectURL(dataUrlToBlob(LB_CURRENT.dataUrl));
+  const el = document.createElement('a'); el.href = u; el.download = LB_CURRENT.name || 'document'; document.body.appendChild(el); el.click(); el.remove(); }
+function closeLb(){ document.getElementById('lb').classList.remove('open'); }
+addEventListener('keydown', e=>{ if(e.key==='Escape') closeLb(); });
 
 
 const AGREEMENT_HTML = `
@@ -292,6 +455,7 @@ function viewAgreement(id){
     <div class="row"><b>Signature (typed):</b> ${esc(a.signature||'')}</div>
     <div class="row"><b>Printed name:</b> ${esc(a.printedName||a.fullName||'')}</div>
     <div class="row"><b>Date signed:</b> ${esc(a.signedAt||'')}</div>
+    ${a.updatedAt?`<div class="row"><b>Recorded:</b> ${dt(a.updatedAt)}</div>`:''}
     <div class="row"><b>Email:</b> ${esc(a.email||'')} &nbsp; <b style="min-width:0">Phone:</b> ${esc(a.phone||'')}</div>
     <div class="row"><b>Mailing address:</b> ${esc(a.mailingAddress||'')}</div>
     <div class="row"><b>Emergency contact 1:</b> ${esc(a.ec1Name||'')} · ${esc(a.ec1Phone||'')}</div>

@@ -3,20 +3,24 @@
 // Set ADMIN_PASSWORD in Vercel env. All requests are POST with { password, action }.
 //
 // actions:
-//   'list'      -> all applications (with short-lived signed URLs for documents)
+//   'list'      -> all applications, with EVERY field the applicant entered
+//                  (the dashboard decides what to show; nothing is filtered out here)
+//   'getFile'   -> { fileId } reassembles a stored document (ID photo, screening
+//                  report) from its Firestore chunks and returns it as a data URL
 //   'setStatus' -> { id, status }  approve / decline / etc.
 //   'charge'    -> { id, chargeType }  trigger move-in or monthly charge
 
-import { db, bucket } from '../lib/firebase.js';
+import { db } from '../lib/firebase.js';
 import { cors } from '../lib/util.js';
 
-const tsToISO = (t) => (t && typeof t.toDate === 'function') ? t.toDate().toISOString() : null;
+const tsToISO = (t) => (t && typeof t.toDate === 'function') ? t.toDate().toISOString()
+  : (typeof t === 'string' ? t : null);
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-  const { password, action, id, status, chargeType } = req.body || {};
+  const { password, action, id, status, chargeType, fileId } = req.body || {};
   if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -24,33 +28,33 @@ export default async function handler(req, res) {
   try {
     if (action === 'list') {
       const snap = await db.collection('memberApplications').get();
-      const apps = await Promise.all(snap.docs.map(async (d) => {
+      const apps = snap.docs.map((d) => {
         const a = d.data();
-        const documents = {};
-        if (a.documents) {
-          for (const [k, v] of Object.entries(a.documents)) {
-            try {
-              const [url] = await bucket.file(v.path).getSignedUrl({ action: 'read', expires: Date.now() + 3600 * 1000 });
-              documents[k] = { name: v.name, url };
-            } catch { documents[k] = { name: v.name }; }
-          }
-        }
-        return {
-          id: d.id,
-          fullName: a.fullName || '', email: a.email || '', phone: a.phone || '',
-          occupation: a.occupation || '', company: a.company || '', about: a.about || '',
-          plan: a.plan || null, status: a.status || 'in_progress',
-          bankConnected: !!a.bankConnected, bgAuthorize: !!a.bgAuthorize,
-          paymentMethod: a.paymentMethod || null, paymentSent: !!a.paymentSent,
-          signature: a.signature || '', signedAt: a.signedAt || '',
-          ec1Name: a.ec1Name || '', ec1Phone: a.ec1Phone || '',
-          moveInCharge: a.moveInCharge || null,
-          documents,
-          createdAt: tsToISO(a.createdAt), updatedAt: tsToISO(a.updatedAt),
-        };
-      }));
+        // Send the whole record: every field the applicant typed reaches the
+        // dashboard. Only the timestamps need converting for JSON.
+        return { ...a, id: d.id, createdAt: tsToISO(a.createdAt), updatedAt: tsToISO(a.updatedAt) };
+      });
       apps.sort((x, y) => (y.updatedAt || '').localeCompare(x.updatedAt || ''));
       return res.status(200).json({ apps });
+    }
+
+    if (action === 'getFile') {
+      if (!fileId) return res.status(400).json({ error: 'fileId required' });
+      const ref = db.collection('applicationFiles').doc(fileId);
+      const snap = await ref.get();
+      if (!snap.exists) return res.status(404).json({ error: 'File not found' });
+      const meta = snap.data();
+      let b64 = '';
+      for (let i = 0; i < (meta.chunkCount || 0); i++) {
+        const c = await ref.collection('chunks').doc(String(i)).get();
+        b64 += (c.exists && c.data().data) || '';
+      }
+      return res.status(200).json({
+        name: meta.name || 'document',
+        type: meta.type || 'application/octet-stream',
+        size: meta.size || 0,
+        dataUrl: `data:${meta.type || 'application/octet-stream'};base64,${b64}`,
+      });
     }
 
     if (action === 'setStatus') {

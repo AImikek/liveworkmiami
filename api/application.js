@@ -1,21 +1,70 @@
 // api/application.js
-// Saves application data progressively, stores uploaded files (ID, background
-// check) in Firebase Storage, and on final submit can trigger the move-in charge.
+// Saves application data progressively and stores uploaded files (ID photo,
+// background check report) directly in Firestore, so they appear in the admin
+// dashboard without needing Firebase Storage or the Blaze plan.
 //
 // POST body:
 //   { id?, step, data, files?, chargeMoveIn? }
 //     id           - application id (omit on first call; one is created and returned)
 //     step         - step number, or 'submit' on final submission
 //     data         - the serializable application object from the front-end
-//     files        - { backgroundCheck:{name,type,base64}, id:{name,type,base64} }
+//     files        - { backgroundCheck:{name,type,base64,thumb}, id:{name,type,base64,thumb} }
+//                    Images are compressed in the browser before upload; thumb is a
+//                    small preview data URL shown on the admin card.
 //     chargeMoveIn - if true on submit, charge deposit + first month now
+//
+// File storage model (Firestore only, works on the free Spark plan):
+//   applicationFiles/{fileId}                -> { appId, kind, name, type, size, chunkCount, uploadedAt }
+//   applicationFiles/{fileId}/chunks/{0..n}  -> { i, data }   (base64 split under the 1 MB doc limit)
+//   The application record gets documents.{kind} = { fileId, name, type, size, thumb, uploadedAt }
+//   api/admin.js action 'getFile' reassembles the chunks for viewing.
 //
 // Returns: { id }
 
-import { db, bucket, admin } from '../lib/firebase.js';
+import { db, admin } from '../lib/firebase.js';
 import { cors, sendEmail } from '../lib/util.js';
 
 export const config = { api: { bodyParser: { sizeLimit: '8mb' } } }; // allow base64 files
+
+const CHUNK = 700000;      // base64 chars per chunk doc (~525 KB binary, safely under Firestore's 1 MB)
+const MAX_B64 = 5600000;   // hard cap per file; the browser compresses images far below this
+
+async function deleteStoredFile(fileId) {
+  const ref = db.collection('applicationFiles').doc(fileId);
+  const snap = await ref.get();
+  const n = (snap.exists && snap.data().chunkCount) || 0;
+  for (let i = 0; i < n; i++) await ref.collection('chunks').doc(String(i)).delete();
+  await ref.delete();
+}
+
+async function storeFile(appId, kind, f, oldFileId) {
+  const b64 = f.base64 || '';
+  if (!b64) return null;
+  if (b64.length > MAX_B64) throw new Error(`file too large (${b64.length} base64 chars)`);
+  // Replace any previous upload of the same document (cleanup is non-fatal).
+  if (oldFileId) {
+    try { await deleteStoredFile(oldFileId); } catch (e) { console.warn('old file cleanup failed:', e.message); }
+  }
+  const fileRef = db.collection('applicationFiles').doc();
+  const chunkCount = Math.ceil(b64.length / CHUNK);
+  for (let i = 0; i < chunkCount; i++) {
+    await fileRef.collection('chunks').doc(String(i)).set({ i, data: b64.slice(i * CHUNK, (i + 1) * CHUNK) });
+  }
+  const meta = {
+    appId, kind,
+    name: f.name || kind,
+    type: f.type || 'application/octet-stream',
+    size: Math.round(b64.length * 3 / 4),
+    chunkCount,
+    uploadedAt: new Date().toISOString(),
+  };
+  await fileRef.set(meta);
+  // What the admin list renders directly from the application record.
+  return {
+    fileId: fileRef.id, name: meta.name, type: meta.type, size: meta.size, uploadedAt: meta.uploadedAt,
+    ...(typeof f.thumb === 'string' && f.thumb.startsWith('data:') && f.thumb.length <= 120000 ? { thumb: f.thumb } : {}),
+  };
+}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -26,25 +75,23 @@ export default async function handler(req, res) {
     const ref = id ? db.collection('memberApplications').doc(id)
                    : db.collection('memberApplications').doc();
 
-    // Upload any files first, collecting their storage paths.
-    // Non-fatal: if Storage isn't enabled yet, the application still saves and
-    // the notification still fires — we just skip retaining the documents.
+    // Store any uploaded files in Firestore, collecting their metadata.
+    // Non-fatal: if a file fails, the application still saves and the
+    // notification still fires; we just skip that document.
     const fileMeta = {};
-    if (files) {
+    if (files && Object.values(files).some(f => f && f.base64)) {
+      let existingDocs = {};
+      try {
+        const cur = await ref.get();
+        existingDocs = (cur.exists && cur.data().documents) || {};
+      } catch (_) {}
       for (const [kind, f] of Object.entries(files)) {
         if (!f || !f.base64) continue;
         try {
-          const safe = (f.name || kind).replace(/[^\w.\-]/g, '_');
-          const path = `applications/${ref.id}/${kind}-${Date.now()}-${safe}`;
-          const file = bucket.file(path);
-          await file.save(Buffer.from(f.base64, 'base64'), {
-            contentType: f.type || 'application/octet-stream',
-            // Private by default. These are sensitive documents — do NOT make public.
-            resumable: false,
-          });
-          fileMeta[kind] = { path, name: f.name, uploadedAt: new Date().toISOString() };
+          const meta = await storeFile(ref.id, kind, f, existingDocs[kind] && existingDocs[kind].fileId);
+          if (meta) fileMeta[kind] = meta;
         } catch (e) {
-          console.error(`file upload failed for ${kind} (Storage may not be enabled):`, e.message);
+          console.error(`file store failed for ${kind}:`, e.message);
         }
       }
     }
