@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>LiveWork Miami · A members residence in Brickell</title>
-<!-- build: v5 · full-term commitment agreement + e-sign evidence package (Aug 27, 2026) -->
+<!-- build: v6.1 · signature matches printed name on-screen + duplicate-record fix + full-term commitment agreement (Aug 27, 2026) -->
 <meta name="description" content="A members-only penthouse residence atop Brickell's DUA luxury tower. Meals, cleaning, and laundry handled daily. Your network, multiplied." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1179,6 +1179,8 @@ const application = { fullName:'',email:'',phone:'',
    reading it throws and the record id from the link is silently lost, which
    created duplicate applications in admin. Do not move this back down. */
 let APP_ID = null; // server-assigned application id
+let APP_ID_FROM_LOCAL = false; // true when APP_ID was restored from this device (not from a link)
+let RESTORED_EMAIL = '';       // the email the restored APP_ID belongs to
 const LINK_FIELDS=['fullName','email','phone','moveIn','lengthOfStay','inMiami','occupation','schedule','wfh','guests','cleanliness','instagram','linkedin','website','anythingElse'];
 function packApplicant(){
   const o={}; LINK_FIELDS.forEach(k=>{ if(application[k]) o[k]=application[k]; });
@@ -1198,7 +1200,7 @@ function unpackApplicant(){
     const o = JSON.parse(decodeURIComponent(atob(b64)));
     LINK_FIELDS.forEach(k=>{ if(typeof o[k]==='string' && o[k]) application[k]=o[k]; });
     if(o._t && CONFIG.BASE_BY_TERM[o._t]) selectedPlan.term=o._t;
-    if(o._id) APP_ID=o._id;
+    if(o._id){ APP_ID=o._id; APP_ID_FROM_LOCAL=false; }
     syncTermFromStay();
     persistLocal();
   }catch(_){}
@@ -1213,6 +1215,9 @@ try{
       if(k==='plan' && v && typeof v==='object'){ application.plan=v; if(v.term) selectedPlan.term=v.term; }
       else if(typeof v==='string' || typeof v==='boolean'){ application[k]=v; }
     }
+    /* Continue the SAME record on this device (prevents a duplicate card when
+       someone finishes onboarding without their personalized link). */
+    if(saved._appId && typeof saved._appId==='string'){ APP_ID=saved._appId; APP_ID_FROM_LOCAL=true; RESTORED_EMAIL=saved.email||''; }
     syncTermFromStay();
   }
 }catch(_){}
@@ -1457,7 +1462,16 @@ function syncTermFromStay(){
   if(t) selectedPlan.term=t;
 }
 function collectStep(){
-  if(step===0) ['fullName','email','phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+  if(step===0){
+    ['fullName','email','phone'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
+    /* A device-restored record id belongs to the restored email. If a different
+       person starts over on this device with a new email, drop the old id so
+       their application never overwrites the previous one. */
+    if(APP_ID && APP_ID_FROM_LOCAL && RESTORED_EMAIL && application.email &&
+       application.email.trim().toLowerCase() !== RESTORED_EMAIL.trim().toLowerCase()){
+      APP_ID = null; APP_ID_FROM_LOCAL = false;
+    }
+  }
   if(step===1){ ['moveIn','lengthOfStay','inMiami'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); }); syncTermFromStay(); }
   if(step===2) ['occupation','schedule','wfh','guests','cleanliness'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
   if(step===3) ['occupation','instagram','linkedin','website','anythingElse'].forEach(k=>{ const el=document.getElementById('f_'+k); if(el) application[k]=el.value.trim(); });
@@ -1493,9 +1507,14 @@ function validateStep(){ collectStep();
   if(step===6 && !application.bgAuthorize) return 'Please authorize the background check to continue.';
   if(step===7 && !application.idFile) return 'Please upload a photo of your ID.';
   if(step===8){
+    // The signature must match the PRINTED NAME on this same screen (visible
+    // and editable), never a hidden field from an earlier step. Case and extra
+    // spaces are forgiven.
+    const normName = s => String(s||'').trim().replace(/\s+/g,' ').toLowerCase();
     if(!application.signature) return 'Please type your full name to sign.';
-    if(application.signature.toLowerCase()!==application.fullName.toLowerCase()) return 'Your signature should match the name from the first step.';
     if(!application.printedName) return 'Please enter your printed name.';
+    if(normName(application.signature) !== normName(application.printedName))
+      return 'Your signature should match your printed name: ' + application.printedName + '. Fix either field so they match.';
     if(!application.addr1) return 'Please enter your street address.';
     if(!application.city) return 'Please enter your city.';
     if(!application.state) return 'Please enter your state.';
@@ -1611,7 +1630,7 @@ async function saveProgress(){
 /* Remember the application on this device so the /welcome completion link
    opens prefilled (name, email, phone, timing) instead of asking again. */
 function persistLocal(){
-  try{ localStorage.setItem('lwm_app', JSON.stringify(serializable(application))); }catch(_){}
+  try{ localStorage.setItem('lwm_app', JSON.stringify({ ...serializable(application), _appId: APP_ID || null })); }catch(_){}
 }
 
 async function connectBank(){

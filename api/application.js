@@ -72,8 +72,36 @@ export default async function handler(req, res) {
 
   try {
     const { id, step, data = {}, files, chargeMoveIn } = req.body || {};
-    const ref = id ? db.collection('memberApplications').doc(id)
-                   : db.collection('memberApplications').doc();
+
+    // Pick the record to write. If the client did not send an id, look for an
+    // existing application with the SAME EMAIL and continue it instead of
+    // creating a duplicate card (this is the backend guarantee against the
+    // "two cards for one person" problem, whatever device or link they used).
+    // Approved members are protected: their record is never merged into.
+    let ref = null;
+    let isExisting = !!id;
+    if (id) {
+      ref = db.collection('memberApplications').doc(id);
+    } else {
+      const email = String((data && data.email) || '').trim();
+      if (email) {
+        try {
+          // Match on the normalized email first; fall back to the exact string
+          // for records saved before emailLower existed.
+          let dup = await db.collection('memberApplications').where('emailLower', '==', email.toLowerCase()).get();
+          if (!dup.docs.length) dup = await db.collection('memberApplications').where('email', '==', email).get();
+          const candidates = dup.docs
+            .map((d) => ({ id: d.id, a: d.data() }))
+            .filter((x) => (x.a.status || '') !== 'approved');
+          candidates.sort((x, y) => {
+            const t = (v) => (v && typeof v.toDate === 'function') ? v.toDate().getTime() : 0;
+            return t(y.a.updatedAt) - t(x.a.updatedAt);
+          });
+          if (candidates.length) { ref = db.collection('memberApplications').doc(candidates[0].id); isExisting = true; }
+        } catch (e) { console.warn('email dedupe lookup failed:', e.message); }
+      }
+      if (!ref) ref = db.collection('memberApplications').doc();
+    }
 
     // Store any uploaded files in Firestore, collecting their metadata.
     // Non-fatal: if a file fails, the application still saves and the
@@ -104,7 +132,8 @@ export default async function handler(req, res) {
       lastStep: step,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
-    if (!id) payload.createdAt = admin.firestore.FieldValue.serverTimestamp();
+    if (!isExisting) payload.createdAt = admin.firestore.FieldValue.serverTimestamp();
+    if (data && data.email) payload.emailLower = String(data.email).trim().toLowerCase();
     // Signature evidence: record the signer's IP server-side whenever a save
     // carries a completed signature (part of the e-sign audit trail).
     if (data && data.signature && data.signedAtISO) {
